@@ -1,0 +1,17 @@
+language: php
+
+dist: xenial
+
+php:
+    '7.2'
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+
+script:
+  - 'composer test'
+
+
+

@@ -1,0 +1,5 @@
+.php_cs.cache
+coverage.*
+.phpintel/
+tests/_data/
+tests/_output/
