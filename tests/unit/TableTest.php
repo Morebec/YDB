@@ -28,7 +28,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function _after()
     {
-        // $this->database->delete();
+        $this->database->delete();
     }
     
     public function testCreateRecord(): void
@@ -50,17 +50,6 @@ class TableTest extends \Codeception\Test\Unit
                 'age' => 39
             ]
         );
-        $table->addRecord($record);
-
-        $record = new Record(
-            RecordId::generate(),
-            [
-                'first_name' => 'Barney',
-                'last_name' => 'Stinson',
-                'age' => 31
-            ]
-        );
-
         $table->addRecord($record);
 
         $r = $table->queryOne(
@@ -149,6 +138,7 @@ class TableTest extends \Codeception\Test\Unit
         );
 
         $table->addRecord($record);
+
 
         $r = $table->queryOne(
             new Query([

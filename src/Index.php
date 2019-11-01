@@ -2,7 +2,9 @@
 
 namespace Morebec\YDB;
 
+use Assert\Assertion;
 use Morebec\ValueObjects\File\File;
+use Morebec\YDB\ColumnType;
 use Morebec\YDB\Database\RecordInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -11,15 +13,27 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class Index
 {
+    /** @var string extension of index files */
+    const FILE_EXTENSION = '.idx';
+
     /** @var string name of the field that is indexed */
     private $fieldName;
+
+    /** @var ColumnType type of the field */
+    private $fieldType;
 
     /** @var File */
     private $file;
 
-    function __construct(string $fieldName, File $file)
+    function __construct(string $fieldName, ColumnType $fieldType, File $file)
     {
+        Assertion::notBlank($fieldName);
+        Assertion::false($fieldType->isEqualTo(ColumnType::ARRAY()), 
+            "Cannot index field '$fieldName', because it is an array."
+        );
+
         $this->fieldName = $fieldName;
+        $this->fieldType = $fieldType;
         $this->file = $file;
     }
 
@@ -43,13 +57,42 @@ class Index
     }
 
     /**
+     * Returns the value of the index
+     * @return mixed
+     */
+    public function getFieldValue() {
+        $value = $this->file->getFilename();
+
+        if($value === 'null') {
+            return null;
+        }
+
+        if($this->fieldType == ColumnType::STRING) {
+            return (string)$value;
+
+        } elseif ($this->fieldType == ColumnType::INTEGER) {
+            return intval($value);
+
+        } elseif ($this->fieldType == ColumnType::BOOLEAN) {
+            return boolval($value);
+
+        } elseif ($this->fieldType == ColumnType::FLOAT) {
+            return floatval($value);
+
+        } elseif ($this->fieldType == ColumnType::ARRAY) {
+            throw new \LogicException("Cannot Index Arrays");
+        }
+
+        throw new \LogicException(sprintf("Unsupported Field Type: %s", $this->fieldType));
+        
+    }
+
+    /**
      * Indexes a record
      * @param  RecordInterface $record record
      */
     public function indexRecord(RecordInterface $record): void
     {
-        return;
-        
         if($this->isRecordIndexed($record)){
             return;
         }
@@ -117,7 +160,7 @@ class Index
     {
         $lineCount = 0;
         
-        $handle = fopen($file, "r");
+        $handle = fopen($this->file, "r");
         while(!feof($handle)){
             $line = fgets($handle, 8192);
             $lineCount = $lineCount + substr_count($line, PHP_EOL);
@@ -126,5 +169,10 @@ class Index
         fclose($handle);
 
         return $lineCount;
+    }
+
+    public function __toString()
+    {
+        return (string)$this->file;
     }
 }

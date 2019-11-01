@@ -5,6 +5,7 @@ namespace Morebec\YDB;
 use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
+use Morebec\ValueObjects\File\Path;
 use Morebec\YDB\Database\ColumnInterface;
 use Morebec\YDB\Database\QueryInterface;
 use Morebec\YDB\Database\RecordIdInterface;
@@ -25,6 +26,12 @@ class Table implements TableInterface
     /** @var Directory directory where the table is located */
     private $directory;
 
+    /** @var Filesystem */
+    private $filesystem;
+
+    /** @var TableIndexManager */
+    private $indexManager;
+
     /**
      * Constructs a new instance of a table object
      * @param string    $name      name of the table
@@ -35,6 +42,10 @@ class Table implements TableInterface
     {
         $this->schema = $schema;
         $this->directory = $directory;
+
+        $this->filesystem = new Filesystem();
+
+        $this->indexManager = new TableIndexManager($this);
     }
 
     /**
@@ -174,7 +185,7 @@ class Table implements TableInterface
      */
     public function getColumnByName(string $name): ?ColumnInterface
     {
-        return $this->getSchema()->getColumnByName($name);
+        return $this->schema->getColumnByName($name);
     }
 
     /**
@@ -185,7 +196,7 @@ class Table implements TableInterface
     {
         // Create schema
         $schemaYaml = Yaml::dump($schema->toArray());
-        file_put_contents($this->getSchemaFile()->getRealPath(), $schemaYaml);   
+        $this->filesystem->dumpFile($this->getSchemaFile()->getRealPath(), $schemaYaml);   
     }
 
     /**
@@ -204,9 +215,9 @@ class Table implements TableInterface
 
         $yaml = Yaml::dump($arr);
 
-        file_put_contents($filePath, $yaml);
+        $this->filesystem->dumpFile($filePath, $yaml);
 
-        $this->updateIndexes();
+        $this->indexManager->updateIndexes();
     }
 
     /**
@@ -216,17 +227,15 @@ class Table implements TableInterface
      */
     public function updateRecord(RecordInterface $record): void
     {
-        $this->validateRecord($record);
-
         $id = $record->getId();
         $arr = $record->toArray();
 
         $filePath = $this->directory->getRealPath() . "/$id.yaml";
 
         $yaml = Yaml::dump($arr);
-        file_put_contents($filePath, $yaml);
+        $this->filesystem->dumpFile($filePath, $yaml);
 
-        $this->rebuildIndexes();
+        $this->indexManager->rebuildIndexes();
     }
 
     /**
@@ -238,7 +247,7 @@ class Table implements TableInterface
         $filePath = $this->directory->getRealPath() . "/$id.yaml";
         unlink($filePath);
 
-        $this->rebuildIndexes();
+        $this->indexManager->rebuildIndexes();
     }
 
     /**
@@ -251,19 +260,23 @@ class Table implements TableInterface
 
         // Verify that every column is there
         foreach ($this->schema->getColumns() as $col) {
-            Assertion::keyExists($arr, $col->getName());
+            $colName = $col->getName();
+            Assertion::keyExists($arr, $colName, 
+                sprintf("Invalid record, record '%s' does not have a field '%s'", $record->getId(), $colName)
+            );
 
-            $value = $arr[$col->getName()];
-            if($col->getType() === ColumnType::STRING) {
+            $value = $arr[$colName];
+            $type = $col->getType();
+            if($type === ColumnType::STRING) {
                 Assertion::string($value);
 
-            } elseif ($col->getType() === ColumnType::BOOLEAN) {
+            } elseif ($type === ColumnType::BOOLEAN) {
                 Assertion::boolean($value);
 
-            } elseif ($col->getType() === ColumnType::FLOAT) {
+            } elseif ($type === ColumnType::FLOAT) {
                 Assertion::float($value);
 
-            } elseif ($col->getType() === ColumnType::ARRAY) {
+            } elseif ($type === ColumnType::ARRAY) {
                 Assertion::isArray($value);
             }
         }
@@ -321,6 +334,8 @@ class Table implements TableInterface
         }
     }
 
+
+
     /**
      * Performs a query and returns all records that match.
      * @param  QueryInterface $query query
@@ -328,29 +343,44 @@ class Table implements TableInterface
      */
     public function query(QueryInterface $query): array
     {
+        // Hybdrid array used
+        $ids = [];
+
         // Use indexes
         $records = [];
         foreach ($query->getCriteria() as $c) {
-            $fieldName = $c->getField();
-            $fieldValue = $c->getValue();
+            // Get usable indexes for this criteria
+            $indexes = $this->indexManager->getIndexesForCriterion($c);
 
-            $column = $this->getColumnByName($fieldName);
-            $index = $this->getIndexForColumnWithValue($column, $fieldValue);
+            // If we have indexes use that, else will use all the
+            // records
+            if (!empty($indexes)) {
+                $ids = [];
+                foreach ($indexes as $index) {
+                    $ids = array_merge($ids, $index->getIds());
+                }
 
-            $ids = $index->getIds();
+                foreach ($ids as $id) {
 
-            foreach ($ids as $id) {
-                $filePath = $this->getDirectory()->getRealPath() . "/$id.yaml";
-                $file = File::fromStringPath($filePath);
-                $records[] = $this->loadRecordFromFile(
-                    $file
-                );
+                    $filePath = $this->getDirectory()->getRealPath() . "/$id.yaml";
+                    $file = File::fromStringPath($filePath);
+                    $records[] = $this->loadRecordFromFile(
+                        $file
+                    );
+                }
+                continue;
             }
+
+            // Else we use all the records
+            $all = iterator_to_array($this->queryAll());
+
+            $filteredAll = array_filter($all, static function ($record) use ($c) {
+                return $c->matches($record);
+            });
+            $records = array_merge($records,  $filteredAll);
         }
 
-        $records = array_filter($records, static function ($record) use ($query) {
-            return $query->matches($record);
-        });
+        $records = array_unique($records);
 
         return $records;
     }
@@ -365,15 +395,16 @@ class Table implements TableInterface
     public function queryOne(QueryInterface $query): ?RecordInterface
     {
         $result = $this->query($query);
-        if (count($result) > 1) {
+        $nbResults = count($result);
+        if ($nbResults > 1) {
             throw new \Exception("The query $query returned more than one result");
         }
 
-        if (empty($result)) {
+        if ($nbResults === 0) {
             return null;
         }
 
-        return $result->next();
+        return $result[0];
     }
 
     /**
@@ -381,103 +412,12 @@ class Table implements TableInterface
      */
     public function clear(): void
     {
-        $fs = new Filesystem();
         foreach ($this->directory->getFiles() as $f) {
             if($f->getBasename() === TableSchema::SCHEMA_FILE_NAME){
                 continue;
             }
 
-            $fs->remove($f);
-        }
-    }
-
-    /**
-     * Returns the index of a column
-     * or null if there is no index on the column
-     * @param  string $name name of the column
-     * @return Index|null 
-     */
-    public function getIndexForColumnWithValue(Column $column, $fieldValue): Index
-    {
-        $indexesDir = $this->getIndexesDirectory();
-
-        $fieldName = $column->getName();
-
-        // Create index directory if necessary
-        $indexDir = Directory::fromStringPath(
-            $indexesDir->getRealPath() . "/$fieldName"
-        );
-        if(!$indexDir->exists()) {
-            mkdir($indexDir->getRealPath());
-        }
-
-        $filePath = $indexDir->getRealPath() . "/$fieldValue.idx";
-
-        return new Index($fieldName, File::fromStringPath($filePath));
-    }
-
-    /**
-     * Returns the directory containing all the indexes of this table
-     * @return Directory
-     */
-    public function getIndexesDirectory(): Directory
-    {
-        $indexesDir = Directory::fromStringPath(
-            $this->getDirectory()->getRealPath() . '/indexes' 
-        );
-        if(!$indexesDir->exists()) {
-            mkdir($indexesDir->getRealPath());
-        }
-
-        return $indexesDir;
-    }
-
-
-    /**
-     * Clears the indexes and rebuilds them
-     */
-    public function rebuildIndexes()
-    {
-        $indexesDir = $this->getIndexesDirectory();
-
-        // Sort Indexes
-        foreach ($indexesDir->getFiles() as $d) {
-            foreach ($d->getFiles() as $f) {
-                $index = new Index($f->getFilename(), $f);
-                $index->clear();
-            }
-        }
-
-        $this->updateIndexes();
-    }
-
-    /**
-     * Updates the indexes of this table
-     */
-    public function updateIndexes()
-    {
-        $indexesDir = $this->getIndexesDirectory();
-        
-        foreach ($this->queryAll() as $record) {
-            foreach ($this->schema->getColumns() as $col) {
-                if(!$col->isIndexed()) {
-                    continue;
-                }
-                $fieldName = $col->getName();
-                $fieldValue = $record->getFieldValue($fieldName);
-
-                $index = $this->getIndexForColumnWithValue($col, $fieldValue);
-                $index->indexRecord($record);
-            }
-        }
-
-
-        // Sort Indexes
-        foreach ($indexesDir->getFiles() as $d) {
-            foreach ($d->getFiles() as $f) {
-                $index = new Index($f->getFilename(), $f);
-                $index->sort();
-            }
+            $this->filesystem->remove($f);
         }
     }
 }

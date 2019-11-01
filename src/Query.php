@@ -133,6 +133,14 @@ class Query implements QueryInterface
      */
     public function __toString()
     {
-        return json_encode($this->criteria);
+        $ands = join(' and ', $this->ands);
+        $ors = join(' or ', $this->ors);
+
+        if (!empty($ors)) {
+            return join(" or ", [$ands, $ors]);
+        }
+
+
+        return $ands;
     }
 }

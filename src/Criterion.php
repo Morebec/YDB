@@ -29,19 +29,12 @@ class Criterion
     }
 
     /**
-     * Indicates if it matches a record
-     * @param  RecordInterface $record record
-     * @return bool                  true if record matches, otherwise false
+     * Indicates if a value matches this criterion
+     * @param  mixed $value the value to test
+     * @return bool true if record matches, otherwise false
      */
-    public function matches(RecordInterface $record): bool
+    public function valueMatches($value): bool
     {
-        if(!$record->hasField($this->field)) {
-            return false;
-        }
-
-        
-        $value = $record->getFieldValue($this->field);
-
         if ($this->operator == Operator::EQUAL) {            
             return $value == $this->value;
         } elseif ($this->operator == Operator::STRICTLY_EQUAL) {
@@ -73,7 +66,22 @@ class Criterion
         }
 
         throw new \LogicException(sprintf("Unsupported operator: '%s'", $this->operator));
-        
+    }
+
+    /**
+     * Indicates if it matches a record
+     * @param  RecordInterface $record record
+     * @return bool                  true if record matches, otherwise false
+     */
+    public function matches(RecordInterface $record): bool
+    {
+        if(!$record->hasField($this->field)) {
+            return false;
+        }
+
+        $value = $record->getFieldValue($this->field);
+
+        return $this->valueMatches($value);
     }
 
     /**
@@ -102,6 +110,7 @@ class Criterion
 
     public function __toString()
     {
-        return sprintf("%s %s %s", $this->field, $this->operator, $this->value);
+        $valueString = is_string($this->value) ? sprintf("'%s'", $this->value) : (string)$this->value;
+        return sprintf("%s %s %s", $this->field, $this->operator, $valueString);
     }
 }

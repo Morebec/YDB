@@ -85,4 +85,10 @@ interface TableInterface
      * Clears the table from all its data
      */
     public function clear(): void;
+
+    /**
+     * Returns the schema of the table
+     * @return TableSchemaInterface
+     */
+    public function getSchema(): TableSchemaInterface;
 }

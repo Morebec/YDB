@@ -1,6 +1,8 @@
 # YDB
 YDB is a simple PHP utility library to use Yaml as a flat file databases
 
+[![Build Status](https://travis-ci.com/Morebec/YDB.svg?branch=master)](https://travis-ci.com/Morebec/YDB)
+
 ## Usage
 
 ### Create a Database
@@ -30,7 +32,7 @@ $table = $this->database->createTable($schema);
 ```
 
 ### Create a Record
-TO add a new record to the database, one must use a Record Object.
+T add a new record to the database, one must use a Record Object.
 A record can be constructed as follows:
 
 ```php
@@ -45,7 +47,6 @@ $r = new Record(
 
 // And then add the record to the table
 $table->addRecord($record);
-);
 ```
 
 **Note on ids**: If you want to have a different type of id, simply create a class 
@@ -71,8 +72,6 @@ $r = $table->queryOne(Query::findById($record->getId()));
 $r = $table->queryOne(
     Query::findByField('first_name', Operator::STRICTLY_EQUAL(), 'James')
 );
-
-
 ```
 
 However the easiest way is to use the Query builder:
