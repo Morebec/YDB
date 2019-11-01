@@ -23,6 +23,12 @@ class Database implements DatabaseInterface
     /** @var Filesystem */
     private $fileSystem;
 
+    /** @var LoggerInterfae */
+    private $logger;
+
+    /** @var Directory Tables directory */
+    private $tablesDir;
+
     /**
      * Constructs a database instance
      * @param Path $root root directory where the database is located
@@ -33,10 +39,21 @@ class Database implements DatabaseInterface
 
         $this->fileSystem = new Filesystem();
 
+
         // Create the root directory if it does not already exists
         if(!$this->root->exists()) {
             $this->create();
         }
+
+        // Tables Directory
+        $this->tablesDir = Directory::fromStringPath($this->root->getRealPath() . '/tables');
+        if(!$this->tablesDir->exists()) {
+            mkdir($this->tablesDir);
+        }  
+
+
+        // Prepare logger
+        $this->logger = new \Katzgrau\KLogger\Logger($this->root->getRealPath() . '/logs');
     }
 
     /**
@@ -49,12 +66,21 @@ class Database implements DatabaseInterface
     }
 
     /**
+     * Returns the directory where tables are stored
+     * @return Directory
+     */
+    public function getTablesDir(): Directory
+    {
+        return $this->tablesDir;
+    }
+
+    /**
      * Creates the database
      * @return
      */
     public function create(): void
     {
-        mkdir($this->root);   
+        mkdir($this->root);
     }
 
     /**
@@ -90,7 +116,7 @@ class Database implements DatabaseInterface
         );
 
         // Create directory
-        $path = $this->root->getRealPath() . "/$tableName";
+        $path = $this->tablesDir . "/$tableName";
         mkdir($path);
 
         // Create schema
@@ -98,7 +124,10 @@ class Database implements DatabaseInterface
         $schemaYaml = Yaml::dump($schema->toArray());
         file_put_contents($schemaPath, $schemaYaml);
 
-        return new Table($schema, Directory::fromStringPath($path));
+        $table = new Table($schema, Directory::fromStringPath($path));
+        $table->setLogger($this->logger);
+
+        return $table;
     }
 
     /**
@@ -116,7 +145,7 @@ class Database implements DatabaseInterface
         // Check if we need to rename the table
         if($table->getName() !== $schema->getTableName()) {
             $directory = Directory::fromStringPath(
-                $this->root->getRealPath() . '/' . $schema->getTableName()
+                $this->tablesDir->getRealPath() . '/' . $schema->getTableName()
             );
             rename(
                 $table->getDirectory()->getRealPath(), 
@@ -158,7 +187,7 @@ class Database implements DatabaseInterface
      */
     public function getTables(): array
     {
-        $files = $this->root->getFiles();
+        $files = $this->tablesDir->getFiles();
         $tables = [];
         foreach ($files as $file) {
             if (!$file instanceof Directory) {

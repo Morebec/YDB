@@ -28,7 +28,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function _after()
     {
-        $this->database->delete();
+        // $this->database->delete();
     }
     
     public function testCreateRecord(): void

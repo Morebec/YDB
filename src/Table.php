@@ -12,6 +12,8 @@ use Morebec\YDB\Database\RecordIdInterface;
 use Morebec\YDB\Database\RecordInterface;
 use Morebec\YDB\Database\TableInterface;
 use Morebec\YDB\Database\TableSchemaInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
@@ -31,6 +33,9 @@ class Table implements TableInterface
 
     /** @var TableIndexManager */
     private $indexManager;
+
+    /** @var LoggerInterface logger */
+    private $logger;
 
     /**
      * Constructs a new instance of a table object
@@ -99,6 +104,11 @@ class Table implements TableInterface
      */
     public function addColumn(ColumnInterface $column, $defaultValue): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Adding column '%s' on table '%s' ... ", $column->getName(), $this->getName()),
+            ['column' => $column->toArray()]
+        );
         // Get records first, or else they wont pass validation
         $records = $this->queryAll();
 
@@ -116,6 +126,12 @@ class Table implements TableInterface
             $record->setFieldValue($column->getName(), $defaultValue);
             $this->updateRecord($record);
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Column '%s' added on table '%s'", $column->getName(), $this->getName()),
+            ['column' => $column->toArray()]
+        );
     }
 
     /**
@@ -125,6 +141,17 @@ class Table implements TableInterface
      */
     public function updateColumn(ColumnInterface $column, ColumnInterface $updatedColumn)
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updating column '%s' on table '%s' ... ", 
+                $column->getName(), 
+                $this->getName()
+            ),
+            [
+                'column' => $column->toArray(),
+                'updated_column' => $updatedColumn->toArray()
+            ]
+        );
         // Get records first, or else they wont pass validation
         $records = $this->queryAll();
 
@@ -150,6 +177,18 @@ class Table implements TableInterface
             $record->removeField($column->getName());
             $this->updateRecord($record);
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updated column '%s' on table '%s'.", 
+                $column->getName(), 
+                $this->getName()
+            ),
+            [
+                'column' => $column->toArray(),
+                'updated_column' => $updatedColumn->toArray()
+            ]
+        );
     }
 
     /**
@@ -158,6 +197,17 @@ class Table implements TableInterface
      */
     public function deleteColumn(ColumnInterface $column): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Deleting column '%s' on table '%s'...", 
+                $column->getName(), 
+                $this->getName()
+            ),
+            [
+                'column' => $column->toArray(),
+            ]
+        );
+
         // Get records first, or else they wont pass validation
         $records = $this->queryAll();
 
@@ -176,6 +226,17 @@ class Table implements TableInterface
             $record->removeField($column->getName());
             $this->updateRecord($record);
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Deleted column '%s' on table '%s'.", 
+                $column->getName(), 
+                $this->getName()
+            ),
+            [
+                'column' => $column->toArray(),
+            ]
+        );
     }
 
     /**
@@ -194,9 +255,27 @@ class Table implements TableInterface
      */
     public function updateSchema(TableSchemaInterface $schema): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updating schema on table '%s'...", 
+                $this->getName()
+            ),
+            [
+                'schema' => $schema->toArray(),
+            ]
+        );
         // Create schema
         $schemaYaml = Yaml::dump($schema->toArray());
-        $this->filesystem->dumpFile($this->getSchemaFile()->getRealPath(), $schemaYaml);   
+        $this->filesystem->dumpFile($this->getSchemaFile()->getRealPath(), $schemaYaml);
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updated schema on table '%s'.", 
+                $this->getName()
+            ),
+            [
+                'schema' => $schema->toArray(),
+            ]
+        );   
     }
 
     /**
@@ -205,6 +284,18 @@ class Table implements TableInterface
      */
     public function addRecord(RecordInterface $record): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Adding record '%s' in table '%s'.", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record_id' => $record->getId(),
+                'record' => $record->toArray()
+            ]
+        );
+
         $this->validateRecord($record);
 
 
@@ -218,6 +309,18 @@ class Table implements TableInterface
         $this->filesystem->dumpFile($filePath, $yaml);
 
         $this->indexManager->updateIndexes();
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Added record '%s' in table '%s'.", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record_id' => $record->getId(),
+                'record' => $record->toArray()
+            ]
+        );
     }
 
     /**
@@ -227,6 +330,17 @@ class Table implements TableInterface
      */
     public function updateRecord(RecordInterface $record): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updating record '%s' in table '%s'...", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record' => $record->toArray()
+            ]
+        );
+
         $id = $record->getId();
         $arr = $record->toArray();
 
@@ -236,6 +350,17 @@ class Table implements TableInterface
         $this->filesystem->dumpFile($filePath, $yaml);
 
         $this->indexManager->rebuildIndexes();
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Updated record '%s' in table '%s'.", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record' => $record->toArray()
+            ]
+        );
     }
 
     /**
@@ -244,10 +369,26 @@ class Table implements TableInterface
      */
     public function deleteRecord(RecordIdInterface $id)
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Deleting record '%s' on table '%s'...", $id, $this->getName()),
+            [
+                'record_id' => $id
+            ]
+        );
+
         $filePath = $this->directory->getRealPath() . "/$id.yaml";
         unlink($filePath);
 
         $this->indexManager->rebuildIndexes();
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Deleted record '%s' on table '%s'.", $id, $this->getName()),
+            [
+                'record_id' => $id
+            ]
+        );
     }
 
     /**
@@ -256,6 +397,17 @@ class Table implements TableInterface
      */
     public function validateRecord(RecordInterface $record): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Validating record '%s' in table '%s'...", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record' => $record->toArray()
+            ]
+        );
+
         $arr = $record->toArray();
 
         // Verify that every column is there
@@ -288,6 +440,17 @@ class Table implements TableInterface
                 "'$key' is not a column in table '$tableName'"
             );
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Validated record '%s' in table '%s'...", 
+                $record->getId(), 
+                $this->getName()
+            ),
+            [
+                'record' => $record->toArray()
+            ]
+        );
     }
 
     /**
@@ -297,6 +460,18 @@ class Table implements TableInterface
      */
     private function loadRecordFromFile(File $file): RecordInterface
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Loading record in table '%s' from file ...", 
+                $this->getName(),
+                $file
+            ),
+            [
+                'record_id' => $file->getFilename(),
+                'file' => $file->getRealPath(),
+                'table' => $this->getName()
+            ]
+        );
         Assertion::true($file->exists(), 
             "Cannot load record, file '$file' does not exist."
         );
@@ -309,10 +484,25 @@ class Table implements TableInterface
         Assertion::keyExists($arr, 'id');
         Assertion::notNull($arr['id']);
 
-        return new Record(
+        $r = new Record(
             new RecordId($arr['id']),
             $arr
         );
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Loaded record '%s' in table '%s' from file.", 
+                $r->getId(),
+                $this->getName()
+            ),
+            [
+                'record_id' => $r->getId(),
+                'file' => $file->getRealPath(),
+                'table' => $this->getName()
+            ]
+        );
+
+        return $r;
     }
 
     /**
@@ -321,6 +511,16 @@ class Table implements TableInterface
      */
     public function queryAll(): \Generator
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Querying all records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName()
+            ]
+        );
+
         $files = $this->directory->getFiles();
         $schemaFile = $this->getSchemaFile();
         $files = array_filter(iterator_to_array($files), static function ($f) use ($schemaFile) {
@@ -332,6 +532,16 @@ class Table implements TableInterface
         foreach ($files as $file) {
             yield $this->loadRecordFromFile($file);
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Queried all records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName()
+            ]
+        );
     }
 
 
@@ -343,8 +553,16 @@ class Table implements TableInterface
      */
     public function query(QueryInterface $query): array
     {
-        // Hybdrid array used
-        $ids = [];
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Querying records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName(),
+                'query' => (string)$query
+            ]
+        );
 
         // Use indexes
         $records = [];
@@ -382,6 +600,18 @@ class Table implements TableInterface
 
         $records = array_unique($records);
 
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Queried records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName(),
+                'query' => (string)$query,
+                'count' => count($records)
+            ]
+        );
+
         return $records;
     }
 
@@ -412,6 +642,16 @@ class Table implements TableInterface
      */
     public function clear(): void
     {
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Clearing records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName(),
+            ]
+        );
+           
         foreach ($this->directory->getFiles() as $f) {
             if($f->getBasename() === TableSchema::SCHEMA_FILE_NAME){
                 continue;
@@ -419,5 +659,39 @@ class Table implements TableInterface
 
             $this->filesystem->remove($f);
         }
+
+        $this->log(
+            LogLevel::INFO, 
+            sprintf("Cleared records from table '%s' ...", 
+                $this->getName()
+            ),
+            [
+                'table' => $this->getName(),
+            ]
+        );
+    }
+
+    /**
+     * Logs a message
+     * @param  string $level   level
+     * @param  string $message message
+     * @param  array  $context context
+     */
+    public function log(string $level, string $message, array $context = []): void
+    {
+        if(!$this->logger) {
+            return;
+        }
+
+        $this->logger->log($level, $message, $context);
+    }
+
+    /**
+     * Sets the logger
+     * @param LoggerInterface $logger logger
+     */
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 }
