@@ -29,13 +29,18 @@ class Database implements DatabaseInterface
     /** @var Directory Tables directory */
     private $tablesDir;
 
+    /** @var DatabaseConfig */
+    private $config;
+
     /**
      * Constructs a database instance
      * @param Path $root root directory where the database is located
      */
-    function __construct(Directory $root)
+    function __construct(DatabaseConfig $config)
     {
-        $this->root = $root;
+        $this->config = $config;
+
+        $this->root = $config->getDatabasePath();
 
         $this->fileSystem = new Filesystem();
 
@@ -51,9 +56,10 @@ class Database implements DatabaseInterface
             mkdir($this->tablesDir);
         }  
 
-
         // Prepare logger
-        $this->logger = new \Katzgrau\KLogger\Logger($this->root->getRealPath() . '/logs');
+        if($this->config->isLoggingEnabled()) {
+            $this->logger = new \Katzgrau\KLogger\Logger($this->root->getRealPath() . '/logs');
+        }
     }
 
     /**
@@ -125,7 +131,7 @@ class Database implements DatabaseInterface
         file_put_contents($schemaPath, $schemaYaml);
 
         $table = new Table($schema, Directory::fromStringPath($path));
-        $table->setLogger($this->logger);
+        $table->setDatabase($this);
 
         return $table;
     }
@@ -261,5 +267,28 @@ class Database implements DatabaseInterface
 
         Assertion::keyExists($schema, 'table_name');
         return new TableSchema($schema['table_name'], $columns);
+    }
+
+    /**
+     * Logs a message
+     * @param  string $level   level
+     * @param  string $message message
+     * @param  array  $context context
+     */
+    public function log(string $level, string $message, array $context = []): void
+    {
+        if(!$this->logger){
+            return;
+        }
+
+        $this->logger->log($level, $message, $context);
+    }
+
+    /**
+     * @return DatabaseConfig
+     */
+    public function getConfig(): DatabaseConfig
+    {
+        return $this->config;
     }
 }

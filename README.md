@@ -9,7 +9,14 @@ YDB is a simple PHP utility library to use Yaml as a flat file databases
 In order to create a database do the following:
 
 ```php
-$database = new Database(Directory::fromStringPath('path/to/the/database'));
+$config = new DatabaseConfig(
+    Directory::fromStringPath(__DIR__ . '/../_data/test-db')
+);
+
+$config->enabledLogging();
+$config->disableIndexing();
+
+$database = new Database($config);
 ```
 
 ### Create a Table

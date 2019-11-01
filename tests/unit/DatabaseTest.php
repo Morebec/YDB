@@ -5,6 +5,7 @@ use Morebec\ValueObjects\File\Path;
 use Morebec\YDB\Column;
 use Morebec\YDB\ColumnType;
 use Morebec\YDB\Database;
+use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\TableSchema;
 
 /**
@@ -14,9 +15,10 @@ class DatabaseTest extends \Codeception\Test\Unit
 {
     public function _before()
     {
-        $this->database = new Database(
+        $config = new DatabaseConfig(
             Directory::fromStringPath(__DIR__ . '/../_data/test-db')
         );
+        $this->database = new Database($config);
     }
 
     public function _after()

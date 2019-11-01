@@ -7,13 +7,13 @@ use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\ValueObjects\File\Path;
 use Morebec\YDB\Database\ColumnInterface;
+use Morebec\YDB\Database\DatabaseInterface;
 use Morebec\YDB\Database\QueryInterface;
 use Morebec\YDB\Database\RecordIdInterface;
 use Morebec\YDB\Database\RecordInterface;
 use Morebec\YDB\Database\TableInterface;
 use Morebec\YDB\Database\TableSchemaInterface;
 use Psr\Log\LogLevel;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
@@ -34,8 +34,8 @@ class Table implements TableInterface
     /** @var TableIndexManager */
     private $indexManager;
 
-    /** @var LoggerInterface logger */
-    private $logger;
+    /** @var DatabaseInterface */
+    private $database;
 
     /**
      * Constructs a new instance of a table object
@@ -567,8 +567,13 @@ class Table implements TableInterface
         // Use indexes
         $records = [];
         foreach ($query->getCriteria() as $c) {
+
             // Get usable indexes for this criteria
-            $indexes = $this->indexManager->getIndexesForCriterion($c);
+            
+            $indexes = [];
+            if ($this->database->getConfig()->isIndexingEnabled()) {
+                $indexes = $this->indexManager->getIndexesForCriterion($c);
+            }
 
             // If we have indexes use that, else will use all the
             // records
@@ -679,19 +684,18 @@ class Table implements TableInterface
      */
     public function log(string $level, string $message, array $context = []): void
     {
-        if(!$this->logger) {
-            return;
-        }
-
-        $this->logger->log($level, $message, $context);
+        $this->database->log($level, $message, $context);
     }
 
     /**
-     * Sets the logger
-     * @param LoggerInterface $logger logger
+     * @param mixed $database
+     *
+     * @return self
      */
-    public function setLogger(?LoggerInterface $logger): void
+    public function setDatabase(DatabaseInterface $database)
     {
-        $this->logger = $logger;
+        $this->database = $database;
+
+        return $this;
     }
 }

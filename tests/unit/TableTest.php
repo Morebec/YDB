@@ -7,6 +7,7 @@ use Morebec\YDB\ColumnType;
 use Morebec\YDB\Criteria;
 use Morebec\YDB\Criterion;
 use Morebec\YDB\Database;
+use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Operator;
 use Morebec\YDB\Query;
 use Morebec\YDB\QueryBuilder;
@@ -21,9 +22,10 @@ class TableTest extends \Codeception\Test\Unit
 {
     public function _before()
     {
-        $this->database = new Database(
+        $config = new DatabaseConfig(
             Directory::fromStringPath(__DIR__ . '/../_data/test-db')
         );
+        $this->database = new Database($config);
     }
 
     public function _after()
