@@ -3,12 +3,25 @@ language: php
 dist: xenial
 
 php:
-    '7.2'
+    - '7.1'
+    - '7.2'
+
+env:
+  matrix:
+    - PREFER_LOWEST="--prefer-lowest --prefer-stable"
+    - PREFER_LOWEST=""
 
 cache:
   directories:
     - vendor
     - $HOME/.composer/cache
+
+install:
+  - composer install
+
+before_script:
+  - composer validate --no-check-all --strict
+  - composer update $PREFER_LOWEST  
 
 script:
   - 'composer test'
