@@ -30,7 +30,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function _after()
     {
-        // $this->database->delete();
+       // $this->database->delete();
     }
     
     public function testCreateRecord(): void
@@ -154,6 +154,17 @@ class TableTest extends \Codeception\Test\Unit
         $this->assertTrue($r->isEqualTo($record));
     }
 
+
+    public function testAndCriteriaOnly()
+    {
+        # code...
+    }
+
+    public function testOrCriteriaOnly($value='')
+    {
+        # code...
+    }
+
     public function testComplexQueryWithQueryBuilder()
     {
         $table = $this->database->createTable(
@@ -185,14 +196,34 @@ class TableTest extends \Codeception\Test\Unit
             )
         );
 
-        $query = QueryBuilder::find('first_name', Operator::STRICTLY_EQUAL(), 'James')
+        $query = new Query([
+                new Criterion('first_name', Operator::STRICTLY_EQUAL(), 'James'),
+                new Criterion('last_name', Operator::STRICTLY_EQUAL(), 'Bond'),
+            ],
+            [
+                new Criterion('age', Operator::GREATER_OR_EQUAL(), 25)
+            ]
+        );
+
+        $qbQuery = QueryBuilder::find('first_name', Operator::STRICTLY_EQUAL(), 'James')
                              ->and('last_name', Operator::STRICTLY_EQUAL(), 'Bond')
                              ->or('age', Operator::GREATER_OR_EQUAL(), 25)
                              ->build()
         ;
-        $r = $table->query($query);
 
+        $this->assertEquals((string)$query, (string)$qbQuery);
+        $this->assertTrue($query->isEqualTo($qbQuery));
+
+
+
+        $r = $table->query($query);
         $this->assertNotNull($r);
+
+        if(count($r) !== 2) {
+            codecept_debug($r);
+            codecept_debug(iterator_to_array($table->queryAll()));
+        }
+
         $this->assertCount(2, $r);
     }
 

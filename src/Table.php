@@ -227,6 +227,9 @@ class Table implements TableInterface
             $this->updateRecord($record);
         }
 
+        // Rebuild indexes
+        $this->indexManager->rebuildIndexes();
+
         $this->log(
             LogLevel::INFO, 
             sprintf("Deleted column '%s' on table '%s'.", 
@@ -578,44 +581,96 @@ class Table implements TableInterface
             ]
         );
 
-        // Use indexes
         $records = [];
-        foreach ($query->getCriteria() as $c) {
 
-            // Get usable indexes for this criteria
-            
-            $indexes = [];
-            if ($this->database->getConfig()->isIndexingEnabled()) {
-                $indexes = $this->indexManager->getIndexesForCriterion($c);
-            }
+        // We need to determine the records that need to be loaded
+        // for the query evaluation, that is, if we ever need to load
+        // all records to make the checks. This result is called the source.
+        // It can therefore either be [all|index]
+        // The rules are
+        // Both "ands" and "ors" groups of criteria must be checked.
+        // 
+        // If at least one criterion of the "and" group can work with
+        // indexes, the source of the "and" group shall be index
+        // Inversely, if at least one "or" criterion requires all records,
+        // the source of the "or" group shall be all
+        // 
+        // Finally if both groups can rely on indexes only we will load form the indexes
+        
+        $andCanOnlyRelyOnIndexes = false;
+        $andIds = [];
+        foreach ($query->getAndCriteria() as $c) {
+            $col = $this->getColumnByName($c->getField());
+            if(!$col) continue;
 
-            // If we have indexes use that, else will use all the
-            // records
-            if (!empty($indexes)) {
-                $ids = [];
-                foreach ($indexes as $index) {
-                    $ids = array_merge($ids, $index->getIds());
-                }
-
-                foreach ($ids as $id) {
-
-                    $filePath = $this->getDirectory()->getRealPath() . "/$id.yaml";
-                    $file = File::fromStringPath($filePath);
-                    $records[] = $this->loadRecordFromFile(
-                        $file
-                    );
-                }
+            if (!$col->isIndexed()) {
                 continue;
             }
+            
+            $andCanOnlyRelyOnIndexes = true;
+            $ids = [];
+            $indexes = $this->indexManager->getIndexesForCriterion($c);
+            foreach ($indexes as $index) {
+                $ids = array_merge($ids, $index->getIds());
+            }
 
-            // Else we use all the records
-            $all = iterator_to_array($this->queryAll());
-
-            $filteredAll = array_filter($all, static function ($record) use ($c) {
-                return $c->matches($record);
-            });
-            $records = array_merge($records,  $filteredAll);
+            // We'll want to keep the smallest subset of ids
+            if (count($ids) < count($andIds) || empty($andIds)) {
+                $andIds = $ids;
+            }
         }
+
+        $orCanOnlyRelyOnIndexes = true;
+        $orIds = [];
+        foreach ($query->getOrCriteria() as $c) {
+            $col = $this->getColumnByName($c->getField());
+            if(!$col) continue;
+
+            if (!$col->isIndexed()) {
+                $orCanOnlyRelyOnIndexes = false;
+                continue;
+            }
+            
+            $ids = [];
+            $indexes = $this->indexManager->getIndexesForCriterion($c);
+            foreach ($indexes as $index) {
+                $ids = array_merge($ids, $index->getIds());
+            }
+
+            // We'll want to keep the smallest subset of ids
+            if (count($ids) < count($andIds) || empty($andIds)) {
+                $andIds = $ids;
+            }
+        }
+
+        $records = [];
+        if ($andCanOnlyRelyOnIndexes && $orCanOnlyRelyOnIndexes) {
+            foreach ($ids as $id) {
+                $this->log(
+                    LogLevel::INFO, 
+                    sprintf("Criterion fetched indexes", 
+                        $this->getName()
+                    ),
+                    [
+                        'criterion' => (string)$c,
+                        '$ids' => $ids
+                    ]
+                );
+                $filePath = $this->getDirectory()->getRealPath() . "/$id.yaml";
+                $file = File::fromStringPath($filePath);
+                $records[] = $this->loadRecordFromFile(
+                    $file
+                );
+            }
+        } else {
+            $records = iterator_to_array($this->queryAll());
+        }
+
+        // Filter records
+        $records = array_filter($records, static function($rec) use ($query) {
+            return $query->matches($rec);
+        });
+
 
         $records = array_unique($records);
 

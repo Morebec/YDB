@@ -19,6 +19,12 @@ class Criterion
     /** @var mixed value */
     private $value;
 
+    /**
+     * Constructs a criterion
+     * @param string   $field    name of the field to test
+     * @param Operator $operator operator
+     * @param mixed   $value    expected value
+     */
     function __construct(string $field, Operator $operator, $value)
     {
         Assertion::notBlank($field);
@@ -59,10 +65,11 @@ class Criterion
             return $value >= $this->value;
 
         } elseif ($this->operator == Operator::IN) {
-            return in_array($this->value, $value);
+            return in_array($value, $this->value);
 
         } elseif ($this->operator == Operator::NOT_IN) {
-            return !in_array($this->value, $value);
+            return !in_array($value, $this->value);
+            
         }
 
         throw new \LogicException(sprintf("Unsupported operator: '%s'", $this->operator));

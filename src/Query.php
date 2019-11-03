@@ -114,6 +114,16 @@ class Query implements QueryInterface
         return array_merge($this->ands, $this->ors);
     }
 
+    public function getAndCriteria(): array
+    {
+        return $this->ands;
+    }
+
+    public function getOrCriteria(): array
+    {
+        return $this->ors;
+    }
+
 
 
     /**
