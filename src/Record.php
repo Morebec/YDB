@@ -35,6 +35,14 @@ class Record implements RecordInterface
             return $this->getId();
         }
 
+        Assertion::keyExists($this->data, $fieldName, 
+            sprintf("Field '%s' not found in entity '%s' available fields are: %s",
+                $fieldName,
+                $this->getId(),
+                join(',', array_keys($this->data))
+            )
+        );
+
         return $this->data[$fieldName];
     }
 

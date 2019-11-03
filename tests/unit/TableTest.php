@@ -113,7 +113,7 @@ class TableTest extends \Codeception\Test\Unit
 
         $table->addRecord($record);
 
-        $table->deleteRecord($record->getId());
+        $table->deleteRecord($record);
 
         $r = $table->queryOne(Query::findById($record->getId()));
         $this->assertNull($r);

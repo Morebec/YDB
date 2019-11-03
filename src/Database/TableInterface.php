@@ -54,10 +54,10 @@ interface TableInterface
     public function updateRecord(RecordInterface $record): void;
 
     /**
-     * Deletes a record by its id
-     * @param  RecordIdInterface $id id of the record
+     * Deletes a record 
+     * @param  RecordInterface $record
      */
-    public function deleteRecord(RecordIdInterface $id);
+    public function deleteRecord(RecordInterface $record);
 
     /**
      * Returns all the records of the table in an array of Record objects

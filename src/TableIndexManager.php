@@ -5,157 +5,99 @@ namespace Morebec\YDB;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\ValueObjects\File\Path;
+use Morebec\YDB\Database\ColumnInterface;
+use Morebec\YDB\Database\RecordInterface;
 use Morebec\YDB\Database\TableInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class responsible for managing the indexing of table records
  */
 class TableIndexManager
 {
+    /** Name of the directory where all indexes are sotred */
+    const INDEXES_DIRECTORY_NAME = 'indexes';
+
     /** @var TableInterface */
     private $table;
+
+    /** @var Directory directory where all indexes are stored */
+    private $indexesDirectory;
+
+    /** @var Filesystem */
+    private $filesystem;
 
     function __construct(TableInterface $table)
     {
         $this->table = $table;
-    }
 
-    /**
-     * Clears the indexes and rebuilds them
-     */
-    public function rebuildIndexes(): void
-    {
-        $this->clearIndexes();
-        $this->updateIndexes();
-    }
+        $this->filesystem = new Filesystem();
 
-    /**
-     * Updates the indexes of this table
-     */
-    public function updateIndexes()
-    {
-        $indexesDir = $this->getIndexesDirectory();
-        
-        foreach ($this->table->queryAll() as $record) {
-            foreach ($this->table->getSchema()->getColumns() as $col) {
-                if(!$col->isIndexed()) {
-                    continue;
-                }
-                $fieldName = $col->getName();
-                $fieldValue = $record->getFieldValue($fieldName);
-
-                $index = $this->getIndexForColumnWithValue($col, $fieldValue);
-                $index->indexRecord($record);
-            }
-        }
-    }
-
-    /**
-     * Sorts the indexes
-     */
-    public function sortIndexes()
-    {
-        // Sort Indexes
-        foreach ($this->getIndexes() as $index) {
-            $index->sort();
-        }
-    }
-
-    /**
-     * Clears the index files
-     */
-    public function clearIndexes(): void
-    {
-        $indexesDir = $this->getIndexesDirectory();
-
-        foreach ($this->getIndexes() as $index) {
-            $index->clear();
-        }
-    }
-
-    /**
-     * Returns a list of all indexes
-     * @return array
-     */
-    public function getIndexes(): array
-    {
-        $indexesDir = $this->getIndexesDirectory();
-
-        $idxs = [];
-
-        foreach ($indexesDir->getFiles() as $d) {
-            foreach ($d->getFiles() as $f) {
-                $fieldName = $d->getFilename();
-                $col = $this->table->getColumnByName($fieldName);
-                if(!$col) continue;
-
-                $type = $col->getType(); 
-                $idxs[] = new Index($fieldName, $type, $f);
-            }
-        }
-
-        return $idxs;
-    }
-
-    /**
-     * Returns the directory containing all the indexes of this manager's table
-     * @return Directory
-     */
-    public function getIndexesDirectory(): Directory
-    {
+        // Indexes dir
         $indexesDir = Directory::fromStringPath(
-            $this->table->getDirectory()->getRealPath() . '/indexes' 
+            sprintf(
+                "%s/%s", 
+                $this->table->getDirectory()->getRealPath(),
+                self::INDEXES_DIRECTORY_NAME
+            )
         );
+
         if(!$indexesDir->exists()) {
             mkdir($indexesDir->getRealPath());
         }
 
-        return $indexesDir;
+        $this->indexesDirectory = $indexesDir;
     }
 
     /**
-     * Indicates if an index directory exists for a certain column with field value
-     * @param  Column $column     column
-     * @param  mixed  $fieldValue field value
-     * @return bool             true if exists, otherwise false
+     * Indexes a record
+     * @param  Record $record record
      */
-    public function indexForColumnWithValueExists(Column $column, $fieldValue): bool
-    {
-        $path = $this->getIndexPathForColumnWithValue($column, $fieldValue);
-        $indexDir = new Directory($path);
-        
-        return $indexDir->exists();
-    }
+    public function indexRecord(RecordInterface $record): void
+    {   
+        $columns = $this->table->getColumns();
 
-    /**
-     * Returns the path to the index directory of a column field with a specific 
-     * value
-     * @param  Column $column     column
-     * @param  mixed  $fieldValue value
-     * @return Path
-     */
-    public function getIndexPathForColumnWithValue(Column $column, $fieldValue): Path
-    {
-        $indexesDir = $this->getIndexesDirectory();
-
-        $fieldName = $column->getName();
-
-        return new Path($indexesDir->getRealPath() . "/$fieldName");
+        foreach ($columns as $col) {
+            $value = $record->getFieldValue($col->getName());
+            $index = $this->getIndexForColumnWithValue($col, $value);
+            $index->indexRecord($record);
+        }
     }
 
 
     /**
-     * Returns the index files that matche a specific criterion
-     * @param  Criterion $c criterion
-     * @return array
+     * Removes the record from all indexes
+     * @param  Record $record record
      */
-    public function getIndexesForCriterion(Criterion $c): array
+    public function clearRecordIndexes(RecordInterface $record): void
     {
-        // Filter indexes that match the criterion
-        return array_filter($this->getIndexes(), static function ($i) use ($c) {
-            $value = $i->getFieldValue();
-            return $c->valueMatches($value);
-        });
+        $columns = $this->table->getColumns();
+
+        foreach ($columns as $col) {
+            $value = $record->getFieldValue($col->getName());
+            $index = $this->getIndexForColumnWithValue($col, $value);
+            $index->removeRecord($record);
+        }
+    }
+
+    /**
+     * Clears a column's indexes
+     */
+    public function clearColumnIndexes(ColumnInterface $column): void
+    {
+        $this->filesystem->remove(
+            $this->indexesDirectory->getRealPath() . '/' . $column->getName()
+        );
+    }
+
+    /**
+     * Updates the indexes of a record
+     * @param  Record $record record
+     */
+    public function updateRecordIndexes(RecordInterface $record): void
+    {
+        $this->clearRecordIndexes($record);
+        $this->indexRecord($record);
     }
 
 
@@ -165,9 +107,9 @@ class TableIndexManager
      * @param  string $name name of the column
      * @return Index|null 
      */
-    public function getIndexForColumnWithValue(Column $column, $fieldValue): Index
+    public function getIndexForColumnWithValue(ColumnInterface $column, $fieldValue): Index
     {
-        $path = $this->getIndexPathForColumnWithValue($column, $fieldValue);
+        $path = $this->buildIndexPathForColumnWithValue($column, $fieldValue);
 
         $indexDir = new Directory($path);
         if(!$indexDir->exists()) {
@@ -182,5 +124,35 @@ class TableIndexManager
             $column->getType(), 
             File::fromStringPath($filePath)
         );
+    }
+
+    /**
+     * Returns the path to the index directory of a column field with a specific 
+     * value
+     * @param  Column $column     column
+     * @param  mixed  $fieldValue value
+     * @return Path
+     */
+    public function buildIndexPathForColumnWithValue(ColumnInterface $column, $fieldValue): Path
+    {
+        $indexesDir = $this->indexesDirectory;
+
+        $fieldName = $column->getName();
+
+        return new Path($indexesDir->getRealPath() . "/$fieldName");
+    }
+
+    /**
+     * Returns the index files that matche a specific criterion
+     * @param  Criterion $c criterion
+     * @return array
+     */
+    public function getIndexForCriterion(Criterion $c): Index
+    {
+        $column = $this->table->getColumnByName($c->getField());
+        $value = $c->getValue();
+        $index = $this->getIndexForColumnWithValue($column, $value);
+
+        return $index;
     }
 }

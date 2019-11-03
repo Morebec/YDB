@@ -105,6 +105,19 @@ class Index
         );
     }
 
+    /**
+     * Clears a record from the index
+     */
+    public function removeRecord(RecordInterface $record): void
+    {
+        $content = $this->file->getContent();
+        $content = str_replace((string)$record->getId() . PHP_EOL, '', $content);
+        file_put_contents($this->file, $content);
+    }
+
+    /**
+     * Clears the index entirely
+     */
     public function clear(): void
     {
         $fs = new Filesystem();

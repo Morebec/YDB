@@ -221,14 +221,14 @@ class Table implements TableInterface
         $newSchema = new TableSchema($this->getName(), $columns);
         $this->updateSchema($newSchema);
         
+        // Destroy index
+        $this->indexManager->clearColumnIndexes($column);
+
         // Update the records
         foreach ($records as $record) {
             $record->removeField($column->getName());
             $this->updateRecord($record);
         }
-
-        // Rebuild indexes
-        $this->indexManager->rebuildIndexes();
 
         $this->log(
             LogLevel::INFO, 
@@ -250,6 +250,15 @@ class Table implements TableInterface
     public function getColumnByName(string $name): ?ColumnInterface
     {
         return $this->schema->getColumnByName($name);
+    }
+
+    /**
+     * Returns all the columns of the table
+     * @return array of Column objects
+     */
+    public function getColumns(): array
+    {
+        return $this->schema->getColumns();
     }
 
     /**
@@ -276,6 +285,8 @@ class Table implements TableInterface
         $schemaYaml = Yaml::dump($schema->toArray());
         $this->filesystem->dumpFile($schemaFile, $schemaYaml);
         $lock->release();
+
+        $this->schema = $schema;
 
         $this->log(
             LogLevel::INFO, 
@@ -320,7 +331,7 @@ class Table implements TableInterface
         $this->filesystem->dumpFile($filePath, $yaml);
         $lock->release();
 
-        $this->indexManager->updateIndexes();
+        $this->indexManager->indexRecord($record);
 
         $this->log(
             LogLevel::INFO, 
@@ -362,7 +373,7 @@ class Table implements TableInterface
         $this->filesystem->dumpFile($filePath, $yaml);
         $lock->release();
 
-        $this->indexManager->rebuildIndexes();
+        $this->indexManager->updateRecordIndexes($record);
 
         $this->log(
             LogLevel::INFO, 
@@ -377,16 +388,17 @@ class Table implements TableInterface
     }
 
     /**
-     * Deletes a record by its id
-     * @param  RecordIdInterface $id id of the record
+     * Deletes a record
+     * @param  RecordIdInterface $record record
      */
-    public function deleteRecord(RecordIdInterface $id)
+    public function deleteRecord(RecordInterface $record)
     {
+        $id = $record->getId();
         $this->log(
             LogLevel::INFO, 
             sprintf("Deleting record '%s' on table '%s'...", $id, $this->getName()),
             [
-                'record_id' => $id
+                'record' => $record->toArray()
             ]
         );
 
@@ -395,7 +407,7 @@ class Table implements TableInterface
         unlink($filePath);
         $lock->release();
 
-        $this->indexManager->rebuildIndexes();
+        $this->indexManager->clearRecordIndexes($record);
 
         $this->log(
             LogLevel::INFO, 
@@ -609,10 +621,8 @@ class Table implements TableInterface
             
             $andCanOnlyRelyOnIndexes = true;
             $ids = [];
-            $indexes = $this->indexManager->getIndexesForCriterion($c);
-            foreach ($indexes as $index) {
-                $ids = array_merge($ids, $index->getIds());
-            }
+            $index = $this->indexManager->getIndexForCriterion($c);
+            $ids = array_merge($ids, $index->getIds());
 
             // We'll want to keep the smallest subset of ids
             if (count($ids) < count($andIds) || empty($andIds)) {
