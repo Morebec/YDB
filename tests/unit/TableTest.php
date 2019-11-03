@@ -187,7 +187,7 @@ class TableTest extends \Codeception\Test\Unit
 
         $query = QueryBuilder::find('first_name', Operator::STRICTLY_EQUAL(), 'James')
                              ->and('last_name', Operator::STRICTLY_EQUAL(), 'Bond')
-                             ->or('age', Operator::LESS_OR_EQUAL(), 35)
+                             ->or('age', Operator::GREATER_OR_EQUAL(), 25)
                              ->build()
         ;
         $r = $table->query($query);
