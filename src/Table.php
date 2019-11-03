@@ -255,6 +255,9 @@ class Table implements TableInterface
      */
     public function updateSchema(TableSchemaInterface $schema): void
     {
+        $schemaPath = $this->getSchemaFile()->getRealPath();
+        $schemaFile = File::fromStringPath($schemaPath);
+
         $this->log(
             LogLevel::INFO, 
             sprintf("Updating schema on table '%s'...", 
@@ -262,11 +265,15 @@ class Table implements TableInterface
             ),
             [
                 'schema' => $schema->toArray(),
+                'schema_path' => $schemaPath
             ]
         );
         // Create schema
+        $lock = $this->database->waitUntilFileUnlocked($schemaFile);
         $schemaYaml = Yaml::dump($schema->toArray());
-        $this->filesystem->dumpFile($this->getSchemaFile()->getRealPath(), $schemaYaml);
+        $this->filesystem->dumpFile($schemaFile, $schemaYaml);
+        $lock->release();
+
         $this->log(
             LogLevel::INFO, 
             sprintf("Updated schema on table '%s'.", 
@@ -306,7 +313,9 @@ class Table implements TableInterface
 
         $yaml = Yaml::dump($arr);
 
+        $lock = $this->database->waitUntilFileUnlocked(File::fromStringPath($filePath));
         $this->filesystem->dumpFile($filePath, $yaml);
+        $lock->release();
 
         $this->indexManager->updateIndexes();
 
@@ -343,11 +352,12 @@ class Table implements TableInterface
 
         $id = $record->getId();
         $arr = $record->toArray();
-
         $filePath = $this->directory->getRealPath() . "/$id.yaml";
 
+        $lock = $this->database->waitUntilFileUnlocked(File::fromStringPath($filePath));
         $yaml = Yaml::dump($arr);
         $this->filesystem->dumpFile($filePath, $yaml);
+        $lock->release();
 
         $this->indexManager->rebuildIndexes();
 
@@ -378,7 +388,9 @@ class Table implements TableInterface
         );
 
         $filePath = $this->directory->getRealPath() . "/$id.yaml";
+        $lock = $this->database->waitUntilFileUnlocked(File::fromStringPath($filePath));
         unlink($filePath);
+        $lock->release();
 
         $this->indexManager->rebuildIndexes();
 
@@ -476,7 +488,9 @@ class Table implements TableInterface
             "Cannot load record, file '$file' does not exist."
         );
 
+        $lock = $this->database->waitUntilFileUnlocked(File::fromStringPath($file));
         $content = $file->getContent();
+        $lock->release();
         $arr = Yaml::parse($content);
 
         Assertion::isArray($arr, "Malformed data file $file");
@@ -662,7 +676,9 @@ class Table implements TableInterface
                 continue;
             }
 
+            $lock = $this->database->waitUntilFileUnlocked(File::fromStringPath($f));
             $this->filesystem->remove($f);
+            $lock->release();
         }
 
         $this->log(

@@ -26,8 +26,9 @@
         "beberlei/assert": "^3.2",
         "katzgrau/klogger": "dev-master",
         "morebec/value-objects": "dev-master",
-        "symfony/yaml": "^4.3",
-        "symfony/filesystem": "^4.3"
+        "symfony/filesystem": "^4.3",
+        "symfony/lock": "^4.3",
+        "symfony/yaml": "^4.3"
     },
     "require-dev": {
         "psy/psysh": "@stable",

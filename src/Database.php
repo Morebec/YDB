@@ -4,11 +4,13 @@ namespace Morebec\YDB;
 
 use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
+use Morebec\ValueObjects\File\File;
 use Morebec\YDB\Column;
 use Morebec\YDB\Database\DatabaseInterface;
 use Morebec\YDB\Database\TableInterface;
 use Morebec\YDB\Database\TableSchemaInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -44,6 +46,7 @@ class Database implements DatabaseInterface
 
         $this->fileSystem = new Filesystem();
 
+        $this->fileLocker = new FileLocker();
 
         // Create the root directory if it does not already exists
         if(!$this->root->exists()) {
@@ -267,6 +270,19 @@ class Database implements DatabaseInterface
 
         Assertion::keyExists($schema, 'table_name');
         return new TableSchema($schema['table_name'], $columns);
+    }
+
+    /**
+     * Waits until a file is unlocked, and when it is returns a
+     * lock to be released 
+     * @param  File   $file file to lock
+     * @return LockInterface
+     */
+    public function waitUntilFileUnlocked(File $file): LockInterface
+    {
+        $lock = $this->fileLocker->createFileLock($file);
+        $lock->acquire(true);
+        return $lock;
     }
 
     /**
