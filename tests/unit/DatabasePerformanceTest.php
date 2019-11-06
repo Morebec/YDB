@@ -68,7 +68,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         
         $delta = $t2 - $t;
 
-        $this->assertTrue($delta <= 1);
+        $this->assertTrue($delta <= 1.5);
     }
 
     public function testQueryAll()
