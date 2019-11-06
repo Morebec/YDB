@@ -238,7 +238,10 @@ class Database implements DatabaseInterface
         );
         $schema = $this->loadTableSchema($directory);
 
-        return new Table($schema, $directory);
+        $table = new Table($schema, $directory);
+
+        $table->setDatabase($this);
+        return $table;
     }
 
     /**

@@ -582,6 +582,7 @@ class Table implements TableInterface
      */
     public function query(QueryInterface $query): array
     {
+        $queryTime = time();
         $this->log(
             LogLevel::INFO, 
             sprintf("Querying records from table '%s' ...", 
@@ -609,9 +610,10 @@ class Table implements TableInterface
         // 
         // Finally if both groups can rely on indexes only we will load form the indexes
         
-        $andCanOnlyRelyOnIndexes = false;
+        $andCriterias = $query->getAndCriteria();
+        $andCanOnlyRelyOnIndexes = empty($andCriterias) ? true : false;
         $andIds = [];
-        foreach ($query->getAndCriteria() as $c) {
+        foreach ($andCriterias as $c) {
             $col = $this->getColumnByName($c->getField());
             if(!$col) continue;
 
@@ -682,7 +684,8 @@ class Table implements TableInterface
         });
 
 
-        $records = array_unique($records);
+        // Use array values to make sure keys are sequential
+        $records = array_values(array_unique($records));
 
         $this->log(
             LogLevel::INFO, 
@@ -692,7 +695,12 @@ class Table implements TableInterface
             [
                 'table' => $this->getName(),
                 'query' => (string)$query,
-                'count' => count($records)
+                'count' => count($records),
+                'strategy' => [
+                    'use_index_for_inclusive' => $andCanOnlyRelyOnIndexes,
+                    'use_index_for_exclusive'=> $orCanOnlyRelyOnIndexes,
+                ],
+                'time' => time() - $queryTime
             ]
         );
 
