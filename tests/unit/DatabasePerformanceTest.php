@@ -62,7 +62,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
     public function testRecordCreation()
     {
         $t = time();
-        $this->createData(100);
+        $this->createData(1000);
         $t2 = time();
         
         $delta = $t2 - $t;
@@ -72,7 +72,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryAll()
     {
-        $this->createData(200);
+        $this->createData(1000);
 
         $table = $this->database->getTableByName('test-performance-table');
 
@@ -87,7 +87,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryOneNotIndexed()
     {
-        $this->createData(150);
+        $this->createData(1000);
 
         $table = $this->database->getTableByName('test-performance-table');
 
@@ -101,7 +101,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryOneIndexed()
     {
-        $this->createData(150);
+        $this->createData(1000);
 
         $table = $this->database->getTableByName('test-performance-table');
 
