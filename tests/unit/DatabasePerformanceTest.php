@@ -13,6 +13,7 @@ use Morebec\YDB\TableSchema;
 
 /**
  * DatabasePerformanceTest
+ * @group performance
  */
 class DatabasePerformanceTest extends \Codeception\Test\Unit
 {
@@ -35,7 +36,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         $this->database->createTable($schema);
     }
 
-    public function _after()
+    public function _passed()
     {
         $this->database->delete();
     }
