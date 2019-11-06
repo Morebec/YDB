@@ -288,6 +288,11 @@ class Table implements TableInterface
 
         $this->schema = $schema;
 
+        // Rebuild indexes
+        foreach ($this->queryAll() as $record) {
+            $this->indexManager->indexRecord($record);
+        }
+
         $this->log(
             LogLevel::INFO, 
             sprintf("Updated schema on table '%s'.", 

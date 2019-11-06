@@ -58,6 +58,7 @@ class TableIndexManager
         $columns = $this->table->getColumns();
 
         foreach ($columns as $col) {
+            if(!$col->isIndexed()) continue;
             $value = $record->getFieldValue($col->getName());
             $index = $this->getIndexForColumnWithValue($col, $value);
             $index->indexRecord($record);
