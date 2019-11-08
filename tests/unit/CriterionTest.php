@@ -258,4 +258,18 @@ class CriterionTest extends \Codeception\Test\Unit
         $this->assertFalse($c->valueMatches(true));
         $this->assertTrue($c->valueMatches(false));
     }
+
+    public function testContains()
+    {
+        $c = new Criterion('test_field', Operator::CONTAINS(), 'Joe');
+        $this->assertTrue($c->valueMatches(['Joe', 'James']));
+        $this->assertFalse($c->valueMatches(['Jenny', 'Jane']));
+    }
+
+    public function testNotContains()
+    {
+        $c = new Criterion('test_field', Operator::NOT_CONTAINS(), 'Joe');
+        $this->assertFalse($c->valueMatches(['Joe', 'James']));
+        $this->assertTrue($c->valueMatches(['Jenny', 'Jane']));    
+    }
 }

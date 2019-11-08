@@ -22,8 +22,11 @@ class Operator extends BasicEnum
     const GREATER_OR_EQUAL = '>=';
 
     const IN = 'in';
-
     const NOT_IN = 'not_in';
+
+    /** operator for arrays */
+    const CONTAINS = 'contains';
+    const NOT_CONTAINS = 'not_contains';
 
     public function __toString()
     {        

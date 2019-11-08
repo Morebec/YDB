@@ -70,6 +70,11 @@ class Criterion
         } elseif ($this->operator == Operator::NOT_IN) {
             return !in_array($value, $this->value);
             
+        } elseif ($this->operator == Operator::CONTAINS) {
+            return in_array($this->value, $value);
+
+        } elseif ($this->operator == Operator::NOT_CONTAINS) {
+            return !in_array($this->value, $value);
         }
 
         throw new \LogicException(sprintf("Unsupported operator: '%s'", $this->operator));
