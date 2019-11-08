@@ -3,21 +3,59 @@ YDB is a simple PHP utility library to use Yaml as a flat file databases
 
 [![Build Status](https://travis-ci.com/Morebec/YDB.svg?branch=master)](https://travis-ci.com/Morebec/YDB)
 
-## Usage
+## Installation
+To install the library in a project, add this to your `composer.json` file:
 
+```json
+{
+    // ...
+    "repositories": [
+        {
+            "url": "https://github.com/Morebec/YDB.git",
+            "type": "git"
+        }
+    ],
+
+    "require": {
+        // ...
+        "morebec/ydb": "dev-master"
+    }
+    // ...
+}
+```
+
+## Usage
 ### Create a Database
-In order to create a database do the following:
+A database can be created by doing the following:
 
 ```php
+// Create a configuration object for the database
 $config = new DatabaseConfig(
     Directory::fromStringPath(__DIR__ . '/../_data/test-db')
 );
 
+// To enable logging
 $config->enabledLogging();
+
+// To disable indexing
 $config->disableIndexing();
 
+// Create the database
 $database = new Database($config);
 ```
+
+This would result in the following file structure at the directory of the database:
+
+```
+test-db/
+    logs/
+    tables/
+        table-1/
+            ...
+        table-2/
+            ...
+```
+
 
 ### Create a Table
 Tables are created using a `TableSchema` that defines the columns of the table.
@@ -35,7 +73,8 @@ $schema = new TableSchema('test-query-record', [
 And to create the table: 
 
 ```php
-$table = $this->database->createTable($schema);
+// This function will return a table object that can be used to be queried
+$table = $database->createTable($schema);
 ```
 
 ### Create a Record
@@ -93,3 +132,15 @@ $query = QueryBuilder::find('first_name', Operator::STRICTLY_EQUAL(), 'James')
 ;
 $r = $table->query($query);
 ```
+
+## Running Tests
+
+```bash
+# Will run all tests including performance tests
+composer test
+
+# Will run all tests excluding performance tests
+composer test-no-performance
+```
+
+
