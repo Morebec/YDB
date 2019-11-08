@@ -24,16 +24,6 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
             Directory::fromStringPath(__DIR__ . '/../_data/performance-test-db')
         );
         $this->database = new Database($config);
-
-        $schema = new TableSchema('test-performance-table', [
-            new Column('id', ColumnType::STRING(), true /* indexed */),
-            new Column('first_name', ColumnType::STRING()),
-            new Column('last_name', ColumnType::STRING()),
-            new Column('age', ColumnType::INTEGER()),
-            new Column('indexed_column', ColumnType::INTEGER(), true /* indexed */)
-        ]);
-
-        $this->database->createTable($schema);
     }
 
     public function _passed()
@@ -41,9 +31,18 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         $this->database->delete();
     }
 
-    public function createData(int $nbRecords)
+    public function createData(string $tableName, int $nbRecords): void
     {
-        $table = $this->database->getTableByName('test-performance-table');
+        $schema = new TableSchema($tableName, [
+            new Column('id', ColumnType::STRING(), true /* indexed */),
+            new Column('first_name', ColumnType::STRING()),
+            new Column('last_name', ColumnType::STRING()),
+            new Column('age', ColumnType::INTEGER()),
+            new Column('indexed_column', ColumnType::INTEGER(), true /* indexed */)
+        ]);
+
+        $table = $this->database->createTable($schema);
+
         for ($i=0; $i < $nbRecords; $i++) { 
 
             $record = new Record(
@@ -63,7 +62,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
     public function testRecordCreation()
     {
         $t = time();
-        $this->createData(1000);
+        $this->createData('test-create-records', 1000);
         $t2 = time();
         
         $delta = $t2 - $t;
@@ -73,9 +72,9 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryAll()
     {
-        $this->createData(1000);
+        $this->createData('test-query-all', 1000);
 
-        $table = $this->database->getTableByName('test-performance-table');
+        $table = $this->database->getTableByName('test-query-all');
 
         $t = time();
         $allRecords = $table->queryAll(); 
@@ -88,9 +87,9 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryOneNotIndexed()
     {
-        $this->createData(1000);
+        $this->createData('test-query-not-indexed', 1000);
 
-        $table = $this->database->getTableByName('test-performance-table');
+        $table = $this->database->getTableByName('test-query-not-indexed');
 
         $t = time();
         $allRecords = $table->queryOne(QueryBuilder::find('age', Operator::EQUAL(), 99)->build()); 
@@ -102,9 +101,9 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
 
     public function testQueryOneIndexed()
     {
-        $this->createData(1000);
+        $this->createData('test-query-indexed', 1000);
 
-        $table = $this->database->getTableByName('test-performance-table');
+        $table = $this->database->getTableByName('test-query-indexed');
 
         $t = time();
         $allRecords = $table->queryOne(
