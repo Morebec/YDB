@@ -26,6 +26,7 @@
         "beberlei/assert": "^3.2",
         "katzgrau/klogger": "^1.0",
         "morebec/value-objects": "dev-master",
+        "symfony/expression-language": "^4.3",
         "symfony/filesystem": "^4.3",
         "symfony/lock": "^4.3",
         "symfony/yaml": "^4.3"

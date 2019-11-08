@@ -124,8 +124,6 @@ class Query implements QueryInterface
         return $this->ors;
     }
 
-
-
     /**
      * Indicates if this value object is equal to abother value object
      * @param  ValueObjectInterface $valueObject othervalue object to compare to
