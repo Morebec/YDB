@@ -1,10 +1,23 @@
 language: php
 
-dist: xenial
-
 php:
     - '7.1'
     - '7.2'
+
+jobs:
+  include:
+    # - os: linux
+    #   dist: xenial
+    - os: windows
+      language: sh
+      before_install:
+          - choco install php --version=7.2.2
+          - export PATH=/c/tools/php73:$PATH
+          - choco install composer --ia /DEV="C:\tools"
+          - export PATH=/c/tools/:$PATH
+        
+  allow_failures:
+    - os: windows
 
 env:
   matrix:
