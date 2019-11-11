@@ -20,12 +20,19 @@ use Morebec\YDB\TableSchema;
  */
 class TableTest extends \Codeception\Test\Unit
 {
+    /** @var array Should contain created tables names */
+    public $tableNames = [];
+
+    /** @var string  contain a table name which should create test method*/
+    public $tableName = '' ;
+
     public function _before()
     {
         $config = new DatabaseConfig(
             Directory::fromStringPath(__DIR__ . '/../_data/test-db')
         );
         $this->database = new Database($config);
+        $this->generateRandomTableName();
     }
 
     public function _after()
@@ -36,7 +43,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testCreateRecord(): void
     {
         $table = $this->database->createTable(
-            new TableSchema('test-create-record', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING()),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -65,7 +72,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testUpdateRecord()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-update-record', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING())
@@ -96,7 +103,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testDeleteRecord()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-delete-record', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING())
@@ -122,7 +129,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testQueryRecordMultipleCriteria($value='')
     {
         $table = $this->database->createTable(
-            new TableSchema('test-query-multiple-record', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -168,7 +175,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testComplexQueryWithQueryBuilder()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-query-builder', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -230,7 +237,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testAddColumn()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-add-column', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -262,7 +269,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testUpdateColumn()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-update-column', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -299,7 +306,7 @@ class TableTest extends \Codeception\Test\Unit
     public function testDeleteColumn()
     {
         $table = $this->database->createTable(
-            new TableSchema('test-delete-column', [
+            new TableSchema($this->tableName, [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('first_name', ColumnType::STRING()),
                 new Column('last_name', ColumnType::STRING()),
@@ -326,5 +333,21 @@ class TableTest extends \Codeception\Test\Unit
         );
 
         $this->assertNull($r);
+    }
+
+    public function generateRandomTableName(int $length = 10):void
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomTableName = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomTableName .= $characters[rand(0, $charactersLength - 1)];
+        }
+        if (in_array($randomTableName, $this->tableNames)) {
+            $this->generateRandomTableName();
+        }else{
+            $this->tableNames[] = $randomTableName;
+            $this->tableName = $randomTableName;
+        }
     }
 }
