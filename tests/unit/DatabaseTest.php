@@ -13,19 +13,12 @@ use Morebec\YDB\TableSchema;
  */
 class DatabaseTest extends \Codeception\Test\Unit
 {
-    /** @var array Should contain created tables names */
-    public $tableNames = [];
-
-    /** @var string  contain a table name which should create test method*/
-    public $tableName = '' ;
-
     public function _before()
     {
         $config = new DatabaseConfig(
             Directory::fromStringPath(__DIR__ . '/../_data/test-db')
         );
         $this->database = new Database($config);
-        $this->generateRandomTableName();
     }
 
     public function _passed()
@@ -35,66 +28,45 @@ class DatabaseTest extends \Codeception\Test\Unit
     
     public function testCreateTable(): void
     {
-        $table = $this->database->createTable(
-            new TableSchema($this->tableName, [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-create-table');
+
         $this->assertTrue($this->database->tableExists($table));
     }
 
     public function testUpdateTable()
     {
-        $table = $this->database->createTable(
-            new TableSchema($this->tableName, [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
-        $this->assertTrue($this->database->tableExists($table));
-        $this->generateRandomTableName();
+        $table = $this->createTestTable('test-update-table');
 
-        $newSchema = new TableSchema($this->tableName, [
+        $this->assertTrue($this->database->tableExists($table));
+
+        $newSchema = new TableSchema('test-update-table-with-new-name', [
                 new Column('id', ColumnType::STRING(), true),
                 new Column('a_column', ColumnType::STRING())
         ]);
 
         $table = $this->database->updateTable($table, $newSchema);
-
+        
         $this->assertEquals($table->getSchema(), $newSchema);
     }
 
     public function testDeleteTable()
     {
-        $table = $this->database->createTable(
-            new TableSchema($this->tableName, [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-update-table');
 
         $this->database->deleteTable($table);
 
         $this->assertFalse($this->database->tableExists($table));
     }
 
-    public function generateRandomTableName(int $length = 10):void
+    protected function createTestTable(string $tableName):Morebec\YDB\Table
     {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomTableName = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomTableName .= $characters[rand(0, $charactersLength - 1)];
-        }
-        if (in_array($randomTableName, $this->tableNames)) {
-            $this->generateRandomTableName();
-        }else{
-            $this->tableNames[] = $randomTableName;
-            $this->tableName = $randomTableName;
-        }
+        return $this->database->createTable(
+            new TableSchema($tableName,[
+                new Column('id', ColumnType::STRING(), true),
+                new Column('firstname', ColumnType::STRING()),
+                new Column('lastname', ColumnType::STRING())
+
+            ])
+        );
     }
 }
