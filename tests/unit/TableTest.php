@@ -35,14 +35,7 @@ class TableTest extends \Codeception\Test\Unit
     
     public function testCreateRecord(): void
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-create-record', [
-                new Column('id', ColumnType::STRING()),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER(), true)
-            ])
-        );
+        $table = $this->createTestTable('test-create-record');
 
         $record = new Record(
             RecordId::generate(),
@@ -64,13 +57,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testUpdateRecord()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-update-record', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-update-record',false);
 
         $record = new Record(
             RecordId::generate(),
@@ -95,13 +82,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testDeleteRecord()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-delete-record', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-delete-record',false);
 
         $record = new Record(
             RecordId::generate(),
@@ -121,14 +102,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testQueryRecordMultipleCriteria($value='')
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-query-multiple-record', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER())
-            ])
-        );
+        $table = $this->createTestTable('test-query-multiple-record');
 
         $record = new Record(
             RecordId::generate(),
@@ -167,14 +141,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testComplexQueryWithQueryBuilder()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-query-builder', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER())
-            ])
-        );
+        $table = $this->createTestTable('test-query-builder');
 
         $table->addRecord(new Record(
                 RecordId::generate(),
@@ -229,14 +196,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testAddColumn()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-add-column', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER())
-            ])
-        );
+        $table = $this->createTestTable('test-add-column');
 
         $record = new Record(
             RecordId::generate(),
@@ -261,14 +221,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testUpdateColumn()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-update-column', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER())
-            ])
-        );
+        $table = $this->createTestTable('test-update-column');
 
         $record = new Record(
             RecordId::generate(),
@@ -298,14 +251,7 @@ class TableTest extends \Codeception\Test\Unit
 
     public function testDeleteColumn()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-delete-column', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('first_name', ColumnType::STRING()),
-                new Column('last_name', ColumnType::STRING()),
-                new Column('age', ColumnType::INTEGER())
-            ])
-        );
+        $table = $this->createTestTable('test-delete-column');
 
         $record = new Record(
             RecordId::generate(),
@@ -326,5 +272,29 @@ class TableTest extends \Codeception\Test\Unit
         );
 
         $this->assertNull($r);
+    }
+
+    protected function createTestTable(string $tableName,bool $hasAge = true):Morebec\YDB\Table
+    {
+        $schema = $this->createTestTableSchema($hasAge);
+
+        return $this->database->createTable(
+            new TableSchema($tableName,$schema)
+        );
+    }
+
+    protected function createTestTableSchema(bool $hasAge)
+    {
+        $schema = [
+            new Column('id', ColumnType::STRING(), true),
+            new Column('first_name', ColumnType::STRING()),
+            new Column('last_name', ColumnType::STRING()),
+        ];
+
+        if ($hasAge) {
+            $schema[] = new Column('age', ColumnType::INTEGER());
+        }
+
+        return $schema;
     }
 }
