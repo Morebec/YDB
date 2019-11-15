@@ -100,7 +100,7 @@ class TableTest extends \Codeception\Test\Unit
         $this->assertNull($r);
     }
 
-    public function testQueryRecordMultipleCriteria($value='')
+    public function testQueryRecordMultipleCriteria()
     {
         $table = $this->createTestTable('test-query-record-multiple-criteria',[new Column('age', ColumnType::INTEGER())] );
 
