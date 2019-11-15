@@ -276,16 +276,16 @@ class TableTest extends \Codeception\Test\Unit
 
     protected function createTestTable(string $tableName,array $additionalColumns = []):Morebec\YDB\Table
     {
-        $baseSchema = [
+        $baseColumns = [
             new Column('id', ColumnType::STRING(), true),
             new Column('first_name', ColumnType::STRING()),
             new Column('last_name', ColumnType::STRING()),
         ];
 
-        $schema = array_merge($baseSchema,$additionalColumns);
+        $columns = array_merge($baseColumns,$additionalColumns);
 
         return $this->database->createTable(
-            new TableSchema($tableName,$schema)
+            new TableSchema($tableName,$columns)
         );
     }
 }
