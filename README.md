@@ -3,6 +3,16 @@ YDB is a simple PHP utility library to use Yaml as a flat file databases
 
 [![Build Status](https://travis-ci.com/Morebec/YDB.svg?branch=master)](https://travis-ci.com/Morebec/YDB)
 
+YDB is a PHP library used by Morebec in some client projects to allow the use of
+yaml files as a database. Some of our clients have technical abilities to view and
+edit YAML files and therefore want their projects to save all their data using this
+format in such a way that when they require it, they can manually update the data themselves.
+It also provides the benifit of applying VCS on the database's data.
+YDB therfore provides an easy way to communicate with such a database in a
+simple and efficient way. It offers functionalities, like table management, table schema
+updates and data indexing for improved performance, as well as a custom SQL like language
+called YQL that allows to query the database in a more user-friendly manner.
+
 ## Installation
 To install the library in a project, add this to your `composer.json` file:
 
