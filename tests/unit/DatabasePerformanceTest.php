@@ -67,7 +67,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         
         $delta = $t2 - $t;
 
-        $this->assertTrue($delta <= 1.5);
+        $this->assertLessThanOrEqual(1.5, $delta);
     }
 
     public function testQueryAll()
@@ -82,7 +82,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         
         $delta = $t2 - $t;
 
-        $this->assertTrue($delta <= 1);
+        $this->assertLessThanOrEqual(1, $delta);
     }
 
     public function testQueryOneNotIndexed()
@@ -96,7 +96,7 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         $t2 = time();
         
         $delta = $t2 - $t;
-        $this->assertTrue($delta <= 1);
+        $this->assertLessThanOrEqual(1, $delta);
     }
 
     public function testQueryOneIndexed()
@@ -112,6 +112,6 @@ class DatabasePerformanceTest extends \Codeception\Test\Unit
         $t2 = time();
         
         $delta = $t2 - $t;
-        $this->assertTrue($delta <= 1);
+        $this->assertLessThanOrEqual(1, $delta);
     }
 }
