@@ -21,32 +21,22 @@ class DatabaseTest extends \Codeception\Test\Unit
         $this->database = new Database($config);
     }
 
-    public function _after()
+    public function _passed()
     {
         $this->database->delete();
     }
     
     public function testCreateTable(): void
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-create-table', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-create-table');
+
         $this->assertTrue($this->database->tableExists($table));
     }
 
     public function testUpdateTable()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-update-table', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-update-table');
+
         $this->assertTrue($this->database->tableExists($table));
 
         $newSchema = new TableSchema('test-update-table-with-new-name', [
@@ -55,22 +45,28 @@ class DatabaseTest extends \Codeception\Test\Unit
         ]);
 
         $table = $this->database->updateTable($table, $newSchema);
-
+        
         $this->assertEquals($table->getSchema(), $newSchema);
     }
 
     public function testDeleteTable()
     {
-        $table = $this->database->createTable(
-            new TableSchema('test-update-table', [
-                new Column('id', ColumnType::STRING(), true),
-                new Column('firstname', ColumnType::STRING()),
-                new Column('lastname', ColumnType::STRING())
-            ])
-        );
+        $table = $this->createTestTable('test-update-table');
 
         $this->database->deleteTable($table);
 
         $this->assertFalse($this->database->tableExists($table));
+    }
+
+    protected function createTestTable(string $tableName):Morebec\YDB\Table
+    {
+        return $this->database->createTable(
+            new TableSchema($tableName,[
+                new Column('id', ColumnType::STRING(), true),
+                new Column('firstname', ColumnType::STRING()),
+                new Column('lastname', ColumnType::STRING())
+
+            ])
+        );
     }
 }
