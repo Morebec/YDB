@@ -7,6 +7,7 @@ use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Exception\DatabaseException;
+use Morebec\YDB\Exception\DatabaseNotFoundException;
 use Morebec\YDB\Service\Engine;
 
 /**
@@ -47,9 +48,9 @@ class DeleteDatabaseCommandHandlerTest extends \Codeception\Test\Unit
 
 
         $handler = new DeleteDatabaseCommandHandler($engine);
-        $handler(new DeleteDatabaseCommand());
 
         // The database does not exist
-        $this->expectException(DatabaseException::class);
+        $this->expectException(DatabaseNotFoundException::class);
+        $handler(new DeleteDatabaseCommand());
     }
 }
