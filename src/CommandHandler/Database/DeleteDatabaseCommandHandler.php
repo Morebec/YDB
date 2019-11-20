@@ -4,6 +4,7 @@ namespace Morebec\YDB\CommandHandler\Database;
 
 use Morebec\ValueObjects\File\Directory;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
+use Morebec\YDB\Event\Database\DatabaseDeletedEvent;
 use Morebec\YDB\Exception\DatabaseException;
 use Morebec\YDB\Exception\DatabaseNotFoundException;
 use Morebec\YDB\Service\Database;
@@ -48,5 +49,7 @@ class DeleteDatabaseCommandHandler
                 "Error while deleting root directory at '$location'. Reason: " . $e->getMessage()
             );
         }
+
+        $this->database->dispatchEvent(DatabaseDeletedEvent::NAME, new DatabaseDeletedEvent());
     }
 }
