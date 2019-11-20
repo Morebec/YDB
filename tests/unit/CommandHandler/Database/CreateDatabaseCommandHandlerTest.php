@@ -27,6 +27,10 @@ class CreateDatabaseCommandHandlerTest extends \Codeception\Test\Unit
 
         $fs = $engine->getFilesystem();
         $this->assertTrue($fs->exists($location));
+
+        // Clean delete database
+        $handler = new DeleteDatabaseCommandHandler($engine);
+        $handler(new DeleteDatabaseCommand());
     }
      
     public function testCreateDatabaseWhenItAlreadyExistsThrowsException(): void
