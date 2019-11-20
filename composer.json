@@ -27,6 +27,7 @@
         "katzgrau/klogger": "^1.0",
         "monolog/monolog": "^2.0",
         "morebec/value-objects": "dev-master",
+        "symfony/event-dispatcher": "^4.3",
         "symfony/filesystem": "^4.3",
         "symfony/lock": "^4.3",
         "symfony/messenger": "^4.3",

@@ -5,6 +5,7 @@ namespace Morebec\YDB\CommandHandler\Database;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
 use Morebec\YDB\Exception\DatabaseException;
+use Morebec\YDB\Exception\DatabaseNotFoundException;
 use Morebec\YDB\Service\Engine;
 use Psr\Log\LogLevel;
 
@@ -31,7 +32,7 @@ class DeleteDatabaseCommandHandler
         $filesystem = $this->engine->getFilesystem();
         
         if(!$filesystem->exists($location)) {
-            throw new DatabaseException(
+            throw new DatabaseNotFoundException(
                 "Cannot delete database at location $location: directory does not exists"
             );
         }

@@ -5,6 +5,7 @@ namespace Morebec\YDB\CommandHandler\Database;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Database;
+use Morebec\YDB\Event\Database\DatabaseCreatedEvent;
 use Morebec\YDB\Exception\DatabaseException;
 use Morebec\YDB\Service\Engine;
 use Psr\Log\LogLevel;
@@ -46,6 +47,6 @@ class CreateDatabaseCommandHandler
             );
         }
 
-        $this->engine->log(LogLevel::INFO, 'Database created');
+        $this->engine->dispatchEvent(DatabaseCreatedEvent::NAME, new DatabaseCreatedEvent());
     }
 }

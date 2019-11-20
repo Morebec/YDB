@@ -18,6 +18,7 @@ class DefaultLogger extends Logger
         parent::__construct('ydb');
         $root = $config->getDatabasePath();
         $logsDir = $root . "/" . Database::LOGS_DIR_NAME;
+        
         $this->pushHandler(new RotatingFileHandler($logsDir, Logger::WARNING));
     }
 }
