@@ -2,6 +2,7 @@
 
 namespace Morebec\YDB\Service;
 
+use Morebec\YDB\CommandHandler\Database\ClearDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Database\CreateDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Database\DeleteDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Table\CreateTableCommandHandler;
@@ -45,7 +46,7 @@ class DatabaseCommandBus extends MessageBus
             // Database Commands
             CreateDatabaseCommand::class => [new CreateDatabaseCommandHandler($database)],
             DeleteDatabaseCommand::class => [new DeleteDatabaseCommandHandler($database)],
-            ClearDatabaseCommand::class => [new ClearDatabaseCommand($database)],
+            ClearDatabaseCommand::class => [new ClearDatabaseCommandHandler($database)],
 
             // Table Commands
             CreateTableCommand::class => [new CreateTableCommandHandler($database)]

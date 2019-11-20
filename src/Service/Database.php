@@ -50,9 +50,9 @@ class Database
      * Dispatches a command on the database's engine
      * @param  DatabaseCommandInterface $command command
      */
-    public function disptachCommand(DatabaseCommandInterface $command): void
+    public function dispatchCommand(DatabaseCommandInterface $command): void
     {
-        $this->engine->disptachCommand($command);
+        $this->engine->dispatchCommand($command);
     }
 
     /**

@@ -26,7 +26,7 @@ class CreateDatabaseCommandHandler
     {
         $location = $this->database->getPath();
 
-        // Check if the directory where the databse is located actually exists
+        // Check if the directory where the database is located actually exists
         $filesystem = $this->database->getFilesystem();
         if($filesystem->exists($location)) {
             throw new DatabaseException(

@@ -2,7 +2,7 @@
 
 namespace Morebec\YDB\Service;
 
-use Morebec\YDB\Command\DatabseCommandInterface;
+use Morebec\YDB\Command\DatabaseCommandInterface;
 use Morebec\YDB\Service\Database;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Event\DatabaseEvent;
@@ -67,9 +67,9 @@ class Engine implements EventSubscriberInterface
 
     /**
      * Dispatches a command through the command bus
-     * @param  DatabseCommandInterface $command command to dispatch
+     * @param  DatabaseCommandInterface $command command to dispatch
      */
-    public function dispatchCommand(DatabseCommandInterface $command): void
+    public function dispatchCommand(DatabaseCommandInterface $command): void
     {
         try {
             $this->commandBus->dispatch($command);

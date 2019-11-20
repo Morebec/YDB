@@ -2,9 +2,10 @@
 
 namespace Morebec\YDB;
 
+use Morebec\YDB\Command\Database\ClearDatabaseCommand;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
-use Morebec\YDB\Command\Database\ClearDatabaseCommand;
+use Morebec\YDB\Service\Database;
 
 /**
  * The Database connection is the main entry point
