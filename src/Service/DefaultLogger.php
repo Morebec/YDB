@@ -15,10 +15,10 @@ class DefaultLogger extends Logger
     
     function __construct(DatabaseConfig $config)
     {
-        parent::__construct('ydb');
+        parent::__construct('default');
         $root = $config->getDatabasePath();
         $logsDir = $root . "/" . Database::LOGS_DIR_NAME;
         
-        $this->pushHandler(new RotatingFileHandler($logsDir, Logger::WARNING));
+        $this->pushHandler(new RotatingFileHandler($logsDir . '/database.log', Logger::DEBUG));
     }
 }
