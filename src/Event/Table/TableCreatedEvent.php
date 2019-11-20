@@ -5,11 +5,11 @@ namespace Morebec\YDB\Event\Table;
 use Morebec\YDB\Event\DatabaseEvent;
 
 /**
- * Fired when a table is cleared
+ * Fired when a table is created
  */
-class TableClearedEvent extends DatabaseEvent
+class TableCreatedEvent extends DatabaseEvent
 {
-    const NAME = 'table.cleared';
+    const NAME = 'table.created';
 
     /** @var string name of the table that was cleared */
     private $tableName;

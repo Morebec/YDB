@@ -2,23 +2,32 @@
 
 namespace Morebec\YDB\Service;
 
+use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
+use Morebec\ValueObjects\File\File;
+use Morebec\YDB\Contract\TableInterface;
+use Morebec\YDB\Contract\TableSchemaInterface;
+use Morebec\YDB\Entity\Column;
+use Morebec\YDB\Entity\Table;
+use Morebec\YDB\Entity\TableSchema;
+use Morebec\YDB\Exception\TableNotFoundException;
+use Morebec\YDB\Exception\TableSchemaNotFoundException;
 
 /**
  * Class responsible for loading tables
  */
 class TableLoader
 {
-    /** @var Directory directory containing all tables */
-    private $tablesDir;
+    /** @var TableManager */
+    private $tableManager;
 
     /**
      * Constructs an instance of this loader
-     * @param Directory $tablesDir directory containing all tables
+     * @param Directory $tableManager directory containing all tables
      */
-    function __construct(Directory $tablesDir)
+    function __construct(TableManager $tableManager)
     {
-        $this->tablesDir = $tablesDir;
+        $this->tableManager = $tableManager;
     }
 
     /**
@@ -46,7 +55,7 @@ class TableLoader
      */
     public function loadTables(): array
     {
-        $files = $this->tablesDir;
+        $files = $this->tableManager->getTablesDirectory();
         $tables = [];
         foreach ($files as $file) {
             if (!$file instanceof Directory) {
@@ -72,7 +81,7 @@ class TableLoader
      * @param  Directory $directory directory
      * @return TableSchemaInterface
      */
-    private function loadTableSchemaByName(string $tableName): TableSchemaInterface
+    public function loadTableSchemaByName(string $tableName): TableSchemaInterface
     {
         $directory = $this->getTableDirectory($tableName);
 
@@ -80,7 +89,7 @@ class TableLoader
         $schemaFile = File::fromStringPath($directory . "/" . TableSchema::SCHEMA_FILE_NAME);
         
         if(!$schemaFile->exists()) {
-            throw new TableSchemaNotFoundException($tableName, $TableSchema);
+            throw new TableSchemaNotFoundException($tableName);
         }
 
         $schema = Yaml::parse($schemaFile->getContent());
@@ -103,6 +112,8 @@ class TableLoader
      */
     private function getTableDirectory(string $tableName): Directory
     {
-        return Directory::fromStringPath($this->tablesDir . "/$tableName");
+        return Directory::fromStringPath(
+            $this->tableManager->getTablesDirectory() . "/$tableName"
+        );
     }
 }

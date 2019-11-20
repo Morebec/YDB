@@ -5,6 +5,7 @@ namespace Morebec\YDB\Service;
 use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
+use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Exception\TableNotFoundException;
 
 /**
@@ -21,7 +22,10 @@ class TableManager
     function __construct(string $databasePath)
     {
         $this->databasePath = $databasePath;
-        $this->tableLoader = new TableLoader($this->getTablesDirectory());
+
+        $this->tableLoader = new TableLoader($this);
+        $this->tableUpdater = new TableUpdater($this);
+        $this->tableQuerier = new TableQuerier($this);
     }
 
     /**
@@ -48,7 +52,7 @@ class TableManager
      */
     public function tableExists(string $tableName): bool
     {
-        return $this->tableLoader->tableExists();
+        return $this->tableLoader->tableExists($tableName);
     }
 
     /**
@@ -67,7 +71,7 @@ class TableManager
      * Returns the directory containing the tables
      * @return Directory
      */
-    private function getTablesDirectory(): Directory
+    public function getTablesDirectory(): Directory
     {
         return Directory::fromStringPath($this->databasePath . '/' . Database::TABLES_DIR_NAME);
     }
@@ -81,8 +85,9 @@ class TableManager
      */
     public function queryRecordsFromTable(string $tableName, QueryInterface $query): \Generator
     {
-        
+        $this->tableQuerier->queryRecordsFromTable($tableName, $query);
     }
+
 
     /**
      * Queries a single record from the database matching a query
@@ -94,6 +99,29 @@ class TableManager
      */
     public function queryOneRecordFromTable(string $tableName, QueryInterface $query): ?RecordInterface
     {
-        # code...
+        $this->tableQuerier->queryOneRecordFromTable($tableName, $query);
+    }
+
+    /**
+     * Returns the schema of a table  by its name
+     * @param  string $tableName name of the table
+     * @return TableSchemaInterface
+     */
+    public function getTableSchema(string $tableName): TableSchemaInterface
+    {
+        $this->tableLoader->loadTableSchemaByName($tableName);
+    }
+
+    /**
+     * Returns the directory of table by its name
+     * @param  string $tableName name of the table
+     * @return Directory
+     */
+    public function getTableDirectory(string $tableName): Directory
+    {
+        // TODO: This line also apears in the table loader ...
+        // Move this in a centralized place, either tableManager, 
+        // or maybe a TableLocator class
+        return Directory::fromStringPath($this->tablesDirectory . "/$tableName");
     }
 }

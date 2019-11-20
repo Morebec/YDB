@@ -100,6 +100,16 @@ class Database
     }
 
     /**
+     * Indicates if a table exists or not
+     * @param  string $tableName name of the table
+     * @return bool            true if it exists, otherwise false
+     */
+    public function tableExists(string $tableName): bool
+    {
+        return $this->tableManager->tableExists($tableName);
+    }
+
+    /**
      * Returns a list of all the table names
      * @return array
      */
