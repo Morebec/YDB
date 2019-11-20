@@ -4,8 +4,10 @@ namespace Morebec\YDB\CommandHandler\Database;
 
 use Morebec\ValueObjects\File\Directory;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
+use Morebec\YDB\Database;
 use Morebec\YDB\Exception\DatabaseException;
 use Morebec\YDB\Service\Engine;
+use Psr\Log\LogLevel;
 
 /**
  * Handles the creation of a database
@@ -35,13 +37,15 @@ class CreateDatabaseCommandHandler
         // Create directories
         try {
             $filesystem->mkdir($location);
-            $filesystem->mkdir('$location/tables');
-            $filesystem->mkdir('$location/bin');
-            $filesystem->mkdir('$location/logs');
+            $filesystem->mkdir("$location/" . Database::TABLE_DIR_NAME);
+            $filesystem->mkdir("$location/" . Database::BIN_DIR_NAME);
+            $filesystem->mkdir("$location/" . Database::LOGS_DIR_NAME);
         } catch (\Exception $e) {
             throw new DatabaseException(
                 "Error while creating database structure '$location'. Reason: " . $e->getMessage()
             );
         }
+
+        $this->engine->log(LogLevel::INFO, 'Database created');
     }
 }

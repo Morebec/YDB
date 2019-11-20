@@ -11,6 +11,15 @@ use Morebec\YDB\Service\Engine;
  */
 class Database
 {
+    /** Name of the directory containing the tables */
+    const TABLE_DIR_NAME = 'tables';
+
+    /** Name of the directory containing the binary files */
+    const BIN_DIR_NAME = 'bin';
+
+    /** Name of the directory containing the logs */
+    const LOGS_DIR_NAME = 'logs';
+
     private function __construct()
     {
     }

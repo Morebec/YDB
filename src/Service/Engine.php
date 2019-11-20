@@ -23,10 +23,24 @@ class Engine
 
     function __construct(DatabaseConfig $config)
     {
+        $this->filesystem = new Filesystem();
+
+        // Make path relative
+        $config->setDatabasePath(
+            $this->filesystem->makePathRelative($config->getDatabasePath(), getcwd())
+        );
+
         $this->databaseConfig = $config;
         $this->commandBus = new DatabaseCommandBus($this);
+
+        // Set the logger or use the default one if none provided
         $this->logger = $config->getLogger();
-        $this->filesystem = new Filesystem();
+        if(!$this->logger) {
+            // The default logger automatically creates a logs directory
+            // even if the database was not created yet. 
+            // This is problematic. Find a workaround
+            $this->logger = new DefaultLogger($config);
+        }
     }
 
     /**
@@ -35,7 +49,14 @@ class Engine
      */
     public function dispatchCommand(DatabseCommandInterface $command): void
     {
-        $this->commandBus->dispatch($command);
+        try {
+            $this->commandBus->dispatch($command);
+        } catch (\Exception $e) {
+            $this->log(LogLevel::CRITICAL, 'There was an exception: ' . $e->getMessage(), [
+                'exception_class' => get_class($e)
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -44,11 +65,12 @@ class Engine
      * @param  string   $message message
      * @param  array    $context optional context data
      */
-    public function log(LogLevel $level, string $message, array $context = [])
+    public function log(string $level, string $message, array $context = [])
     {
         if(!$this->logger) return;
 
-        $this->logger-log($level, $message, $context);
+        $context['database_root'] = $this->databaseConfig->getDatabasePath();
+        $this->logger->log($level, $message, $context);
     }
 
     /**

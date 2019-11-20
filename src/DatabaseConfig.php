@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 class DatabaseConfig
 {   
     /**
-     * Directory where the database should be located
+     * Relative path to the directory where the database should be located
      * @var string
      */
     private $databasePath;
@@ -36,7 +36,7 @@ class DatabaseConfig
      *
      * @return self
      */
-    public function setDatabasePath(string $databasePath): string
+    public function setDatabasePath(string $databasePath): self
     {
         $this->databasePath = $databasePath;
 
@@ -52,11 +52,12 @@ class DatabaseConfig
     }
 
     /**
+     * If set to null will use the default logger which is a Monolog Rotating Log Handler
      * @param LoggerInterface $logger
      *
      * @return self
      */
-    public function setLogger(?LoggerInterface $logger)
+    public function setLogger(?LoggerInterface $logger): self
     {
         $this->logger = $logger;
 
