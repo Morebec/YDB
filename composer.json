@@ -28,6 +28,7 @@
         "morebec/value-objects": "dev-master",
         "symfony/filesystem": "^4.3",
         "symfony/lock": "^4.3",
+        "symfony/messenger": "^4.3",
         "symfony/yaml": "^4.3"
     },
     "require-dev": {
@@ -41,7 +42,7 @@
         }
     },
     "scripts": {
-        "test": "php vendor/bin/codecept config:validate && php vendor/bin/codecept run --coverage-xml",
+        "test": "php vendor/bin/codecept config:validate && vendor/bin/codecept clean && php vendor/bin/codecept run --coverage-xml",
         "test-no-performance": "php vendor/bin/codecept run --coverage-xml --skip-group performance",
         "cs-lint": "php-cs-fixer fix src/ --diff -vvv --dry-run",
         "cs-fix": "php-cs-fixer fix src/ -vvv || true",

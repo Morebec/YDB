@@ -2,7 +2,7 @@
 
 namespace Morebec\YDB;
 
-use Morebec\ValueObjects\File\Directory;
+use Psr\Log\LoggerInterface;
 
 /**
  * DatabaseConfig
@@ -15,31 +15,28 @@ class DatabaseConfig
      */
     private $databasePath;
 
-    /** @var bool indicates if logging should be enabled or not */
-    private $loggingEnabled = true;
+    /** @var LoggerInterface|null logger */
+    private $logger;
 
-    /** @var bool indicates if logging should be enabled */
-    private $indexingEnabled = true;
-
-    function __construct(Directory $databasePath)
+    function __construct(string $databasePath)
     {
         $this->databasePath = $databasePath;
     }
 
     /**
-     * @return Directory
+     * @return string
      */
-    public function getDatabasePath(): Directory
+    public function getDatabasePath(): string
     {
         return $this->databasePath;
     }
 
     /**
-     * @param Directory $databasePath
+     * @param string $databasePath
      *
      * @return self
      */
-    public function setDatabasePath(Directory $databasePath): Directory
+    public function setDatabasePath(string $databasePath): string
     {
         $this->databasePath = $databasePath;
 
@@ -47,65 +44,21 @@ class DatabaseConfig
     }
 
     /**
-     * @return bool
+     * @return LoggerInterface
      */
-    public function isLoggingEnabled(): bool
+    public function getLogger(): ?LoggerInterface
     {
-        return $this->loggingEnabled;
+        return $this->logger;
     }
 
     /**
-     * @param bool $loggingEnabled
+     * @param LoggerInterface $logger
      *
      * @return self
      */
-    public function enableLogging(bool $loggingEnabled): self
+    public function setLogger(?LoggerInterface $logger)
     {
-        $this->loggingEnabled = $loggingEnabled;
-
-        return $this;
-    }
-
-    /**
-     * Disables logging
-     * 
-     * @return self
-     */
-    public function disableLogging(): self
-    {
-        $this->loggingEnabled = false;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIndexingEnabled(): bool
-    {
-        return $this->indexingEnabled;
-    }
-
-    /**
-     * @param bool $indexingEnabled
-     *
-     * @return self
-     */
-    public function enableIndexing(bool $indexingEnabled): self
-    {
-        $this->indexingEnabled = $indexingEnabled;
-
-        return $this;
-    }
-
-    /**
-     * Disables indexing
-     * 
-     * @return self
-     */
-    public function disableIndexing(): self
-    {
-        $this->indexingEnabled = false;
+        $this->logger = $logger;
 
         return $this;
     }
