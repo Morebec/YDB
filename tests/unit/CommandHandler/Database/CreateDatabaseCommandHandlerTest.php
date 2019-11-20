@@ -16,8 +16,8 @@ class CreateDatabaseCommandHandlerTest extends \Codeception\Test\Unit
 {
     public function testCreateDatabase(): void
     {
-        $dbName = 'testCreateDatabaseWhenItAlreadyExistsThrowsException';
-        $location = __DIR__ . codecept_output_dir() . 'data/' . $dbName;
+        $dbName = 'testCreateDatabase';
+        $location = codecept_output_dir() . 'data/' . $dbName;
         $config = new DatabaseConfig($location);
 
         $engine = new Engine($config);
@@ -32,7 +32,7 @@ class CreateDatabaseCommandHandlerTest extends \Codeception\Test\Unit
     public function testCreateDatabaseWhenItAlreadyExistsThrowsException(): void
     {
         $dbName = 'testCreateDatabaseWhenItAlreadyExistsThrowsException';
-        $config = new DatabaseConfig(__DIR__ . codecept_output_dir() . 'data/' . $dbName);
+        $config = new DatabaseConfig(codecept_output_dir() . 'data/' . $dbName);
 
         $engine = new Engine($config);
         $handler = new CreateDatabaseCommandHandler($engine);
@@ -42,7 +42,7 @@ class CreateDatabaseCommandHandlerTest extends \Codeception\Test\Unit
         // At this point it should already exist
         $this->expectException(DatabaseException::class);
         try {
-            //$handler(new CreateDatabaseCommand());
+            $handler(new CreateDatabaseCommand());
         } catch (DatabaseException $e) {
             // Clean up and rethrow for PHPUnit
             $handler = new DeleteDatabaseCommandHandler($engine);

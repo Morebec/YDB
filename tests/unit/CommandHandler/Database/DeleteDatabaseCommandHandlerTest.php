@@ -16,8 +16,8 @@ class DeleteDatabaseCommandHandlerTest extends \Codeception\Test\Unit
 {
     public function testDeleteDatabase(): void
     {
-        $dbName = 'testDeleteDatabaseWhenItDoesNotExistsThrowsException';
-        $location = __DIR__ . codecept_output_dir() . 'data/' .$dbName;
+        $dbName = 'testDeleteDatabase';
+        $location = codecept_output_dir() . 'data/' .$dbName;
         $config = new DatabaseConfig($location);
 
         $engine = new Engine($config);
@@ -41,15 +41,15 @@ class DeleteDatabaseCommandHandlerTest extends \Codeception\Test\Unit
     public function testDeleteDatabaseWhenItDoesNotExistsThrowsException(): void
     {
         $dbName = 'testDeleteDatabaseWhenItDoesNotExistsThrowsException';
-        $config = new DatabaseConfig(__DIR__ . codecept_output_dir() . 'data/' .$dbName);
+        $config = new DatabaseConfig(codecept_output_dir() . 'data/' .$dbName);
 
         $engine = new Engine($config);
 
 
         $handler = new DeleteDatabaseCommandHandler($engine);
+        $handler(new DeleteDatabaseCommand());
 
         // The database does not exist
         $this->expectException(DatabaseException::class);
-        $handler(new DeleteDatabaseCommand());
     }
 }
