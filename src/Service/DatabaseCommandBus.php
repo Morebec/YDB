@@ -15,12 +15,16 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
  */
 class DatabaseCommandBus extends MessageBus
 {
-    function __construct(Engine $engine)
+    /**
+     * Constructs an instance of DatabaseCommandBus
+     * @param Database $database database
+     */
+    function __construct(Database $database)
     {
         parent::__construct([
             new HandleMessageMiddleware(
                 new HandlersLocator(
-                    $this->buildHandlersList($engine)
+                    $this->buildHandlersList($database)
                 )
             ),
         ]);
@@ -29,14 +33,14 @@ class DatabaseCommandBus extends MessageBus
     /**
      * Builds the list of commands and their associated handlers
      * and returns it
-     * @param  Engine $engine engine
+     * @param  Database $database database
      * @return array
      */
-    private function buildHandlersList(Engine $engine): array
+    private function buildHandlersList(Database $database): array
     {
         return [
-            CreateDatabaseCommand::class => [new CreateDatabaseCommandHandler($engine)],
-            DeleteDatabaseCommand::class => [new DeleteDatabaseCommandHandler($engine)],
+            CreateDatabaseCommand::class => [new CreateDatabaseCommandHandler($database)],
+            DeleteDatabaseCommand::class => [new DeleteDatabaseCommandHandler($database)],
         ];
     }
 }

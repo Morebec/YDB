@@ -3,28 +3,29 @@
 namespace Morebec\YDB\Service;
 
 use Morebec\YDB\Command\DatabseCommandInterface;
+use Morebec\YDB\Service\Database;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Event\DatabaseEvent;
 use Morebec\YDB\Event\Database\DatabaseCreatedEvent;
-use Morebec\YDB\Service\DefaultLogger;
+use Morebec\YDB\Service\DatabaseLogger;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * The engine class serves as a service container
- * for the diffrent command handlers of the database
+ * The engine class serves as a service container.
+ * It builds the different services and maintains an interface to them. 
  */
 class Engine implements EventSubscriberInterface
 {
-    /** @var DatabaseConfig */
-    private $databaseConfig;
+    /** @var Database */
+    private $database;
 
-    /** @var DatabaseCommandBus */
+    /** @var DatabaseCommandBus usd to issue commands */
     private $commandBus;
 
-    /** @var Filesystem */
+    /** @var Filesystem used for file manipulation by the different services */
     private $filesystem;
 
     /** @var LoggerInterface|null */
@@ -33,29 +34,35 @@ class Engine implements EventSubscriberInterface
     /** @var DatabaseEventDispatcher */
     private $eventDispatcher;
 
+    /** @var TableManager */
+    private $tableManager;
+
     function __construct(DatabaseConfig $config)
     {
+        // Initialize filesystem
         $this->filesystem = new Filesystem();
 
-        // Make path relative
-        $config->setDatabasePath(
-            $this->filesystem->makePathRelative($config->getDatabasePath(), getcwd())
-        );
+        // Initialize Database
+        $this->database = new Database($config, $this);
 
-        $this->databaseConfig = $config;
+        // Initialize command bus
+        $this->commandBus = new DatabaseCommandBus($this->database);
 
-        $this->commandBus = new DatabaseCommandBus($this);
+        // Initialize event dispatcher
         $this->eventDispatcher = new DatabaseEventDispatcher($this);
+
+        // Try to configure logger
+        if ($this->database->exists()) {
+            $this->setupLogger();
+        }
     }
 
     /**
      * Sets up the logger
      */
-    private function setupLogger()
+    private function setupLogger(): void
     {
-        if($this->logger) return;
-
-        $this->logger = new DefaultLogger($this->databaseConfig);
+        $this->logger = new DatabaseLogger($this->database->getPath());
     }
 
     /**
@@ -97,7 +104,7 @@ class Engine implements EventSubscriberInterface
     {
         if(!$this->logger) return;
 
-        $context['database_root'] = $this->databaseConfig->getDatabasePath();
+        $context['database_root'] = $this->database->getPath();
         $this->logger->log($level, $message, $context);
     }
 
@@ -113,11 +120,20 @@ class Engine implements EventSubscriberInterface
     }
 
     /**
+     * Returns the Database service instance
+     * @return Database
+     */
+    public function getDatabase(): Database
+    {
+        return $this->database;
+    }
+
+    /**
      * @return DatabaseConfig
      */
     public function getDatabaseConfig(): DatabaseConfig
     {
-        return $this->databaseConfig;
+        return $this->database->getConfig();
     }
 
     /**

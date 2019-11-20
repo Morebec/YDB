@@ -6,7 +6,7 @@ use Morebec\ValueObjects\File\Directory;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
 use Morebec\YDB\Exception\DatabaseException;
 use Morebec\YDB\Exception\DatabaseNotFoundException;
-use Morebec\YDB\Service\Engine;
+use Morebec\YDB\Service\Database;
 use Psr\Log\LogLevel;
 
 /**
@@ -14,22 +14,22 @@ use Psr\Log\LogLevel;
  */
 class DeleteDatabaseCommandHandler
 {
-    /** @var Engine */
-    private $engine;
+    /** @var Database */
+    private $database;
 
-    function __construct(Engine $engine)
+    function __construct(Database $database)
     {
-        $this->engine = $engine;   
+        $this->database = $database;   
     }
 
     public function __invoke(DeleteDatabaseCommand $command)
     {
-        $this->engine->log(LogLevel::INFO, 'Command Requested: Delete database');
+        $this->database->log(LogLevel::INFO, 'Command Requested: Delete database');
 
-        $location = $this->engine->getDatabaseConfig()->getDatabasePath();
+        $location = $this->database->getPath();
 
         // Check if the directory where the databse is located actually exists
-        $filesystem = $this->engine->getFilesystem();
+        $filesystem = $this->database->getFilesystem();
         
         if(!$filesystem->exists($location)) {
             throw new DatabaseNotFoundException(
@@ -38,10 +38,10 @@ class DeleteDatabaseCommandHandler
         }
 
         // Exists, let's delete it     
-        $filesystem = $this->engine->getFilesystem();
+        $filesystem = $this->database->getFilesystem();
 
         try {
-            $this->engine->log(LogLevel::INFO, 'Deleting database ...');
+            $this->database->log(LogLevel::INFO, 'Deleting database ...');
             $filesystem->remove($location);
         } catch (\Exception $e) {
             throw new DatabaseException(

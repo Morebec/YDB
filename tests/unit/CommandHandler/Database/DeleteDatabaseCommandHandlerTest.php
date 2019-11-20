@@ -22,13 +22,14 @@ class DeleteDatabaseCommandHandlerTest extends \Codeception\Test\Unit
         $config = new DatabaseConfig($location);
 
         $engine = new Engine($config);
+        $database = $engine->getDatabase();
 
         // Create the database
-        $handler = new CreateDatabaseCommandHandler($engine);
+        $handler = new CreateDatabaseCommandHandler($database);
         $handler(new CreateDatabaseCommand());
 
         // Delete the database
-        $handler = new DeleteDatabaseCommandHandler($engine);
+        $handler = new DeleteDatabaseCommandHandler($database);
         $handler(new DeleteDatabaseCommand());
 
         $fs = $engine->getFilesystem();
@@ -45,9 +46,10 @@ class DeleteDatabaseCommandHandlerTest extends \Codeception\Test\Unit
         $config = new DatabaseConfig(codecept_output_dir() . 'data/' .$dbName);
 
         $engine = new Engine($config);
+        $database = $engine->getDatabase();
 
 
-        $handler = new DeleteDatabaseCommandHandler($engine);
+        $handler = new DeleteDatabaseCommandHandler($database);
 
         // The database does not exist
         $this->expectException(DatabaseNotFoundException::class);
