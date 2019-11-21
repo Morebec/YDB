@@ -8,6 +8,8 @@ use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Event\DatabaseEvent;
 use Morebec\YDB\Event\Database\DatabaseCreatedEvent;
 use Morebec\YDB\Service\DatabaseLogger;
+use Morebec\YDB\Service\DatabaseCommandLogger;
+use Morebec\YDB\Service\DatabaseEventLogger;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,6 +32,12 @@ class Engine implements EventSubscriberInterface
 
     /** @var LoggerInterface|null */
     private $logger;
+
+    /** @var LoggerInterface|null */
+    private $commandLogger;
+
+    /** @var LoggerInterface|null */
+    private $eventLogger;
 
     /** @var DatabaseEventDispatcher */
     private $eventDispatcher;
@@ -63,6 +71,8 @@ class Engine implements EventSubscriberInterface
     private function setupLogger(): void
     {
         $this->logger = new DatabaseLogger($this->database->getPath());
+        $this->commandLogger = new DatabaseCommandLogger($this->database->getPath());
+        $this->eventLogger = new DatabaseEventLogger($this->database->getPath());
     }
 
     /**
@@ -100,12 +110,18 @@ class Engine implements EventSubscriberInterface
      * @param  string   $message message
      * @param  array    $context optional context data
      */
-    public function log(string $level, string $message, array $context = []): void
+    public function log(string $channel="default",string $level, string $message, array $context = []): void
     {
         if(!$this->logger) return;
 
         $context['database_root'] = (string)$this->database->getPath();
-        $this->logger->log($level, $message, $context);
+        if($channel=="default"){
+            $this->logger->log($level, $message, $context);
+        }else if($channel=="command"){
+            $this->commandLogger->log($level, $message, $context);
+        }else if($channel=="event"){
+            $this->eventLogger->log($level, $message, $context);
+        }
     }
 
     /**
