@@ -43,4 +43,9 @@ class TautologyCriterion implements CriterionInterface
     {
         return true;
     }
+
+    public function __toString()
+    {
+        return 'true === true';
+    }
 }

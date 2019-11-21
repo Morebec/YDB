@@ -14,11 +14,5 @@ interface QueryInterface extends ValueObjectInterface
      * @param  RecordInterface $r query
      * @return bool             true if it matches otherwise false
      */
-    public function matches(RecordInterface $record): bool;
-
-    /**
-     * Returns the list of criteria used in this query
-     * @return array
-     */
-    public function getCriteria(): array;
+    public function matchesRecord(RecordInterface $record): bool;
 }

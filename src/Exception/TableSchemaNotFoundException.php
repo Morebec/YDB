@@ -7,10 +7,8 @@ namespace Morebec\YDB\Exception;
  */
 class TableSchemaNotFoundException extends DatabaseException
 {
-    
     function __construct(string $tableName, string $schemaFile)
     {
         parent::__construct("Table schema not found on '$tableName' at '$schemaFile'");
     }
 }
-

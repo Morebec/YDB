@@ -5,8 +5,8 @@ namespace Morebec\YDB\Exception;
 use Morebec\YDB\Exception\DatabaseException;
 
 /**
- * QueryException
+ * YQLException
  */
-class QueryException extends DatabaseException
+class YQLException extends DatabaseException
 {
 }

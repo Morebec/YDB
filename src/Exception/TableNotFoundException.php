@@ -7,7 +7,6 @@ namespace Morebec\YDB\Exception;
  */
 class TableNotFoundException extends DatabaseException
 {
-    
     function __construct(string $tableName)
     {
         parent::__construct("Table '$tableName' was not found");

@@ -66,12 +66,14 @@ class TableQuerier
                        new QuerySource(QuerySource::INDEX) : 
                        new QuerySource(QuerySource::ALL)
         ;
-        
+
         if($finalSource == QuerySource::ALL) {
 
-        } 
-
+        }
     }
+
+
+
 
     private function getAndSource(TableSchemaInterface $schema, array $criteria): QuerySource
     {
