@@ -7,6 +7,7 @@ use Assert\Assertion;
 use Morebec\ValueObjects\ValueObjectInterface;
 use Morebec\YDB\Contract\ColumnInterface;
 use Morebec\YDB\Contract\ColumnTypeInterface;
+use Morebec\YDB\Enum\ColumnType;
 
 /**
  * Column
@@ -43,7 +44,7 @@ class Column implements ColumnInterface
             $data['name'], 
             new ColumnType($data['type']), 
             $data['indexed'],
-            $data['default']
+            $default
         );
     }
     /**

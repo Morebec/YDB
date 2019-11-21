@@ -6,9 +6,11 @@ use Morebec\YDB\CommandHandler\Database\ClearDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Database\CreateDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Database\DeleteDatabaseCommandHandler;
 use Morebec\YDB\CommandHandler\Table\CreateTableCommandHandler;
+use Morebec\YDB\CommandHandler\Record\InsertRecordCommandHandler;
 use Morebec\YDB\Command\Database\ClearDatabaseCommand;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
+use Morebec\YDB\Command\Record\InsertRecordCommand;
 use Morebec\YDB\Command\Table\CreateTableCommand;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
@@ -49,7 +51,11 @@ class DatabaseCommandBus extends MessageBus
             ClearDatabaseCommand::class => [new ClearDatabaseCommandHandler($database)],
 
             // Table Commands
-            CreateTableCommand::class => [new CreateTableCommandHandler($database)]
+            CreateTableCommand::class => [new CreateTableCommandHandler($database)],
+
+
+            // Record Commands
+            InsertRecordCommand::class => [new InsertRecordCommandHandler($database)]
         ];
     }
 }

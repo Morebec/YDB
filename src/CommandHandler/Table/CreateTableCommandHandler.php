@@ -4,7 +4,9 @@ namespace Morebec\YDB\CommandHandler\Table;
 
 use Morebec\YDB\Command\Table\CreateTableCommand;
 use Morebec\YDB\Contract\TableSchemaInterface;
+use Morebec\YDB\Entity\Column;
 use Morebec\YDB\Entity\TableSchema;
+use Morebec\YDB\Enum\ColumnType;
 use Morebec\YDB\Event\Table\TableCreatedEvent;
 use Morebec\YDB\Exception\TableAlreadyExistsException;
 use Morebec\YDB\Service\Database;
@@ -45,7 +47,17 @@ class CreateTableCommandHandler
         $this->createTableDirectory($path);
 
         // Create schema file
-        $this->createTableSchema($path, $command->getTableSchema());
+        $schema = $command->getTableSchema();
+
+        // Make sure there is an id field
+        if (!$schema->columnWithNameExists('id')) {
+            $schemaColumns = $schema->getColumns();
+            $schemaColumns[] = new Column('id', ColumnType::STRING(), true /* indexed */);
+
+            $schema = new TableSchema($schema->getTableName(), $schemaColumns);
+        }
+
+        $this->createTableSchema($path, $schema);
 
         $this->database->log(
             LogLevel::INFO, 

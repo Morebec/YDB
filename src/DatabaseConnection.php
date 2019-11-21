@@ -5,6 +5,10 @@ namespace Morebec\YDB;
 use Morebec\YDB\Command\Database\ClearDatabaseCommand;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
+use Morebec\YDB\Command\Record\InsertRecordCommand;
+use Morebec\YDB\Command\Table\CreateTableCommand;
+use Morebec\YDB\Contract\RecordInterface;
+use Morebec\YDB\Entity\TableSchema;
 use Morebec\YDB\Service\Database;
 
 /**

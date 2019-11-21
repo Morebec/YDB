@@ -19,7 +19,7 @@ class CreateTableCommandHandlerTest extends \Codeception\Test\Unit
     
     public function testCreateTable()
     {
-        $dbName = 'testCreateTable';
+        $dbName = 'test-create-table';
         $location = codecept_output_dir() . 'data/' . $dbName;
         $config = new DatabaseConfig($location);
 
@@ -43,7 +43,7 @@ class CreateTableCommandHandlerTest extends \Codeception\Test\Unit
     public function testCreateTableThatAlreadyExistsThrowsException()
     {
         // Create table once
-        $dbName = 'testCreateTable';
+        $dbName = 'test-create-table-that-already-exists-throws-exception';
         $location = codecept_output_dir() . 'data/' . $dbName;
         $config = new DatabaseConfig($location);
 
@@ -61,8 +61,11 @@ class CreateTableCommandHandlerTest extends \Codeception\Test\Unit
 
         // Create table again, should throw exception
         $this->expectException(TableAlreadyExistsException::class);
-        $handler($command);
-
-        (new DeleteDatabaseCommandHandler($database))(new DeleteDatabaseCommand());
+        try {
+            $handler($command);
+        } catch (TableAlreadyExistsException $e) {
+            (new DeleteDatabaseCommandHandler($database))(new DeleteDatabaseCommand());
+            throw $e;
+        }
     }    
 }

@@ -12,6 +12,7 @@ use Morebec\YDB\Entity\Table;
 use Morebec\YDB\Entity\TableSchema;
 use Morebec\YDB\Exception\TableNotFoundException;
 use Morebec\YDB\Exception\TableSchemaNotFoundException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class responsible for loading tables

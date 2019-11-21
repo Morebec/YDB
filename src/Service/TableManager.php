@@ -109,7 +109,7 @@ class TableManager
      */
     public function getTableSchema(string $tableName): TableSchemaInterface
     {
-        $this->tableLoader->loadTableSchemaByName($tableName);
+        return $this->tableLoader->loadTableSchemaByName($tableName);
     }
 
     /**
@@ -119,9 +119,11 @@ class TableManager
      */
     public function getTableDirectory(string $tableName): Directory
     {
-        // TODO: This line also apears in the table loader ...
+        // TODO: This line apears in multiple places ...
         // Move this in a centralized place, either tableManager, 
         // or maybe a TableLocator class
-        return Directory::fromStringPath($this->tablesDirectory . "/$tableName");
+        return Directory::fromStringPath(
+            $this->getTablesDirectory() . "/$tableName"
+        );
     }
 }

@@ -5,6 +5,7 @@ namespace Morebec\YDB\Service;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\Path;
 use Morebec\YDB\Command\DatabaseCommandInterface;
+use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\DatabaseConnection;
 use Morebec\YDB\Event\DatabaseEvent;
@@ -116,6 +117,36 @@ class Database
     public function getTableNames(): array
     {
         return $this->tableManager->getTableNames();
+    }
+
+    /**
+     * Returns the table schema associated with a table
+     * @param  string $tableName nameo f the table
+     * @return TableSchemaInterface
+     */
+    public function getTableSchema(string $tableName): TableSchemaInterface
+    {
+        return $this->tableManager->getTableSchema($tableName);
+    }
+
+    /**
+     * Returns the directory where a table is located
+     * @param  string $tableName name of the table
+     * @return Directory
+     */
+    public function getTableDirectory(string $tableName): Directory
+    {
+        return $this->tableManager->getTableDirectory($tableName);
+    }
+
+    /**
+     * Returns the directory where tables are located
+     * @param  string $tableDirectory directory
+     * @return Directory
+     */
+    public function getTablesDirectory(string $tableDirectory): Directory
+    {
+        return $this->tableManager->getTablesDirectory();
     }
 
     /**

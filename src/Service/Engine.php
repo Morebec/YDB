@@ -104,7 +104,7 @@ class Engine implements EventSubscriberInterface
     {
         if(!$this->logger) return;
 
-        $context['database_root'] = $this->database->getPath();
+        $context['database_root'] = (string)$this->database->getPath();
         $this->logger->log($level, $message, $context);
     }
 
