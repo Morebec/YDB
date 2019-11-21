@@ -8,6 +8,7 @@ use Morebec\YDB\Command\DatabaseCommandInterface;
 use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\DatabaseConnection;
+use Morebec\YDB\Entity\QueryResultInterface;
 use Morebec\YDB\Event\DatabaseEvent;
 use Morebec\YDB\Service\Engine;
 use Symfony\Component\Filesystem\Filesystem;
@@ -82,22 +83,9 @@ class Database
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function query(string $tableName, QueryInterface $query): \Generator
+    public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
     {
-        return $this->tableManager->queryRecordsFromTable($tableName, $query);   
-    }
-
-    /**
-     * Queries a table on the database for one single results and returns it or null
-     * if nothing was found.
-     * If more than one results match the query, throws an exception
-     * @param  string         $tableName name of the table
-     * @param  QueryInterface $query     query
-     * @return RecordInterface|null
-     */
-    public function queryOne(string $tableName, QueryInterface $query): RecordInterface
-    {
-        return $this->tableManager->queryOneRecordFromTable($tableName, $query);
+        return $this->tableManager->queryTable($tableName, $query);   
     }
 
     /**

@@ -6,6 +6,7 @@ use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\YDB\Contract\TableSchemaInterface;
+use Morebec\YDB\Entity\QueryResultInterface;
 use Morebec\YDB\Exception\TableNotFoundException;
 
 /**
@@ -83,23 +84,9 @@ class TableManager
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function queryRecordsFromTable(string $tableName, QueryInterface $query): \Generator
+    public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
     {
-        $this->tableQuerier->queryRecordsFromTable($tableName, $query);
-    }
-
-
-    /**
-     * Queries a single record from the database matching a query
-     * or return null if none found.
-     * If more than one records match the query, returns an exception
-     * @param  string         $tableName name of the table
-     * @param  QueryInterface $query     query
-     * @return RecordInterface|null
-     */
-    public function queryOneRecordFromTable(string $tableName, QueryInterface $query): ?RecordInterface
-    {
-        $this->tableQuerier->queryOneRecordFromTable($tableName, $query);
+        $this->tableQuerier->queryTable($tableName, $query);
     }
 
     /**

@@ -20,8 +20,6 @@ First, you need to create a configuration object. This configuration object allo
 
 ```php
 $config = new DatabaseConfig('path/to/my/database');
-// Override default logger
-$config->setLogger(new MyLogger());
 ```
 
 Getting a connection object
@@ -34,6 +32,7 @@ This connection object is the main entry point to manipulating the database:
 $conn->createTable($tableName, $schema);
 $conn->updateTable($tableName, $newSchema);
 $conn->tableExists($tableName);
+// ...
 ```
 
 ## Table creation and manipulation
@@ -47,7 +46,7 @@ $schema = new TableSchemaBuilder()
             ->addColumn(
                     new ColumnBuilder()
                         ->withName('name-of-the-column')
-                        ->withType(ColumnType->STRING())
+                        ->withType(ColumnType::STRING())
                         ->unique()
                         ->build()
             )
