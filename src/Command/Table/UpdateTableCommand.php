@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Command\Table;
 
@@ -13,7 +13,7 @@ class UpdateTableCommand implements DatabaseCommandInterface
     /** @var TableSchemaInterface */
     private $tableSchema;
 
-    function __construct(TableSchemaInterface $tableSchema)
+    public function __construct(TableSchemaInterface $tableSchema)
     {
         $this->tableSchema = $tableSchema;
     }

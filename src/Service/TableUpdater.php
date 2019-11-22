@@ -14,7 +14,7 @@ class TableUpdater
     /** @var TableManager */
     private $tableManager;
 
-    function __construct(TableManager $tableManager)
+    public function __construct(TableManager $tableManager)
     {
         $this->tableManager = $tableManager;
     }

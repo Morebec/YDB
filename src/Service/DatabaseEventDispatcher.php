@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class DatabaseEventDispatcher extends EventDispatcher
 {
-    function __construct(Engine $engine)
+    public function __construct(Engine $engine)
     {
         parent::__construct();
         

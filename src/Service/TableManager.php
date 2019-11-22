@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -20,7 +20,7 @@ class TableManager
     /** @var TableLoader */
     private $tableLoader;
 
-    function __construct(string $databasePath)
+    public function __construct(string $databasePath)
     {
         $this->databasePath = $databasePath;
 
@@ -39,7 +39,7 @@ class TableManager
     {
         $table = null;
         try {
-            $table = $this->tableLoader->loadTableByName($tableName);            
+            $table = $this->tableLoader->loadTableByName($tableName);
         } catch (TableNotFoundException $e) {
         }
 
@@ -107,7 +107,7 @@ class TableManager
     public function getTableDirectory(string $tableName): Directory
     {
         // TODO: This line apears in multiple places ...
-        // Move this in a centralized place, either tableManager, 
+        // Move this in a centralized place, either tableManager,
         // or maybe a TableLocator class
         return Directory::fromStringPath(
             $this->getTablesDirectory() . "/$tableName"

@@ -8,6 +8,8 @@ use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Entity\QueryResultInterface;
 use Morebec\YDB\Enum\QuerySource;
 use Morebec\YDB\Exception\TableNotFoundException;
+use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\YQL\ExpressionNode;
 
 /**
  * Class responsible for querying tables
@@ -17,7 +19,7 @@ class TableQuerier
     /** @var TableManager */
     private $tableManager;
 
-    function __construct(TableManager $tableManager)
+    public function __construct(TableManager $tableManager)
     {
         $this->tableManager = $tableManager;
     }
@@ -30,80 +32,61 @@ class TableQuerier
      * @return \Generator
      */
     public function queryTable(
-        string $tableName, 
+        string $tableName,
         QueryInterface $query
-    ): QueryResultInterface
-    {
-        // A Query is based on criteria that belong to two groups:
-        //  - and: Every criterion must return true
-        //  - or: At least one criterion must return true
-        // We need to determine the records that need to be loaded
-        // for the query evaluation, that is, if we ever need to load
-        // all records to make the checks. This result is called the source.
-        // It can therefore either be [all|index]
-        // The rules are
-        // Both "ands" and "ors" groups of criteria must be checked.
-        // 
-        // If at least one criterion of the "and" group can work with
-        // indexes, the source of the "and" group shall be index
-        // Inversely, if at least one "or" criterion requires all records,
-        // the source of the "or" group shall be all
-        // 
-        // Finally if both groups can rely on indexes only we will load form the indexes
-        
+    ): QueryResultInterface {
         // First validate that the table in the query exists
-        
-        if(!$this->tableManager->tableExists($tableName)) {
+        if (!$this->tableManager->tableExists($tableName)) {
             throw new QueryException("Invalid query: table '$tableName' does not exist");
         }
 
+        // We now need to find the records that are potential candidates
+        // for the query.
+        // The best case scenario, we'll be able to get them through indexes.
+        // else, we'll need to check with every record in the table.
+        
+        // Run through the Query's expression and find the columns that are in use
+        $columns = $this->getColumnsForQuery($query);
+
+        // Check if these columns are valid in the table's schema
         $schema = $this->tableManager->getTableSchema($tableName);
-
-        $andSource = $this->getAndSource($query->getAndCriteria());
-        $orSource = $this->getOrSource($query->getOrCriteria());
-        $finalSource = $andSource == QuerySource::INDEX && 
-                       $orSource == QuerySource::INDEX ?
-                       new QuerySource(QuerySource::INDEX) : 
-                       new QuerySource(QuerySource::ALL)
-        ;
-
-        if($finalSource == QuerySource::ALL) {
-
+        foreach ($columns as $col) {
+            if (!$schema->columnWithNameExists($col)) {
+                throw new QueryException(
+                    "Invalid query: table '$tableName' does not have a column named '$col'"
+                );
+            }
         }
+
+        // Now we need to traverse the expression tree
+        // And evaluate every expression with the appropriate
+        // record candidates
     }
 
-
-
-
-    private function getAndSource(TableSchemaInterface $schema, array $criteria): QuerySource
+    private function getColumnsForQuery(Query $query): array
     {
-        foreach ($criteria as $criterion) {
-            $col = $this->getColumnByName($c->getField());
-            if(!$col) {
-                throw new QueryException("Invalid query: table '$tableName' does not exist");
-            }
+        $expr = $query->getExpression();
 
-            if($col->isIndexed()) {
-                return new QuerySource(QuerySource::INDEX);
-            }
-        }
+        $columns = [];
+        $this->getColumnsForExpression($expr, $columns);
 
-        return new QuerySource(QuerySource::ALL);
+        // Make values unique in an efficient
+        return array_flip(array_values($columns));
     }
 
-    private function getOrSource(TableSchemaInterface $schema, array $criteria): QuerySource
+    private function getColumnsForExpression(ExpressionNode $node, array $columns)
     {
-        foreach ($criteria as $criterion) {
-            $col = $this->getColumnByName($c->getField());
-            if(!$col) {
-                throw new QueryException("Invalid query: table '$tableName' does not exist");
-            }
-
-            if(!$col->isIndexed()) {
-                return new QuerySource(QuerySource::ALL);
-            }
+        if ($node instanceof TermNode) {
+            $columns[] = $node->getTerm()->getFieldName();
+            return;
         }
 
-        return new QuerySource(QuerySource::INDEX);
+        $leftNode = $node->getLeft();
+        $this->getColumnsForExpression($leftNode, $columns);
+
+        $rightNode = $node->getRight();
+        if ($rightNode) {
+            $this->getColumnsForExpression($rightNode, $columns);
+        }
     }
 }

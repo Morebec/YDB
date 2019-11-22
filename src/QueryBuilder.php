@@ -1,19 +1,19 @@
-<?php 
+<?php
 
 namespace Morebec\YDB;
 
 use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Entity\Query\Operator;
 use Morebec\YDB\Entity\Query\Query;
-use Morebec\YDB\Entity\Query\TautologyCriterion;
-use Morebec\YDB\YQL\CriterionNode;
-use Morebec\YDB\YQL\TreeNode;
+use Morebec\YDB\Entity\Query\TautologyTerm;
+use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\YQL\ExpressionNode;
 
 /**
  * QueryBuilder
  */
 class QueryBuilder extends ExpressionBuilder
-{   
+{
 
     /**
      * Creates a find all clause to the query
@@ -21,7 +21,7 @@ class QueryBuilder extends ExpressionBuilder
      */
     public function findAll(): QueryBuilder
     {
-        return new static(new CriterionNode(new TautologyCriterion()));
+        return new static(new TermNode(new TautologyTerm()));
     }
 
     /**
@@ -33,12 +33,11 @@ class QueryBuilder extends ExpressionBuilder
      */
     public function find(string $fieldName, Operator $operator, $value): QueryBuilder
     {
-
         $exp = ExpressionBuilder::where($fieldName, $operator, $value)
                            ->build();
 
-        $qb = new static(new CriterionBuilder);
-        $qb->addAnd(new Criterion($fieldName, $operator, $value));
+        $qb = new static(new TermBuilder);
+        $qb->addAnd(new Term($fieldName, $operator, $value));
         return $qb;
     }
 
@@ -47,7 +46,7 @@ class QueryBuilder extends ExpressionBuilder
      * @return Query
      */
     public function build(): QueryInterface
-    {   
+    {
         return new Query($this->root);
     }
 }

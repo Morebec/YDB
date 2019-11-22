@@ -1,22 +1,22 @@
-<?php 
+<?php
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\Entity\Query\Criterion;
+use Morebec\YDB\Entity\Query\Term;
 use Morebec\YDB\Entity\Query\Operator;
-use Morebec\YDB\YQL\CriterionNode;
-use Morebec\YDB\YQL\TreeNode;
-use Morebec\YDB\YQL\TreeOperator;
+use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\YQL\ExpressionNode;
+use Morebec\YDB\YQL\ExpressionOperator;
 
 /**
  * ExpressionBuilder
  */
 class ExpressionBuilder
 {
-    /** @var TreeNode root tree node */
+    /** @var ExpressionNode root tree node */
     protected $root;
 
-    private function __construct(TreeNode $root)
+    private function __construct(ExpressionNode $root)
     {
         $this->root = $root;
     }
@@ -30,7 +30,7 @@ class ExpressionBuilder
      */
     public static function where(string $fieldName, Operator $operator, $value): self
     {
-        $whereNode = new CriterionNode(new Criterion($fieldName, $operator, $value));
+        $whereNode = new TermNode(new Term($fieldName, $operator, $value));
         return new static($whereNode);
     }
 
@@ -43,8 +43,8 @@ class ExpressionBuilder
      */
     public function andWhere(string $fieldName, Operator $operator, $value): self
     {
-        $whereNode = new CriterionNode(new Criterion($fieldName, $operator, $value));
-        $this->addNodeRight(new TreeOperator(TreeOperator::AND), $whereNode);
+        $whereNode = new TermNode(new Term($fieldName, $operator, $value));
+        $this->addNodeRight(new ExpressionOperator(ExpressionOperator::AND), $whereNode);
         return $this;
     }
 
@@ -58,14 +58,14 @@ class ExpressionBuilder
      */
     public function orWhere(string $fieldName, Operator $operator, $value): self
     {
-        $whereNode = new CriterionNode(new Criterion($fieldName, $operator, $value));
-        $this->addNodeRight(new TreeOperator(TreeOperator::OR), $whereNode);
+        $whereNode = new TermNode(new Term($fieldName, $operator, $value));
+        $this->addNodeRight(new ExpressionOperator(ExpressionOperator::OR), $whereNode);
         return $this;
     }
 
     /**
      * Builds the Expression and returns it
-     * @return TreeNode
+     * @return ExpressionNode
      */
     public function build()
     {
@@ -75,14 +75,14 @@ class ExpressionBuilder
     /**
      * Adds a node to the right of the root
      * @param TreeOpeartor $operator operator
-     * @param TreeNode     $node     node
+     * @param ExpressionNode     $node     node
      */
-    private function addNodeRight(TreeOperator $operator, TreeNode $node): void
+    private function addNodeRight(ExpressionOperator $operator, ExpressionNode $node): void
     {
-        if(!$this->root) {
+        if (!$this->root) {
             throw new \Exception("An expression must start with a simple where clause");
         }
 
-        $this->root = new TreeNode($this->root, $operator, $node);
+        $this->root = new ExpressionNode($this->root, $operator, $node);
     }
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Contract;
 
@@ -8,7 +8,7 @@ use Morebec\ValueObjects\ValueObjectInterface;
  * Interface for Database Records
  */
 interface RecordInterface
-{   
+{
     /**
      * Returns theid of the record
      * @return RecordIdInterface
@@ -54,5 +54,4 @@ interface RecordInterface
      * @return RecordInterface
      */
     public function copy(): RecordInterface;
-
 }

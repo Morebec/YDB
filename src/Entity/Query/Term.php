@@ -1,16 +1,16 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\Query;
 
 use Assert\Assertion;
 use Morebec\ValueObjects\ValueObjectInterface;
-use Morebec\YDB\Contract\CriterionInterface;
+use Morebec\YDB\Contract\TermInterface;
 use Morebec\YDB\Contract\RecordInterface;
 
 /**
- * Criterion
+ * Term
  */
-class Criterion implements CriterionInterface
+class Term implements TermInterface
 {
     /** @var string field */
     private $field;
@@ -22,12 +22,12 @@ class Criterion implements CriterionInterface
     private $value;
 
     /**
-     * Constructs a criterion
+     * Constructs a Term
      * @param string   $field    name of the field to test
      * @param Operator $operator operator
      * @param mixed   $value    expected value
      */
-    function __construct(string $field, Operator $operator, $value)
+    public function __construct(string $field, Operator $operator, $value)
     {
         Assertion::notBlank($field);
 
@@ -37,7 +37,16 @@ class Criterion implements CriterionInterface
     }
 
     /**
-     * Indicates if the criterion supports a given field
+     * Returns the name of the field of evaluated by this Term
+     * @return string
+     */
+    public function getFieldName(): string
+    {
+        return $this->field;
+    }
+
+    /**
+     * Indicates if the Term supports a given field
      * @param  string $fieldName name of the field
      * @return bool              true if the field is supported, otherwise false
      */
@@ -47,45 +56,35 @@ class Criterion implements CriterionInterface
     }
 
     /**
-     * Indicates if a value matches this criterion
+     * Indicates if a value matches this Term
      * @param  mixed $value the value to test
      * @return bool true if record matches, otherwise false
      */
     public function valueMatches($value): bool
     {
         // TODO: Replace with switch
-        if ($this->operator == Operator::EQUAL) {    
+        if ($this->operator == Operator::EQUAL) {
             return $value == $this->value;
         } elseif ($this->operator == Operator::STRICTLY_EQUAL) {
             return $value === $this->value;
-
         } elseif ($this->operator == Operator::NOT_EQUAL) {
             return $value != $this->value;
-
         } elseif ($this->operator == Operator::STRICTLY_NOT_EQUAL) {
             return $value !== $this->value;
-
         } elseif ($this->operator == Operator::LESS_THAN) {
             return $value < $this->value;
-
         } elseif ($this->operator == Operator::GREATER_THAN) {
             return $value > $this->value;
-
         } elseif ($this->operator == Operator::LESS_OR_EQUAL) {
             return $value <= $this->value;
-
         } elseif ($this->operator == Operator::GREATER_OR_EQUAL) {
             return $value >= $this->value;
-
         } elseif ($this->operator == Operator::IN) {
             return in_array($value, $this->value);
-
         } elseif ($this->operator == Operator::NOT_IN) {
             return !in_array($value, $this->value);
-            
         } elseif ($this->operator == Operator::CONTAINS) {
             return in_array($this->value, $value);
-
         } elseif ($this->operator == Operator::NOT_CONTAINS) {
             return !in_array($this->value, $value);
         }
@@ -100,7 +99,7 @@ class Criterion implements CriterionInterface
      */
     public function matchesRecord(RecordInterface $record): bool
     {
-        if(!$record->hasField($this->field)) {
+        if (!$record->hasField($this->field)) {
             return false;
         }
 

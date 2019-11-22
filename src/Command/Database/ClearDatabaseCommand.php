@@ -8,5 +8,5 @@ use Morebec\YDB\Command\DatabaseCommandInterface;
  * ClearDatabaseCommand
  */
 class ClearDatabaseCommand implements DatabaseCommandInterface
-{    
+{
 }

@@ -1,18 +1,18 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Contract;
 
 use Morebec\ValueObjects\ValueObjectInterface;
 
 /**
- * A criterion is used by queries to test multiple criteria and determine if a
+ * A Term is used by queries to test multiple criteria and determine if a
  * record matches a query.
- * A criterion tests a single field against a value
+ * A Term tests a single field against a value
  */
-interface CriterionInterface extends ValueObjectInterface
-{   
+interface TermInterface extends ValueObjectInterface
+{
     /**
-     * Indicates if a value matches this criterion     
+     * Indicates if a value matches this Term
      * @param  mixed $value the value to test
      * @return bool true if record matches, otherwise false
      */
@@ -26,7 +26,7 @@ interface CriterionInterface extends ValueObjectInterface
     public function matchesRecord(RecordInterface $record): bool;
 
     /**
-     * Indicates if the criterion supports a given field
+     * Indicates if the Term supports a given field
      * @param  string $fieldName name of the field
      * @return bool              true if the field is supported, otherwise false
      */

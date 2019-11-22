@@ -1,21 +1,21 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\Query;
 
 use Morebec\ValueObjects\ValueObjectInterface;
 use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\RecordInterface;
-use Morebec\YDB\YQL\TreeNode;
+use Morebec\YDB\YQL\ExpressionNode;
 
 /**
  * Query
  */
 class Query implements QueryInterface
 {
-    /** @var TreeNode expression */
+    /** @var ExpressionNode expression */
     private $expression;
 
-    function __construct(TreeNode $expression)
+    public function __construct(ExpressionNode $expression)
     {
         $this->expression = $expression;
     }
@@ -27,7 +27,6 @@ class Query implements QueryInterface
      */
     public function matchesRecord(RecordInterface $record): bool
     {
-
     }
 
     public function isEqualTo(ValueObjectInterface $vo): bool
@@ -38,5 +37,10 @@ class Query implements QueryInterface
     public function __toString()
     {
         return (string)$this->expression;
+    }
+
+    public function getExpression(): ExpressionNode
+    {
+        return $this->expression;
     }
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity;
 
@@ -21,10 +21,10 @@ class Table implements TableInterface
      * @param TableSchemaInterface $schema    schema
      * @param Directory            $directory table directory
      */
-    function __construct(TableSchemaInterface $schema, Directory $directory)
+    public function __construct(TableSchemaInterface $schema, Directory $directory)
     {
         $this->schema = $schema;
-        $this->directory = $directory;    
+        $this->directory = $directory;
     }
 
     /**

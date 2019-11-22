@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Event\Database;
 

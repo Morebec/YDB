@@ -1,21 +1,21 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\Query;
 
-use Morebec\YDB\Contract\CriterionInterface;
+use Morebec\YDB\Contract\TermInterface;
 
 /**
- * TautologyCriterion always match a record, it is used
+ * TautologyTerm always match a record, it is used
  * so that a Query using this would find all the records
  */
-class TautologyCriterion implements CriterionInterface
+class TautologyTerm implements TermInterface
 {
-    function __construct()
+    public function __construct()
     {
     }
 
     /**
-     * Indicates if a value matches this criterion     
+     * Indicates if a value matches this Term
      * @param  mixed $value the value to test
      * @return bool true if record matches, otherwise false
      */
@@ -35,7 +35,7 @@ class TautologyCriterion implements CriterionInterface
     }
 
     /**
-     * Indicates if the criterion supports a given field
+     * Indicates if the Term supports a given field
      * @param  string $fieldName name of the field
      * @return bool              true if the field is supported, otherwise false
      */

@@ -14,15 +14,15 @@ FIND
         WHERE (genre == 'crime' AND price == '10.00')
     
 Root
-    - left: TreeNode
-            - left: genre == 'adventure' => criterion (TreeNode)
-            - operator: AND => (TreeOperator)
-            - price == '5.00' => criterion (TreeNode)
+    - left: ExpressionNode
+            - left: genre == 'adventure' => criterion (ExpressionNode)
+            - operator: AND => (ExpressionOperator)
+            - price == '5.00' => criterion (ExpressionNode)
     - operator: OR
-    - right: TreeNode
-            - left: genre == 'crime' => criterion (TreeNode)
-            - operator: AND => (TreeOperator)
-            - price == '10.00' => criterion (TreeNode)
+    - right: ExpressionNode
+            - left: genre == 'crime' => criterion (ExpressionNode)
+            - operator: AND => (ExpressionOperator)
+            - price == '10.00' => criterion (ExpressionNode)
 
 
 

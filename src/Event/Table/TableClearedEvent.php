@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Event\Table;
 
@@ -14,7 +14,7 @@ class TableClearedEvent extends DatabaseEvent
     /** @var string name of the table that was cleared */
     private $tableName;
 
-    function __construct(string $tableName)
+    public function __construct(string $tableName)
     {
         $this->tableName = $tableName;
     }

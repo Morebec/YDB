@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -25,7 +25,7 @@ class DatabaseCommandBus extends MessageBus
      * Constructs an instance of DatabaseCommandBus
      * @param Database $database database
      */
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
         parent::__construct([
             new HandleMessageMiddleware(

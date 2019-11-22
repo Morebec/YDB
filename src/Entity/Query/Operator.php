@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\Query;
 
@@ -18,7 +18,7 @@ class Operator extends BasicEnum
     const LESS_THAN = '<';
     const GREATER_THAN = '>';
 
-    const LESS_OR_EQUAL = '<=';    
+    const LESS_OR_EQUAL = '<=';
     const GREATER_OR_EQUAL = '>=';
 
     const IN = 'in';
@@ -29,7 +29,7 @@ class Operator extends BasicEnum
     const NOT_CONTAINS = 'not_contains';
 
     public function __toString()
-    {        
+    {
         return (string)$this->getValue();
     }
 
@@ -39,7 +39,6 @@ class Operator extends BasicEnum
      */
     public static function __callStatic($method, $arguments)
     {
-
         return new static(constant("self::$method"));
     }
 }

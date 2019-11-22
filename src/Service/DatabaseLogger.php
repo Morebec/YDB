@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -16,7 +16,7 @@ class DatabaseLogger extends Logger
      * Constructs an instance of the database logger
      * @param string $databasePath path to the database
      */
-    function __construct(string $databasePath)
+    public function __construct(string $databasePath)
     {
         parent::__construct('default');
         $logsDir = $databasePath . "/" . Database::LOGS_DIR_NAME;

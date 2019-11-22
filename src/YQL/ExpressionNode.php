@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\YQL;
 
@@ -8,27 +8,26 @@ use Morebec\ValueObjects\ValueObjectInterface;
 /**
  * Represents a node in a AST Tree
  */
-class TreeNode implements ValueObjectInterface
+class ExpressionNode implements ValueObjectInterface
 {
-    /** @var TreeNode left */
+    /** @var ExpressionNode left */
     private $left;
 
-    /** @var TreeNode|null right */
+    /** @var ExpressionNode|null right */
     private $right;
 
-    /** @var TreeOperator operator */
+    /** @var ExpressionOperator operator */
     private $operator;
 
-    function __construct(
-        TreeNode $left, 
-        ?TreeOperator $operator = null, 
-        ?TreeNode $right = null
-    )
-    {
-        if($operator) {
+    public function __construct(
+        ExpressionNode $left,
+        ?ExpressionOperator $operator = null,
+        ?ExpressionNode $right = null
+    ) {
+        if ($operator) {
             Assertion::notNull(
-                $right, 
-                'A TreeNode cannot have an operator without a right node'
+                $right,
+                'A ExpressionNode cannot have an operator without a right node'
             );
         }
 
@@ -38,25 +37,25 @@ class TreeNode implements ValueObjectInterface
     }
 
     /**
-     * @return TreeNode
+     * @return ExpressionNode
      */
-    public function getLeft(): TreeNode
+    public function getLeft(): ExpressionNode
     {
         return $this->left;
     }
 
     /**
-     * @return TreeNode|null
+     * @return ExpressionNode|null
      */
-    public function getRight(): ?TreeNode
+    public function getRight(): ?ExpressionNode
     {
         return $this->right;
     }
 
     /**
-     * @return TreeOperator
+     * @return ExpressionOperator
      */
-    public function getOperator(): ?TreeOperator
+    public function getOperator(): ?ExpressionOperator
     {
         return $this->operator;
     }
@@ -80,8 +79,9 @@ class TreeNode implements ValueObjectInterface
     {
         $str = sprintf("(%s)", $this->left);
 
-        if($this->operator && $this->right) {
-            $str = $str . sprintf(" %s (%s)",
+        if ($this->operator && $this->right) {
+            $str = $str . sprintf(
+                " %s (%s)",
                 $this->operator,
                 $this->right
             );

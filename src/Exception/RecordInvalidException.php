@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Exception;
 
@@ -9,7 +9,7 @@ use Morebec\YDB\Contract\RecordIdInterface;
  */
 class RecordInvalidException extends DatabaseException
 {
-    function __construct(string $tableName, RecordIdInterface $recordId)
+    public function __construct(string $tableName, RecordIdInterface $recordId)
     {
         parent::__construct("Invalid record '$recordId' for table '$tableName'");
     }

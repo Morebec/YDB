@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity;
 
@@ -17,7 +17,7 @@ class Record implements RecordInterface
     /** @var array */
     private $data;
 
-    function __construct(RecordIdInterface $id, array $data)
+    public function __construct(RecordIdInterface $id, array $data)
     {
         $this->id = $id;
         $this->data = $data;
@@ -29,11 +29,14 @@ class Record implements RecordInterface
      */
     public function getFieldValue(string $fieldName)
     {
-        if($fieldName === 'id') {
+        if ($fieldName === 'id') {
             return $this->getId();
         }
-        Assertion::keyExists($this->data, $fieldName, 
-            sprintf("Field '%s' not found in entity '%s' available fields are: %s",
+        Assertion::keyExists(
+            $this->data,
+            $fieldName,
+            sprintf(
+                "Field '%s' not found in entity '%s' available fields are: %s",
                 $fieldName,
                 $this->getId(),
                 join(',', array_keys($this->data))

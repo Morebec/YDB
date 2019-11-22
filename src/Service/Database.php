@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -85,7 +85,7 @@ class Database
      */
     public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
     {
-        return $this->tableManager->queryTable($tableName, $query);   
+        return $this->tableManager->queryTable($tableName, $query);
     }
 
     /**

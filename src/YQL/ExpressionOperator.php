@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\YQL;
 
 use Morebec\ValueObjects\BasicEnum;
 
 /**
- * TreeOperator
+ * ExpressionOperator
  */
-class TreeOperator extends BasicEnum
+class ExpressionOperator extends BasicEnum
 {
     const AND = 'AND';
     const OR = 'OR';

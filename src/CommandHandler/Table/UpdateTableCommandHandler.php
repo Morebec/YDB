@@ -10,15 +10,14 @@ use Morebec\YDB\Service\Database;
 class UpdateTableCommandHandler
 {
     /** @var Database */
-    private $database; 
+    private $database;
 
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
-       $this->database = $database;
+        $this->database = $database;
     }
 
     public function __invoke()
     {
-        
     }
-}  
+}

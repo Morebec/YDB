@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity;
 
@@ -41,8 +41,8 @@ class Column implements ColumnInterface
         $default = array_key_exists('default', $data) ? $data['default'] : null;
 
         return new static(
-            $data['name'], 
-            new ColumnType($data['type']), 
+            $data['name'],
+            new ColumnType($data['type']),
             $data['indexed'],
             $default
         );
@@ -53,18 +53,17 @@ class Column implements ColumnInterface
      * @param ColumnTypeInterface $type    type of the column
      * @param bool|boolean        $indexed indicates if it is indexed or not
      */
-    function __construct(
-        string $name, 
-        ColumnTypeInterface $type, 
+    public function __construct(
+        string $name,
+        ColumnTypeInterface $type,
         bool $indexed = false,
         $defaultValue = null
-    )
-    {
+    ) {
         Assert::that($name)
             ->notBlank('The name of a column cannot be blank')
             ->notContains(' ', 'The name of a column cannot contain spaces')
             ->notRegex(
-                '/[#$%^&*()+=\-\[\]\';,.\/{}|":<>?~\\\\]/', 
+                '/[#$%^&*()+=\-\[\]\';,.\/{}|":<>?~\\\\]/',
                 'The name of a column cannot contain special characters'
             )
         ;

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -26,7 +26,7 @@ class TableLoader
      * Constructs an instance of this loader
      * @param Directory $tableManager directory containing all tables
      */
-    function __construct(TableManager $tableManager)
+    public function __construct(TableManager $tableManager)
     {
         $this->tableManager = $tableManager;
     }
@@ -41,7 +41,7 @@ class TableLoader
     {
         $directory = $this->getTableDirectory($tableName);
 
-        if(!$directory->exists()) {
+        if (!$directory->exists()) {
             throw new TableNotFoundException($tableName);
         }
 
@@ -89,7 +89,7 @@ class TableLoader
         // Load schema
         $schemaFile = File::fromStringPath($directory . "/" . TableSchema::SCHEMA_FILE_NAME);
         
-        if(!$schemaFile->exists()) {
+        if (!$schemaFile->exists()) {
             throw new TableSchemaNotFoundException($tableName);
         }
 

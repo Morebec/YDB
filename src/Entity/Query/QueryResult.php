@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\Query;
 
@@ -14,7 +14,7 @@ class QueryResult implements QueryResultInterface
     /** @var \Iterator generator the to records */
     private $recordIterator;
 
-    function __construct(\Iterator $recordIterator, QueryInterface $query)
+    public function __construct(\Iterator $recordIterator, QueryInterface $query)
     {
         $this->recordIterator = $recordIterator;
     }
@@ -23,10 +23,10 @@ class QueryResult implements QueryResultInterface
      * Retreives the next Record found for the query.
      * Moves the pointer forward so subsequent calls
      * return always return the next Record.
-     * When there are no more records, returns null 
+     * When there are no more records, returns null
      * @return RecordInterface|null
      */
-    public function fetch(): ?RecordInterface 
+    public function fetch(): ?RecordInterface
     {
         $record = $this->recordIterator->current();
         $this->recordIterator->next();

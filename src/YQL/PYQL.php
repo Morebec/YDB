@@ -1,42 +1,43 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\YQL;
 
 use Morebec\YDB\Contract\RecordInterface;
-use Morebec\YDB\YQL\CriterionNode;
-use Morebec\YDB\YQL\TreeNode;
+use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\YQL\ExpressionNode;
 
 /**
- * PHP YDB Query Language
+ * PHP implementation of the YDB Query Language
  */
 class PYQL
 {
+    
+    
     /**
-     * Evaluates a TreeNode to see if it matches a record
-     * @param  TreeNode        $node   node
+     * Evaluates a ExpressionNode to see if it matches a record
+     * @param  ExpressionNode        $node   node
      * @param  RecordInterface $record record
      * @return bool                  true if it matches, otherwise false
      */
     public static function evaluateForRecord(
-        TreeNode $node, 
+        ExpressionNode $node,
         RecordInterface $record
     ): bool {
-        
-        if($node instanceof CriterionNode) {
-            return $node->getCriterion()->matchesRecord($record);
+        if ($node instanceof TermNode) {
+            return $node->getTerm()->matchesRecord($record);
         }
 
         $leftNode = $node->getLeft();
-        $leftValue = $node->getLeft() ? 
+        $leftValue = $node->getLeft() ?
                         self::evaluateForRecord($leftNode, $record) : false;
 
         $operator = $node->getOperator();
-        if(!$operator) {
+        if (!$operator) {
             return $leftValue;
         }
 
         $rightNode = $node->getRight();
-        $rightValue = $node->getRight() ? 
+        $rightValue = $node->getRight() ?
                         self::evaluateForRecord($rightNode, $record) : false;
 
         return self::evaluateOperator($leftValue, $operator, $rightValue);
@@ -45,22 +46,21 @@ class PYQL
     /**
      * Evaluates a right and a left value with an operator
      * @param  bool     $rightValue   right value
-     * @param  TreeOperator $operator operator
+     * @param  ExpressionOperator $operator operator
      * @param  bool     $leftValue    left value
      * @return bool                   evaluated value
      */
     private static function evaluateOperator(
-        bool $right, 
-        TreeOperator $operator, 
+        bool $right,
+        ExpressionOperator $operator,
         bool $left
-    ): bool
-    {
+    ): bool {
         switch ($operator) {
-            case TreeOperator::AND:
+            case ExpressionOperator::AND:
                 return $right && $left;
                 break;
 
-            case TreeOperator::OR:
+            case ExpressionOperator::OR:
                 return $right || $left;
                 break;
             

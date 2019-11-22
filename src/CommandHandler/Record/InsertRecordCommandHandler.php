@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\CommandHandler\Record;
 
@@ -19,7 +19,7 @@ class InsertRecordCommandHandler
     /** @var Database */
     private $database;
 
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }
@@ -80,7 +80,7 @@ class InsertRecordCommandHandler
 
             // Make sure the field exist on the record
             // TODO: throw RecordMissingFieldException
-            if(!$record->hasField($colName) && $colName !== 'id') {
+            if (!$record->hasField($colName) && $colName !== 'id') {
                 throw new \Exception(
                     sprintf("Invalid record, record '%s' does not have a field '%s'", $record->getId(), $colName)
                 );
@@ -90,7 +90,7 @@ class InsertRecordCommandHandler
             $value = $record->getFieldValue($colName);
 
             $type = $col->getType();
-            if($type === ColumnType::STRING) {
+            if ($type === ColumnType::STRING) {
                 Assertion::string($value);
             } elseif ($type === ColumnType::BOOLEAN) {
                 Assertion::boolean($value);
@@ -105,10 +105,11 @@ class InsertRecordCommandHandler
             }
         }
 
-        // Verify that there is no extra fields 
+        // Verify that there is no extra fields
         $recordData = $record->toArray();
         foreach ($recordData as $key => $value) {
-            Assertion::true($schema->columnWithNameExists($key), 
+            Assertion::true(
+                $schema->columnWithNameExists($key),
                 "'$key' is not a column in table '$tableName'"
             );
         }

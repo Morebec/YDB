@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * The engine class serves as a service container.
- * It builds the different services and maintains an interface to them. 
+ * It builds the different services and maintains an interface to them.
  */
 class Engine implements EventSubscriberInterface
 {
@@ -37,7 +37,7 @@ class Engine implements EventSubscriberInterface
     /** @var TableManager */
     private $tableManager;
 
-    function __construct(DatabaseConfig $config)
+    public function __construct(DatabaseConfig $config)
     {
         // Initialize filesystem
         $this->filesystem = new Filesystem();
@@ -102,7 +102,9 @@ class Engine implements EventSubscriberInterface
      */
     public function log(string $level, string $message, array $context = []): void
     {
-        if(!$this->logger) return;
+        if (!$this->logger) {
+            return;
+        }
 
         $context['database_root'] = (string)$this->database->getPath();
         $this->logger->log($level, $message, $context);

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Enum;
 
@@ -10,5 +10,5 @@ use Morebec\ValueObjects\BasicEnum;
 class QuerySource extends BasicEnum
 {
     const INDEX = 'INDEX';
-    const ALL = 'ALL';    
+    const ALL = 'ALL';
 }

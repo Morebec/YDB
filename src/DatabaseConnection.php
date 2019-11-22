@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB;
 
@@ -20,7 +20,7 @@ class DatabaseConnection
     /** @var Database database */
     private $database;
 
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }

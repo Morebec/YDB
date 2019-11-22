@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\CommandHandler\Table;
 
@@ -21,7 +21,7 @@ class CreateTableCommandHandler
     /** @var Database */
     private $database;
 
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }
@@ -32,13 +32,13 @@ class CreateTableCommandHandler
         $tableName = $schema->getTableName();
 
         $this->database->log(
-            LogLevel::INFO, 
-            "Creating table '$tableName' ...", 
+            LogLevel::INFO,
+            "Creating table '$tableName' ...",
             ['table_name' => $tableName]
         );
 
         // Check if table already exists, if so throw exception
-        if($this->database->tableExists($tableName)) {
+        if ($this->database->tableExists($tableName)) {
             throw new TableAlreadyExistsException($tableName);
         }
 
@@ -60,8 +60,8 @@ class CreateTableCommandHandler
         $this->createTableSchema($path, $schema);
 
         $this->database->log(
-            LogLevel::INFO, 
-            "Table '$tableName' created.", 
+            LogLevel::INFO,
+            "Table '$tableName' created.",
             ['table_name' => $tableName]
         );
 

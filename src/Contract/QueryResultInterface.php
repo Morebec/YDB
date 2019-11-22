@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity;
 
@@ -11,7 +11,7 @@ interface QueryResultInterface
      * Retreives the next Record found for the query.
      * Moves the pointer forward so subsequent calls
      * return always return the next Record.
-     * When there are no more records, returns null 
+     * When there are no more records, returns null
      * @return RecordInterface|null
      */
     public function fetch(): ?RecordInterface;
