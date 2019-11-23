@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\CommandHandler\Database;
 
@@ -17,9 +17,9 @@ class CreateDatabaseCommandHandler
     /** @var Database */
     private $database;
 
-    function __construct(Database $database)
+    public function __construct(Database $database)
     {
-        $this->database = $database;   
+        $this->database = $database;
     }
 
     public function __invoke(CreateDatabaseCommand $command)
@@ -28,7 +28,7 @@ class CreateDatabaseCommandHandler
 
         // Check if the directory where the database is located actually exists
         $filesystem = $this->database->getFilesystem();
-        if($filesystem->exists($location)) {
+        if ($filesystem->exists($location)) {
             throw new DatabaseException(
                 "Cannot create database at location $location: directory it already exists"
             );

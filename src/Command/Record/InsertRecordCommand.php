@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Command\Record;
 
@@ -16,7 +16,7 @@ class InsertRecordCommand implements DatabaseCommandInterface
     /** @var RecordInterface record to insert */
     private $record;
 
-    function __construct(string $tableName, RecordInterface $record)
+    public function __construct(string $tableName, RecordInterface $record)
     {
         $this->record = $record;
         $this->tableName = $tableName;

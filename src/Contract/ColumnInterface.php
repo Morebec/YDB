@@ -13,5 +13,5 @@ interface ColumnInterface extends ValueObjectInterface
      * Returns the name of the column
      * @return string
      */
-    public function getName(): string;    
+    public function getName(): string;
 }

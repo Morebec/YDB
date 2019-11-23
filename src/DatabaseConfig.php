@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB;
 
@@ -8,14 +8,14 @@ use Psr\Log\LoggerInterface;
  * DatabaseConfig
  */
 class DatabaseConfig
-{   
+{
     /**
      * Relative path to the directory where the database should be located
      * @var string
      */
     private $databasePath;
 
-    function __construct(string $databasePath)
+    public function __construct(string $databasePath)
     {
         $this->databasePath = $databasePath;
     }

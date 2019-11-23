@@ -8,5 +8,5 @@ use Morebec\YDB\Command\DatabaseCommandInterface;
  * CreateDatabaseCommand
  */
 class CreateDatabaseCommand implements DatabaseCommandInterface
-{    
+{
 }

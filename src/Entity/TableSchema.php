@@ -33,7 +33,7 @@ class TableSchema implements TableSchemaInterface
             ->notBlank('The name of a table cannot be blank')
             ->notContains(' ', 'The name of a table cannot contain spaces')
             ->notRegex(
-                '/[#$%^&*()+=\[\]\';,.\/{}|":<>?~\\\\]/', 
+                '/[#$%^&*()+=\[\]\';,.\/{}|":<>?~\\\\]/',
                 'The name of a table cannot contain special characters in (#$%^&*()+=\[\]\';,.\/{}|":<>?~\)'
             )
         ;
@@ -86,7 +86,7 @@ class TableSchema implements TableSchemaInterface
     public function getColumnByName(string $name): ?ColumnInterface
     {
         foreach ($this->columns as $column) {
-            if($column->getName() === $name) {
+            if ($column->getName() === $name) {
                 return $column;
             }
         }
@@ -124,7 +124,7 @@ class TableSchema implements TableSchemaInterface
             'columns' => array_map(static function ($col) {
                 return $col->toArray();
             }, $this->columns)
-        ];    
+        ];
     }
 
     /**

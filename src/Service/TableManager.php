@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -6,6 +6,7 @@ use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\YDB\Contract\TableSchemaInterface;
+use Morebec\YDB\Entity\QueryResultInterface;
 use Morebec\YDB\Exception\TableNotFoundException;
 
 /**
@@ -19,7 +20,7 @@ class TableManager
     /** @var TableLoader */
     private $tableLoader;
 
-    function __construct(string $databasePath)
+    public function __construct(string $databasePath)
     {
         $this->databasePath = $databasePath;
 
@@ -38,7 +39,7 @@ class TableManager
     {
         $table = null;
         try {
-            $table = $this->tableLoader->loadTableByName($tableName);            
+            $table = $this->tableLoader->loadTableByName($tableName);
         } catch (TableNotFoundException $e) {
         }
 
@@ -83,23 +84,9 @@ class TableManager
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function queryRecordsFromTable(string $tableName, QueryInterface $query): \Generator
+    public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
     {
-        $this->tableQuerier->queryRecordsFromTable($tableName, $query);
-    }
-
-
-    /**
-     * Queries a single record from the database matching a query
-     * or return null if none found.
-     * If more than one records match the query, returns an exception
-     * @param  string         $tableName name of the table
-     * @param  QueryInterface $query     query
-     * @return RecordInterface|null
-     */
-    public function queryOneRecordFromTable(string $tableName, QueryInterface $query): ?RecordInterface
-    {
-        $this->tableQuerier->queryOneRecordFromTable($tableName, $query);
+        $this->tableQuerier->queryTable($tableName, $query);
     }
 
     /**
@@ -120,7 +107,7 @@ class TableManager
     public function getTableDirectory(string $tableName): Directory
     {
         // TODO: This line apears in multiple places ...
-        // Move this in a centralized place, either tableManager, 
+        // Move this in a centralized place, either tableManager,
         // or maybe a TableLocator class
         return Directory::fromStringPath(
             $this->getTablesDirectory() . "/$tableName"
