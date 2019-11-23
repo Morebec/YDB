@@ -6,15 +6,15 @@ use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Entity\Query\Operator;
 use Morebec\YDB\Entity\Query\Query;
 use Morebec\YDB\Entity\Query\TautologyTerm;
-use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\Entity\Query\Term;
 use Morebec\YDB\YQL\ExpressionNode;
+use Morebec\YDB\YQL\TermNode;
 
 /**
  * QueryBuilder
  */
 class QueryBuilder extends ExpressionBuilder
 {
-
     /**
      * Creates a find all clause to the query
      * @return QUeryBuilder
@@ -36,7 +36,7 @@ class QueryBuilder extends ExpressionBuilder
         $exp = ExpressionBuilder::where($fieldName, $operator, $value)
                            ->build();
 
-        $qb = new static(new TermBuilder);
+        $qb = new static(new ExpressionNode());
         $qb->addAnd(new Term($fieldName, $operator, $value));
         return $qb;
     }

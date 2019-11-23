@@ -14,9 +14,13 @@ class QueryResult implements QueryResultInterface
     /** @var \Iterator generator the to records */
     private $recordIterator;
 
+    /** @var QueryInterface */
+    private $query;
+
     public function __construct(\Iterator $recordIterator, QueryInterface $query)
     {
         $this->recordIterator = $recordIterator;
+        $this->query = $query;
     }
 
     /**
@@ -49,6 +53,6 @@ class QueryResult implements QueryResultInterface
      */
     public function getQuery(): QueryInterface
     {
-        throw new \Exception('Method getQuery() is not implemented.');
+        return $this->query;
     }
 }

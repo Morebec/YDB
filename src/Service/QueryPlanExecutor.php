@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -21,7 +21,10 @@ class QueryPlanExecutor
     /** @var TableManager */
     private $tableManager;
 
-    function __construct(TableManager $tableManager)
+    /** @var RecordLoader */
+    private $recordLoader;
+
+    public function __construct(TableManager $tableManager)
     {
         $this->tableManager = $tableManager;
         $this->recordLoader = new RecordLoader();
@@ -33,16 +36,15 @@ class QueryPlanExecutor
      * @return \Generator
      */
     public function execute(
-        string $tableName, 
-        QueryInterface $query, 
+        string $tableName,
+        QueryInterface $query,
         QueryPlan $plan
-    ): \Generator
-    {
+    ): \Generator {
         $strategy = $plan->getStrategy();
         $records = $this->getStrategyRecords($tableName, $strategy);
 
         foreach ($records as $record) {
-            if(PYQL::evaluateQueryForRecord($query, $record)) {
+            if (PYQL::evaluateQueryForRecord($query, $record)) {
                 yield $record;
             }
         }
@@ -54,10 +56,9 @@ class QueryPlanExecutor
      * @return Generator
      */
     private function getStrategyRecords(
-        string $tableName, 
+        string $tableName,
         QueryPlanStrategy $strategy
-    ):\Generator
-    {        
+    ):\Generator {
         if ($strategy instanceof TableScanStrategy) {
             return $this->doTableScan($tableName);
         }
@@ -71,7 +72,7 @@ class QueryPlanExecutor
         }
 
         if ($strategy instanceof MultiStrategy) {
-            return $this->doMultiScan($tableName, $multiScan);
+            return $this->doMultiScan($tableName, $strategy);
         }
     }
 
@@ -85,8 +86,12 @@ class QueryPlanExecutor
         $dir = $this->tableManager->getTableDirectory($tableName);
         $files = $dir->getFiles();
         foreach ($files as $file) {
-            if($file->getExtension() != 'yaml') continue;
-            if($file->getBasename() === TableSchema::SCHEMA_FILE_NAME) continue;
+            if ($file->getExtension() != 'yaml') {
+                continue;
+            }
+            if ($file->getBasename() === TableSchema::SCHEMA_FILE_NAME) {
+                continue;
+            }
                         
             $data = $this->recordLoader->load($file);
 
@@ -100,22 +105,20 @@ class QueryPlanExecutor
      * @return \Generator
      */
     public function doIndexScan(
-        string $tableName, 
+        string $tableName,
         IndexScanStrategy $strategy
-    ): \Generator
-    {
+    ): \Generator {
         // TODO: Implement indexes
         yield from $this->doTableScan($tableName);
     }
 
     /**
-     * Does a filename scan for an array of ids 
+     * Does a filename scan for an array of ids
      */
-    public function doFilenameScan(
-        string $tableName, 
+    public function doIdScan(
+        string $tableName,
         IdScanStrategy $strategy
-    ): \Generator
-    {
+    ): \Generator {
         // TODO: Implement filename scan
         yield from $this->doTableScan($tableName);
     }
@@ -127,12 +130,11 @@ class QueryPlanExecutor
      * @return \Generator
      */
     public function doMultiScan(
-        string $tableName, 
+        string $tableName,
         MultiStrategy $multi
-    ): \Generator
-    {
+    ): \Generator {
         foreach ($multi->getStragies() as $s) {
-            yield from $this->getStrategyRecords($s);
+            yield from $this->getStrategyRecords($tableName, $s);
         }
     }
 }

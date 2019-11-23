@@ -10,7 +10,7 @@ use Morebec\ValueObjects\ValueObjectInterface;
  */
 class ExpressionNode implements ValueObjectInterface
 {
-    /** @var ExpressionNode left */
+    /** @var ExpressionNode|null left */
     private $left;
 
     /** @var ExpressionNode|null right */
@@ -20,7 +20,7 @@ class ExpressionNode implements ValueObjectInterface
     private $operator;
 
     public function __construct(
-        ExpressionNode $left,
+        ?ExpressionNode $left = null,
         ?ExpressionOperator $operator = null,
         ?ExpressionNode $right = null
     ) {
@@ -39,7 +39,7 @@ class ExpressionNode implements ValueObjectInterface
     /**
      * @return ExpressionNode
      */
-    public function getLeft(): ExpressionNode
+    public function getLeft(): ?ExpressionNode
     {
         return $this->left;
     }
@@ -58,6 +58,15 @@ class ExpressionNode implements ValueObjectInterface
     public function getOperator(): ?ExpressionOperator
     {
         return $this->operator;
+    }
+
+    /**
+     * Indicates if this is a leaf
+     * @return boolean true if leaf, otherwise false
+     */
+    public function isLeaf(): bool
+    {
+        return $this->left === null && $this->right === null;
     }
 
     /**

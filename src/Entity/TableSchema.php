@@ -14,7 +14,7 @@ use Morebec\YDB\Entity\TableSchema;
  */
 class TableSchema implements TableSchemaInterface
 {
-    const SCHEMA_FILE_NAME = 'schema.yaml';
+    public const SCHEMA_FILE_NAME = 'schema.yaml';
 
     /** @var string name of the table */
     private $tableName;

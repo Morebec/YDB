@@ -14,6 +14,7 @@ class TermNode extends ExpressionNode
     public function __construct(Term $c)
     {
         $this->term = $c;
+        parent::__construct();
     }
 
     public function __toString()

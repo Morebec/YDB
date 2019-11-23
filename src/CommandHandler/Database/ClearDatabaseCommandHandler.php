@@ -29,7 +29,7 @@ class ClearDatabaseCommandHandler
             $this->database->log(LogLevel::INFO, "Clearing table '$tableName' ...");
 
             $this->database->clearTable($tableName);
-            $this->database->dispatchEvent(TableClearedEvent::NAME, new TableClearedEvent());
+            $this->database->dispatchEvent(TableClearedEvent::NAME, new TableClearedEvent($tableName));
 
             $this->database->log(LogLevel::INFO, "Table '$tableName' cleared");
         }

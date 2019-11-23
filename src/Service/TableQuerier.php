@@ -29,6 +29,9 @@ class TableQuerier
     /** @var QueryPlanner */
     private $queryPlanner;
 
+    /** @var QueryPlanExecutor */
+    private $queryPlanExecutor;
+
     public function __construct(TableManager $tableManager)
     {
         $this->tableManager = $tableManager;
@@ -118,10 +121,9 @@ class TableQuerier
      * @param  array          $columns columns in use (will be populated)
      */
     private function getColumnsForExpression(
-        ExpressionNode $node, 
+        ExpressionNode $node,
         array &$columns
-    ): void
-    {
+    ): void {
         if ($node instanceof TermNode) {
             $columns[] = $node->getTerm()->getFieldName();
             return;

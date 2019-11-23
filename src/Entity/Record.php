@@ -5,6 +5,7 @@ namespace Morebec\YDB\Entity;
 use Assert\Assertion;
 use Morebec\YDB\Contract\RecordIdInterface;
 use Morebec\YDB\Contract\RecordInterface;
+use Morebec\YDB\Entity\Identity\RecordId;
 
 /**
  * Record

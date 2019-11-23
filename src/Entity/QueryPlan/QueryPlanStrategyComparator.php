@@ -1,12 +1,15 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\QueryPlan;
 
+use Assert\Assertion;
 use Morebec\YDB\Entity\QueryPlan\IdScanStrategy;
+use Morebec\YDB\Entity\QueryPlan\MultiStrategy;
+use Morebec\YDB\Entity\QueryPlan\TableScanStrategy;
 use Morebec\YDB\YQL\ExpressionOperator;
 
 /**
- * Compares two strategies, and determine 
+ * Compares two strategies, and determine
  * which one should be used
  */
 class QueryPlanStrategyComparator
@@ -21,16 +24,15 @@ class QueryPlanStrategyComparator
      * @return array
      */
     public static function compare(
-        QueryPlanStrategy $leftOperand, 
+        QueryPlanStrategy $leftOperand,
         ExpressionOperator $operator,
-        QueryPlanStrategy $rightOperand 
-    ): QueryPlanStrategy
-    {
-        if($operator == ExpressionOperator::OR) {
+        QueryPlanStrategy $rightOperand
+    ): QueryPlanStrategy {
+        if ($operator == ExpressionOperator::OR) {
             return self::compareOrOperator($leftOperand, $rightOperand);
         }
 
-        if($operator == ExpressionOperator::AND) {
+        if ($operator == ExpressionOperator::AND) {
             return self::compareAndOperator($leftOperand, $rightOperand);
         }
     }
@@ -42,19 +44,18 @@ class QueryPlanStrategyComparator
      * @return QUeryPlanStrategy
      */
     private static function compareOrOperator(
-        QueryPlanStrategy $leftOperand, 
+        QueryPlanStrategy $leftOperand,
         QueryPlanStrategy $rightOperand
-    ): QueryPlanStrategy 
-    {
+    ): QueryPlanStrategy {
         // If any of the two are TableScans, return the TableScans
-        if (self::isOfType($leftOperand, TableScan::class) ||
-            self::isOfType($rightOperand,TableScan::class)) {
-            $leftIsIdScan = self::isOfType($leftOperand, TableScan::class);
+        if (self::isOfType($leftOperand, TableScanStrategy::class) ||
+            self::isOfType($rightOperand, TableScanStrategy::class)) {
+            $leftIsIdScan = self::isOfType($leftOperand, TableScanStrategy::class);
             return  $leftIsIdScan ? $leftOperand : $rightOperand;
         }
 
         // If both are the same, return a merged version of them
-        if (self::isOfType($leftOperand, get_class($rightOperand))){
+        if (self::isOfType($leftOperand, get_class($rightOperand))) {
             return self::mergeStrategies($leftOperand, $rightOperand);
         }
 
@@ -68,7 +69,7 @@ class QueryPlanStrategyComparator
         // If any of the two are MultiStrategy, we must append the new strategy
         // to the multi strategy
         if (self::isOfType($leftOperand, MultiStrategy::class) ||
-            self::isOfType($rightOperand,MultiStrategy::class)) {
+            self::isOfType($rightOperand, MultiStrategy::class)) {
             return self::mergeStrategies($leftOperand, $rightOperand);
         }
 
@@ -84,10 +85,9 @@ class QueryPlanStrategyComparator
      * @return QUeryPlanStrategy
      */
     private static function compareAndOperator(
-        QueryPlanStrategy $leftOperand, 
+        QueryPlanStrategy $leftOperand,
         QueryPlanStrategy $rightOperand
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         $leftOperandClass = get_class($leftOperand);
         $rightOperandClass = get_class($rightOperand);
 
@@ -98,7 +98,7 @@ class QueryPlanStrategyComparator
 
         // If any of the two are Id scans, return the Id scan
         if (self::isOfType($leftOperand, IdScanStrategy::class) ||
-            self::isOfType($rightOperand,IdScanStrategy::class)) {
+            self::isOfType($rightOperand, IdScanStrategy::class)) {
             $leftIsIdScan = self::isOfType($leftOperand, IdScanStrategy::class);
             return  $leftIsIdScan ? $leftOperand : $rightOperand;
         }
@@ -114,21 +114,23 @@ class QueryPlanStrategyComparator
      * @return QueryPlanStrategy
      */
     private static function mergeStrategies(
-        QueryPlanStrategy $strategyA, 
+        QueryPlanStrategy $strategyA,
         QueryPlanStrategy $strategyB
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         // Validate input first
         // If any of the two are multi strategy
         // it can be merged
         // In any other case they need to be of the same type
-        if(!self::isOfType($strategyA, MultiStrategy::class) && 
-           !self::isOfType($strategyB, MultiStrategy::class) ) {
+        if (!self::isOfType($strategyA, MultiStrategy::class) &&
+           !self::isOfType($strategyB, MultiStrategy::class)) {
             // None of the two are multi, make further validation
             $strategyAClass = get_class($strategyA);
             $strategyBClass = get_class($strategyB);
-            Assertion::equals($strategyAClass, $strategyBClass,
-                sprintf('Cannot merge two strategies of different types: found %s and %s',
+            Assertion::equals(
+                $strategyAClass,
+                $strategyBClass,
+                sprintf(
+                    'Cannot merge two strategies of different types: found %s and %s',
                     $strategyAClass,
                     $strategyBClass
                 )
@@ -136,7 +138,7 @@ class QueryPlanStrategyComparator
         }
 
         // If both are multi we must merge both multies
-        if(
+        if (
             self::isOfType($strategyA, MultiStrategy::class) &&
             self::isOfType($strategyB, MultiStrategy::class)
           ) {
@@ -146,19 +148,19 @@ class QueryPlanStrategyComparator
         // If any of the two are MultiStrategy, we must append the new strategy
         // to the multi strategy
         if (self::isOfType($strategyA, MultiStrategy::class) ||
-            self::isOfType($strategyB,MultiStrategy::class)) {
+            self::isOfType($strategyB, MultiStrategy::class)) {
             $strategyAIsMulti = self::isOfType($strategyA, MultiStrategy::class);
             $multi = $strategyAIsMulti ? $strategyA : $strategyB;
             $nonMulti = $strategyAIsMulti ? $strategyB : $strategyA;
             return self::mergeMultiScanAndNonMulti($multi, $nonMulti);
         }
 
-        if(self::isOfType($strategyA, IndexScanStrategy::class)) {
+        if (self::isOfType($strategyA, IndexScanStrategy::class)) {
             return self::mergeIndexScans($strategyA, $strategyB);
         }
 
-        if(self::isOfType(IdScanStrategy::class)) {
-           return self::mergeIdScans($strategyA, $strategyB);
+        if (self::isOfType($strategyA, IdScanStrategy::class)) {
+            return self::mergeIdScans($strategyA, $strategyB);
         }
 
         // We probably have two TableStrategies
@@ -172,11 +174,10 @@ class QueryPlanStrategyComparator
      * @param  QueryPlanStrategy $strategyB index scan B
      * @return IndexScan
      */
-    public static function mergeIndexScans(        
-        IndexScanStrategy $strategyA, 
+    public static function mergeIndexScans(
+        IndexScanStrategy $strategyA,
         IndexScanStrategy $strategyB
-    ): IndexScanStrategy
-    {
+    ): IndexScanStrategy {
         // Merge indexes
         return new IndexScanStrategy(array_merge(
             $strategyA->getIndexNames(),
@@ -190,11 +191,10 @@ class QueryPlanStrategyComparator
      * @param  IdScanStrategy $strategyB id scan
      * @return IdScanStrategy
      */
-    public static function mergeIdScans(        
-        IdScanStrategy $strategyA, 
+    public static function mergeIdScans(
+        IdScanStrategy $strategyA,
         IdScanStrategy $strategyB
-    ): IdScanStrategy
-    {
+    ): IdScanStrategy {
         // Merge ids
         return new IdScanStrategy(array_merge(
             $strategyA->getIds(),
@@ -204,15 +204,14 @@ class QueryPlanStrategyComparator
 
     /**
      * Merges two multiscans
-     * @param  MultiScanStrategy $strategyA multiscan
-     * @param  MultiScanStrategy $strategyB multiscan
+     * @param  MultiStrategy $strategyA multiscan
+     * @param  MultiStrategy $strategyB multiscan
      * @return MultiStrategy
      */
-    public static function mergeMultiScans(        
-        MultiScanStrategy $strategyA, 
-        MultiScanStrategy $strategyB
-    ): MultiScanStrategy
-    {
+    public static function mergeMultiScans(
+        MultiStrategy $strategyA,
+        MultiStrategy $strategyB
+    ): MultiStrategy {
         $strategies = array_merge($strategyA, $strategyB);
 
         // Now sort into type arrays
@@ -220,10 +219,10 @@ class QueryPlanStrategyComparator
 
         foreach ($strategies as $s) {
             $sClass = get_class($s);
-            if(!array_key_exists($sClass, $types)) {
+            if (!array_key_exists($sClass, $types)) {
                 $types[$sClass] = [];
             }
-            $types[$sClass][] = $s; 
+            $types[$sClass][] = $s;
         }
 
         // Merge by types
@@ -231,8 +230,12 @@ class QueryPlanStrategyComparator
         foreach ($types as $typeArr) {
             foreach ($typeArr as $a) {
                 foreach ($typeArr as $b) {
-                    if($a === $b) continue;
-                    if(!self::isOfType($a, $b)) continue;
+                    if ($a === $b) {
+                        continue;
+                    }
+                    if (!self::isOfType($a, $b)) {
+                        continue;
+                    }
                     $strategies[] = self::mergeStrategies($a, $b);
                 }
                 break; // We dont want to traverse again
@@ -251,12 +254,10 @@ class QueryPlanStrategyComparator
     public static function mergeMultiScanAndNonMulti(
         MultiStrategy $multiScan,
         QueryPlanStrategy $strategy
-    ): MultiStrategy
-    {
-
+    ): MultiStrategy {
         $strategies = [];
         foreach ($multiScan->getStrategies() as $s) {
-            if(self::isOfType($strategy, $s)) {
+            if (self::isOfType($strategy, $s)) {
                 $s = self::mergeStrategies($strategy, $s);
             }
             $strategies[] = $s;
@@ -274,8 +275,7 @@ class QueryPlanStrategyComparator
     private static function isOfType(
         QueryPlanStrategy $strategy,
         string $typeClass
-    ): bool
-    {
+    ): bool {
         return get_class($strategy) === $typeClass;
     }
-}   
+}

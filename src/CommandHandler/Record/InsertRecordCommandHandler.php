@@ -7,6 +7,7 @@ use Morebec\YDB\Command\Record\InsertRecordCommand;
 use Morebec\YDB\Contract\RecordInterface;
 use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Enum\ColumnType;
+use Morebec\YDB\Exception\TableNotFoundException;
 use Morebec\YDB\Service\Database;
 use Psr\Log\LogLevel;
 use Symfony\Component\Yaml\Yaml;

@@ -85,10 +85,9 @@ class Database
      * @return \Generator
      */
     public function queryTable(
-        string $tableName, 
+        string $tableName,
         QueryInterface $query
-    ): QueryResultInterface
-    {
+    ): QueryResultInterface {
         return $this->tableManager->queryTable($tableName, $query);
     }
 

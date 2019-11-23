@@ -2,6 +2,8 @@
 
 namespace Morebec\YDB\Entity\Query;
 
+use Morebec\ValueObjects\ValueObjectInterface;
+use Morebec\YDB\Contract\RecordInterface;
 use Morebec\YDB\Contract\TermInterface;
 
 /**
@@ -47,5 +49,10 @@ class TautologyTerm implements TermInterface
     public function __toString()
     {
         return 'true === true';
+    }
+
+    public function isEqualTo(ValueObjectInterface $vo): bool
+    {
+        return (string)$this === (string)$vo;
     }
 }

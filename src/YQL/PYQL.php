@@ -11,18 +11,17 @@ use Morebec\YDB\YQL\TermNode;
  * PHP implementation of the YDB Query Language
  */
 class PYQL
-{   
+{
     /**
      * Evaluates a Query to see if it matches a record
      * @param  Query           $query   query
      * @param  RecordInterface $record record
      * @return bool            true if it matches, otherwise false
      */
-    public function evaluateQueryForRecord(
-        QueryInterface $query, 
+    public static function evaluateQueryForRecord(
+        QueryInterface $query,
         RecordInterface $record
-    ): bool
-    {
+    ): bool {
         return self::evaluateExpressionForRecord($query->getExpressionNode(), $record);
     }
     

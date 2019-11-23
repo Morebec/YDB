@@ -2,8 +2,11 @@
 
 namespace Morebec\YDB\Entity;
 
+use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\YDB\Contract\TableInterface;
+use Morebec\YDB\Contract\TableSchemaInterface;
+use Morebec\YDB\Entity\TableSchema;
 
 /**
  * Table

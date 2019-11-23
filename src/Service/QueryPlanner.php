@@ -45,17 +45,16 @@ class QueryPlanner
      * @return QueryPlanStrategy
      */
     public function createPlanForQuery(
-        TableSchemaInterface $schema, 
+        TableSchemaInterface $schema,
         Query $query
-    ): QueryPlan
-    {
-        // We need to traverse the expression tree and determine for every 
+    ): QueryPlan {
+        // We need to traverse the expression tree and determine for every
         // expression node the strategy to use
         $expr = $query->getExpressionNode();
         $strategy = $this->getStrategiesForExpression($schema, $expr);
 
         // Make sure we have at least one strategy
-        if(!$strategy) {
+        if (!$strategy) {
             throw new QueryException(
                 "Internal Error: Could not compute a query Plan for the given query, no stratgies computed"
             );
@@ -69,14 +68,13 @@ class QueryPlanner
     /**
      * Returns the strategies to uses for an expression's terms
      * @param  ExpressionNode $node       expression
-     * @param  array         
+     * @param  array
      *  $strategies built array of strategies
      */
     public function getStrategiesForExpression(
         TableSchemaInterface $schema,
         ExpressionNode $node
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         if ($node instanceof TermNode) {
             return $this->determineStrategyForTerm($schema, $node);
         }
@@ -101,18 +99,17 @@ class QueryPlanner
      * @return QueryPlanStrategy
      */
     private function determineStrategyForTerm(
-        TableSchemaInterface $schema, 
+        TableSchemaInterface $schema,
         TermNode $node
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         $fieldName = $node->getTermFieldName();
 
-        if($fieldName === 'id') {
+        if ($fieldName === 'id') {
             return new IdScanStrategy([$node->getTermValue()]);
         }
 
         // If the column is indexed we will use an index scan
-        if($schema->getColumnByName($fieldName)->isIndexed()) {
+        if ($schema->getColumnByName($fieldName)->isIndexed()) {
             return new IndexScanStrategy([$node->getTermValue()]);
         }
 

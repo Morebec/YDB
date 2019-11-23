@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Service;
 
@@ -15,8 +15,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class RecordLoader
 {
-    
-    function __construct()
+    public function __construct()
     {
     }
 
@@ -27,7 +26,8 @@ class RecordLoader
      */
     public function load(File $recordFile): RecordInterface
     {
-        Assertion::true($recordFile->exists(), 
+        Assertion::true(
+            $recordFile->exists(),
             "Cannot load record, file '$recordFile' does not exist."
         );
 

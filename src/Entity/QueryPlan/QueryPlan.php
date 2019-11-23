@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\QueryPlan;
 
@@ -12,7 +12,7 @@ class QueryPlan
     /** @var QueryPlanStrategy */
     private $strategy;
 
-    function __construct(QueryPlanStrategy $strategy)
+    public function __construct(QueryPlanStrategy $strategy)
     {
         $this->strategy = $strategy;
     }

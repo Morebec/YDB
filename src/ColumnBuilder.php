@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB;
 
@@ -16,7 +16,7 @@ class ColumnBuilder
     private $columnName;
 
     /** @var ColumnType type of the column */
-    private $type;
+    private $columnType;
 
     /** @var indicate if the column is indexed */
     private $indexed;
@@ -28,7 +28,7 @@ class ColumnBuilder
     private $unique;
 
 
-    function __construct(string $name)
+    public function __construct(string $name)
     {
         $this->columnName = $name;
         $this->indexed = false;
@@ -121,7 +121,6 @@ class ColumnBuilder
         $this->indexed = true;
 
         return $this;
-
     }
 
     /**

@@ -7,6 +7,7 @@ use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
 use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\QueryResultInterface;
+use Morebec\YDB\Contract\TableInterface;
 use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Exception\TableNotFoundException;
 use Morebec\YDB\Service\Database;
@@ -16,6 +17,9 @@ use Morebec\YDB\Service\Database;
  */
 class TableManager
 {
+    /** @var Database */
+    private $database;
+
     /** @var string path to the database */
     private $databasePath;
 
@@ -94,10 +98,9 @@ class TableManager
      * @return \Generator
      */
     public function queryTable(
-        string $tableName, 
+        string $tableName,
         QueryInterface $query
-    ): QueryResultInterface
-    {
+    ): QueryResultInterface {
         return $this->tableQuerier->queryTable($tableName, $query);
     }
 

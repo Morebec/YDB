@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\Entity\QueryPlan;
 
@@ -12,7 +12,7 @@ class MultiStrategy extends QueryPlanStrategy
     /** @var array array of QueryPlanStrategy objects */
     private $strategies;
 
-    function __construct(array $strategies)
+    public function __construct(array $strategies)
     {
         Assertion::count($strategies, 2, "A multistrategy must have at least 2");
         $this->strategies = $strategies;
@@ -26,7 +26,7 @@ class MultiStrategy extends QueryPlanStrategy
     public function hasStrategyType(string $className): bool
     {
         foreach ($this->strategies as $strategy) {
-            if(get_class($strategy) === $className) {
+            if (get_class($strategy) === $className) {
                 return true;
             }
         }

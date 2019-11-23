@@ -90,7 +90,7 @@ class TableLoader
         $schemaFile = File::fromStringPath($directory . "/" . TableSchema::SCHEMA_FILE_NAME);
         
         if (!$schemaFile->exists()) {
-            throw new TableSchemaNotFoundException($tableName);
+            throw new TableSchemaNotFoundException($tableName, $schemaFile);
         }
 
         $schema = Yaml::parse($schemaFile->getContent());

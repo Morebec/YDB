@@ -3,6 +3,7 @@
 namespace Morebec\YDB\Service;
 
 use Morebec\YDB\Contract\ColumnInterface;
+use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Entity\TableSchema;
 
 /**
@@ -33,13 +34,22 @@ class TableUpdater
 
         $columns = $schema->getColumns();
         $columns[] = $column;
-        $newSchema = new TableSchema($this->getName(), $columns);
+        $newSchema = new TableSchema($schema->getName(), $columns);
         $this->updateSchema($newSchema);
         
         // Update the records
         foreach ($records as $record) {
             $record->setFieldValue($column->getName(), $defaultValue);
-            $this->updateRecord($record);
+            // $this->updateRecord($record);
         }
+    }
+
+    /**
+     * Updates the schema of a table
+     * @param  TableSchemaInterface $newSchema new schema
+     */
+    public function updateSchema(TableSchemaInterface $newSchema): void
+    {
+        # code...
     }
 }

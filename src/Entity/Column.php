@@ -71,7 +71,7 @@ class Column implements ColumnInterface
         $this->name = $name;
         $this->type = $type;
         $this->indexed = $indexed;
-        $this->defaultValue = null;
+        $this->defaultValue = $defaultValue;
     }
     /**
      * @return string
