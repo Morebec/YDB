@@ -25,7 +25,7 @@ class YQLTest extends \Codeception\Test\Unit
             'genre' => 'adventure'
         ]);
 
-        $result = PYQL::evaluateForRecord($tree, $record);
+        $result = PYQL::evaluateExpressionForRecord($tree, $record);
 
         $this->assertTrue($result);
     }
@@ -44,7 +44,7 @@ class YQLTest extends \Codeception\Test\Unit
             'genre' => 'adventure'
         ]);
 
-        $result = PYQL::evaluateForRecord($tree, $record);
+        $result = PYQL::evaluateExpressionForRecord($tree, $record);
 
         $this->assertTrue($result);
     }
@@ -85,13 +85,13 @@ class YQLTest extends \Codeception\Test\Unit
             'price' => 5,
             'genre' => 'adventure'
         ]);
-        $this->assertTrue(PYQL::evaluateForRecord($tree, $record));
+        $this->assertTrue(PYQL::evaluateExpressionForRecord($tree, $record));
 
         // Will NOT match
         $record = new Record(RecordId::generate(), [
             'price' => 5,
             'genre' => 'crime'
         ]);
-        $this->assertFalse(PYQL::evaluateForRecord($tree, $record));
+        $this->assertFalse(PYQL::evaluateExpressionForRecord($tree, $record));
     }
 }

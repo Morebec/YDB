@@ -2,24 +2,37 @@
 
 namespace Morebec\YDB\YQL;
 
+use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\RecordInterface;
-use Morebec\YDB\YQL\TermNode;
 use Morebec\YDB\YQL\ExpressionNode;
+use Morebec\YDB\YQL\TermNode;
 
 /**
  * PHP implementation of the YDB Query Language
  */
 class PYQL
-{
-    
+{   
+    /**
+     * Evaluates a Query to see if it matches a record
+     * @param  Query           $query   query
+     * @param  RecordInterface $record record
+     * @return bool            true if it matches, otherwise false
+     */
+    public function evaluateQueryForRecord(
+        QueryInterface $query, 
+        RecordInterface $record
+    ): bool
+    {
+        return self::evaluateExpressionForRecord($query->getExpressionNode(), $record);
+    }
     
     /**
      * Evaluates a ExpressionNode to see if it matches a record
-     * @param  ExpressionNode        $node   node
+     * @param  ExpressionNode  $node   node
      * @param  RecordInterface $record record
-     * @return bool                  true if it matches, otherwise false
+     * @return bool            true if it matches, otherwise false
      */
-    public static function evaluateForRecord(
+    public static function evaluateExpressionForRecord(
         ExpressionNode $node,
         RecordInterface $record
     ): bool {
@@ -28,8 +41,7 @@ class PYQL
         }
 
         $leftNode = $node->getLeft();
-        $leftValue = $node->getLeft() ?
-                        self::evaluateForRecord($leftNode, $record) : false;
+        $leftValue = self::evaluateExpressionForRecord($leftNode, $record);
 
         $operator = $node->getOperator();
         if (!$operator) {
@@ -37,8 +49,7 @@ class PYQL
         }
 
         $rightNode = $node->getRight();
-        $rightValue = $node->getRight() ?
-                        self::evaluateForRecord($rightNode, $record) : false;
+        $rightValue = self::evaluateExpressionForRecord($rightNode, $record);
 
         return self::evaluateOperator($leftValue, $operator, $rightValue);
     }

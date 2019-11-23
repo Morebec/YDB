@@ -44,7 +44,7 @@ class ExpressionBuilder
     public function andWhere(string $fieldName, Operator $operator, $value): self
     {
         $whereNode = new TermNode(new Term($fieldName, $operator, $value));
-        $this->addNodeRight(new ExpressionOperator(ExpressionOperator::AND), $whereNode);
+        $this->insertNodeRight(new ExpressionOperator(ExpressionOperator::AND), $whereNode);
         return $this;
     }
 
@@ -59,7 +59,7 @@ class ExpressionBuilder
     public function orWhere(string $fieldName, Operator $operator, $value): self
     {
         $whereNode = new TermNode(new Term($fieldName, $operator, $value));
-        $this->addNodeRight(new ExpressionOperator(ExpressionOperator::OR), $whereNode);
+        $this->insertNodeRight(new ExpressionOperator(ExpressionOperator::OR), $whereNode);
         return $this;
     }
 
@@ -77,7 +77,7 @@ class ExpressionBuilder
      * @param TreeOpeartor $operator operator
      * @param ExpressionNode     $node     node
      */
-    private function addNodeRight(ExpressionOperator $operator, ExpressionNode $node): void
+    private function insertNodeRight(ExpressionOperator $operator, ExpressionNode $node): void
     {
         if (!$this->root) {
             throw new \Exception("An expression must start with a simple where clause");

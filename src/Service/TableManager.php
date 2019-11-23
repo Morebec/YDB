@@ -5,9 +5,11 @@ namespace Morebec\YDB\Service;
 use Assert\Assertion;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\File;
+use Morebec\YDB\Contract\QueryInterface;
+use Morebec\YDB\Contract\QueryResultInterface;
 use Morebec\YDB\Contract\TableSchemaInterface;
-use Morebec\YDB\Entity\QueryResultInterface;
 use Morebec\YDB\Exception\TableNotFoundException;
+use Morebec\YDB\Service\Database;
 
 /**
  * Manages operations on tables
@@ -20,9 +22,16 @@ class TableManager
     /** @var TableLoader */
     private $tableLoader;
 
-    public function __construct(string $databasePath)
+    /** @var TableUpdater */
+    private $tableUpdater;
+
+    /** @var TableQuerier */
+    private $tableQuerier;
+
+    public function __construct(Database $database)
     {
-        $this->databasePath = $databasePath;
+        $this->database = $database;
+        $this->databasePath = $database->getPath();
 
         $this->tableLoader = new TableLoader($this);
         $this->tableUpdater = new TableUpdater($this);
@@ -84,9 +93,12 @@ class TableManager
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
+    public function queryTable(
+        string $tableName, 
+        QueryInterface $query
+    ): QueryResultInterface
     {
-        $this->tableQuerier->queryTable($tableName, $query);
+        return $this->tableQuerier->queryTable($tableName, $query);
     }
 
     /**
@@ -112,5 +124,16 @@ class TableManager
         return Directory::fromStringPath(
             $this->getTablesDirectory() . "/$tableName"
         );
+    }
+
+    /**
+     * Logs a message throught the database logger
+     * @param  string $level   level
+     * @param  string $message message
+     * @param  array  $context context
+     */
+    public function log(string $level, string $message, array $context = []): void
+    {
+        $this->database->log($level, $message, $context);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Morebec\YDB\Entity;
+namespace Morebec\YDB\Contract;
 
 /**
  * Represents the result of a query

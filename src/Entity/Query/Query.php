@@ -39,7 +39,7 @@ class Query implements QueryInterface
         return (string)$this->expression;
     }
 
-    public function getExpression(): ExpressionNode
+    public function getExpressionNode(): ExpressionNode
     {
         return $this->expression;
     }

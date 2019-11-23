@@ -4,7 +4,7 @@ namespace Morebec\YDB\Entity\Query;
 
 use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\RecordInterface;
-use Morebec\YDB\Entity\QueryResultInterface;
+use Morebec\YDB\Contract\QueryResultInterface;
 
 /**
  * QueryResult

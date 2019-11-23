@@ -5,10 +5,11 @@ namespace Morebec\YDB\Service;
 use Morebec\ValueObjects\File\Directory;
 use Morebec\ValueObjects\File\Path;
 use Morebec\YDB\Command\DatabaseCommandInterface;
+use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\DatabaseConnection;
-use Morebec\YDB\Entity\QueryResultInterface;
+use Morebec\YDB\Contract\QueryResultInterface;
 use Morebec\YDB\Event\DatabaseEvent;
 use Morebec\YDB\Service\Engine;
 use Symfony\Component\Filesystem\Filesystem;
@@ -45,7 +46,7 @@ class Database
     {
         $this->config = $config;
         $this->engine = $engine;
-        $this->tableManager = new TableManager($config->getDatabasePath());
+        $this->tableManager = new TableManager($this);
     }
 
     /**
@@ -83,7 +84,10 @@ class Database
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function queryTable(string $tableName, QueryInterface $query): QueryResultInterface
+    public function queryTable(
+        string $tableName, 
+        QueryInterface $query
+    ): QueryResultInterface
     {
         return $this->tableManager->queryTable($tableName, $query);
     }

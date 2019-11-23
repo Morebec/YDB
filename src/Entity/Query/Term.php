@@ -45,6 +45,11 @@ class Term implements TermInterface
         return $this->field;
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
     /**
      * Indicates if the Term supports a given field
      * @param  string $fieldName name of the field

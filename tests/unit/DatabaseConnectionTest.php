@@ -122,5 +122,7 @@ class DatabaseConnectionTest extends \Codeception\Test\Unit
                         $recordId . '.yaml';
             
         $this->assertTrue($fs->exists($expectedPath));
+
+        $conn->deleteDatabase();
     }
 }

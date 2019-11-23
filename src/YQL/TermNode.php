@@ -25,4 +25,14 @@ class TermNode extends ExpressionNode
     {
         return $this->term;
     }
+
+    public function getTermFieldName(): string
+    {
+        return $this->term->getFieldName();
+    }
+
+    public function getTermValue()
+    {
+        return $this->term->getValue();
+    }
 }

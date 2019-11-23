@@ -7,7 +7,9 @@ use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
 use Morebec\YDB\Command\Record\InsertRecordCommand;
 use Morebec\YDB\Command\Table\CreateTableCommand;
+use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\RecordInterface;
+use Morebec\YDB\Contract\QueryResultInterface;
 use Morebec\YDB\Entity\TableSchema;
 use Morebec\YDB\Service\Database;
 
@@ -134,21 +136,8 @@ class DatabaseConnection
      * @param  QueryInterface $query     query
      * @return \Generator
      */
-    public function query(string $tableName, QueryInterface $query): \Generator
+    public function query(string $tableName, QueryInterface $query): QueryResultInterface
     {
-        # code...
-    }
-
-    /**
-     * Queries a single result from the database and returns the record or null
-     * if none could be found. If there are more than one results matching
-     * the query, throws an exception.
-     * @param  string         $tableName name of the table
-     * @param  QueryInterface $query     query
-     * @return RecordInterface|null
-     */
-    public function queryOne(string $tableName, QueryInterface $query): ?RecordInterface
-    {
-        # code...
+        return $this->database->queryTable($tableName, $query);
     }
 }
