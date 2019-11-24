@@ -28,7 +28,7 @@ class ExpressionBuilder
      * @param  mixed   $value      value
      * @return self                for chaining
      */
-    public static function where(string $fieldName, Operator $operator, $value): self
+    public static function where(string $fieldName, Operator $operator, $value): ExpressionBuilder
     {
         $whereNode = new TermNode(new Term($fieldName, $operator, $value));
         return new static($whereNode);

@@ -50,6 +50,7 @@ $schema = new TableSchemaBuilder()
                         ->unique()
                         ->build()
             )
+            ->build()
 );
 ```
 A schema can also be defined by a YAML file (in the table's directory):

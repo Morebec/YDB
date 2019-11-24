@@ -50,5 +50,59 @@ class TableQuerierTest extends \Codeception\Test\Unit
         $this->assertEquals((string)$record, (string)$result->fetch());
 
         $conn->deleteDatabase();
-    }    
+    }
+
+    public function testQueryWithMultipleCriteria()
+    {
+
+        $dbName = 'test-query-table-multiple-criteria';
+        $dbPath = codecept_output_dir() . 'data/' . $dbName;
+        $config = new DatabaseConfig($dbPath);
+        $conn = Database::getConnection($config);
+
+        $conn->createDatabase();
+
+        $tableName = 'books';
+        $schema = TableSchemaBuilder::withName($tableName)
+                ->withColumn(
+                    ColumnBuilder::withName('price')
+                                 ->withFloatType()
+                                 ->indexed()
+                                 ->build()
+                )
+                ->withColumn(
+                    ColumnBuilder::withName('genre')
+                                 ->withStringType()
+                                 ->indexed()
+                                 ->build()
+                )
+                ->build()
+        ;
+
+        $conn->createTable($schema);
+
+        
+        $conn->insertRecord($tableName, new Record(RecordId::generate(), [
+            'price' => 2.00,
+            'genre' => 'adventure',
+        ]));
+        $conn->insertRecord($tableName, new Record(RecordId::generate(), [
+            'price' => 5.00,
+            'genre' => 'sci-fi',
+        ]));
+        $conn->insertRecord($tableName, new Record(RecordId::generate(), [
+            'price' => 10.00,
+            'genre' => 'fantasy',
+        ]));
+
+        $query = QueryBuilder::where('price', Operator::EQUAL(), 2.00)
+                             ->orWhere('genre', Operator::EQUAL(), 'fantasy')
+                             ->build()
+        ;
+
+        $result = $conn->query($tableName, $query);
+        $records = $result->fetchAll();
+        $this->assertCount(2, $records);
+        // $conn->deleteDatabase();
+    } 
 }

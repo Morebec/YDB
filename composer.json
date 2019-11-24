@@ -36,7 +36,9 @@
     "require-dev": {
         "codeception/codeception": "^3.1",
         "friendsofphp/php-cs-fixer": "^2.15",
+        "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.11.19",
+        "phpstan/phpstan-beberlei-assert": "^0.11.2",
         "psy/psysh": "@stable"
     },
     "autoload": {

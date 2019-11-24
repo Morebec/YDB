@@ -126,7 +126,7 @@ class QueryPlanStrategyComparator
             // None of the two are multi, make further validation
             $strategyAClass = get_class($strategyA);
             $strategyBClass = get_class($strategyB);
-            Assertion::equals(
+            Assertion::same(
                 $strategyAClass,
                 $strategyBClass,
                 sprintf(
