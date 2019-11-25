@@ -2,6 +2,7 @@
 
 namespace Morebec\YDB\Service;
 
+use Morebec\ValueObjects\DateTime\Time\Timestamp;
 use Morebec\YDB\Contract\QueryInterface;
 use Morebec\YDB\Contract\QueryResultInterface;
 use Morebec\YDB\Contract\RecordInterface;
@@ -9,6 +10,7 @@ use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Entity\QueryPlan\QueryPlan;
 use Morebec\YDB\Entity\Query\Query;
 use Morebec\YDB\Entity\Query\QueryResult;
+use Morebec\YDB\Entity\Query\QueryStatistics;
 use Morebec\YDB\Entity\Query\TermPlanNode;
 use Morebec\YDB\Enum\QuerySource;
 use Morebec\YDB\Exception\QueryException;
@@ -55,6 +57,8 @@ class TableQuerier
             'query' => (string)$query
         ]);
 
+        $startTime = Timestamp::now();
+
         // VALIDATE THAT THE TABLE IN THE QUERY EXISTS
         if (!$this->tableManager->tableExists($tableName)) {
             throw new QueryException("Invalid query: table '$tableName' does not exist");
@@ -79,7 +83,12 @@ class TableQuerier
             'table_name' => $tableName,
             'query' => (string)$query,
         ]);
+        $queryPlanStartTime = Timestamp::now();
+
         $plan = $this->queryPlanner->createPlanForQuery($schema, $query);
+        $queryPlanEndTime = Timestamp::now();
+
+
         $this->tableManager->log(LogLevel::INFO, "Created query plan for table '$tableName'", [
             'table_name' => $tableName,
             'query' => (string)$query,
@@ -89,13 +98,24 @@ class TableQuerier
 
         // Execute the plan
         $matchIterator = $this->queryPlanExecutor->execute($tableName, $query, $plan);
+        $endTime = Timestamp::now();
+
+        $stats = new QueryStatistics(
+            $startTime, 
+            $endTime,
+            $queryPlanStartTime,
+            $queryPlanEndTime
+        );
+
         $this->tableManager->log(LogLevel::INFO, "Executed query plan for table '$tableName'", [
             'table_name' => $tableName,
             'query' => (string)$query,
-            'query_plan' => (string)$plan
-
+            'query_plan' => (string)$plan,
+            'duration' => $stats->getDuration(),
+            'query_planner_duration' => $stats->getQueryPlannerDuration()
         ]);
-        return new QueryResult($matchIterator, $query);
+
+        return new QueryResult($matchIterator, $query, $stats);
     }
 
 

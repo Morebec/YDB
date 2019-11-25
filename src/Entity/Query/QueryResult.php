@@ -17,10 +17,19 @@ class QueryResult implements QueryResultInterface
     /** @var QueryInterface */
     private $query;
 
-    public function __construct(\Iterator $recordIterator, QueryInterface $query)
+    /** @var QueryStatistics */
+    private $statistics;
+
+
+    public function __construct(
+        \Iterator $recordIterator, 
+        QueryInterface $query,
+        QueryStatistics $statistics
+    )
     {
         $this->recordIterator = $recordIterator;
         $this->query = $query;
+        $this->statistics = $statistics;
     }
 
     /**
@@ -54,5 +63,23 @@ class QueryResult implements QueryResultInterface
     public function getQuery(): QueryInterface
     {
         return $this->query;
+    }
+
+    /**
+     * Returns the duration of the query
+     * @return int
+     */
+    public function getDuration(): int
+    {
+        return $this->statistics->getDuration();
+    }
+
+    /**
+     * Returns the duration of the query planner step
+     * @return int
+     */
+    public function getQueryPlannerDuration(): int
+    {
+        return $this->statistics->getQueryPlannerDuration();
     }
 }
