@@ -103,6 +103,50 @@ class TableQuerierTest extends \Codeception\Test\Unit
         $result = $conn->query($tableName, $query);
         $records = $result->fetchAll();
         $this->assertCount(2, $records);
-        // $conn->deleteDatabase();
+        $conn->deleteDatabase();
     } 
+
+    public function testQueryOneInABigTable()
+    {
+
+        $dbName = 'test-query-one-in-big-table';
+        $dbPath = codecept_output_dir() . 'data/' . $dbName;
+        $config = new DatabaseConfig($dbPath);
+        $conn = Database::getConnection($config);
+
+        $conn->createDatabase();
+
+        $tableName = 'books';
+        $schema = TableSchemaBuilder::withName($tableName)
+                ->withColumn(
+                    ColumnBuilder::withName('price')
+                                 ->withFloatType()
+                                 ->indexed()
+                                 ->build()
+                )
+                ->build()
+        ;
+
+        $conn->createTable($schema);
+
+        $recordId = RecordId::generate();
+        $conn->insertRecord($tableName, new Record($recordId, [
+            'price' => 2.00,
+        ]));
+
+        for ($i=0; $i < 100; $i++) { 
+            $conn->insertRecord($tableName, new Record(RecordId::generate(), [
+                'price' => 2.00,
+            ]));
+        }
+
+        $query = QueryBuilder::where('id', Operator::EQUAL(), $recordId)
+                             ->build()
+        ;
+
+        $result = $conn->query($tableName, $query);
+        $records = $result->fetchAll();
+        $this->assertCount(1, $records);
+        // $conn->deleteDatabase();
+    }
 }
