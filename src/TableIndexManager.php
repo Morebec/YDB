@@ -76,6 +76,7 @@ class TableIndexManager
 
         foreach ($columns as $col) {
             $value = $record->getFieldValue($col->getName());
+            if (!$col->isIndexed()) continue; 
             $index = $this->getIndexForColumnWithValue($col, $value);
             $index->removeRecord($record);
         }
