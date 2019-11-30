@@ -3,3 +3,4 @@ coverage.*
 .phpintel/
 vendor/
 composer.lock
+/nbproject/private/
