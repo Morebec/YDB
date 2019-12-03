@@ -15,7 +15,7 @@ This document outlines a few guidelines in order to help developers contribute t
 A coding standard is a necessary mean to ensure that developers can work on the project's code
 in a way that is consistent and familiar for everyone. We have decided to follow the PSR-1, PSR-2 and PSR-4 standards to align ourselves with a great amount of well-known PHP projects.
 
-To enforce these rules, we rely on the [https://cs.symfony.com/](PHP-CS-Fixer Tool).
+To enforce these rules, we rely on the [PHP-CS-Fixer Tool](https://cs.symfony.com/).
 
 ### Git
 #### Commit messages
@@ -93,6 +93,7 @@ Next, add the deprecation notice in the `CHANGELOG.md` file:
 Finally, bump the minor of the version.
 
 In summary, to deprecated a piece of code:
+
     1. Add a PHPDoc block for the deprecated class, method or property.
     1. Trigger a PHP `E_USER_DEPRECATED` error.
     1. Document the deprecation to the `CHANGELOG.md` file.
@@ -109,6 +110,7 @@ Once a deprecation has been removed, document it in the `CHANGELOG.md` file:
 ```
 
 In summary, to remove a deprecated piece of code:
+
     1. Remove the PHPDoc block for the deprecated class, method or property.
     1. Remove the PHP `E_USER_DEPRECATED` error trigger.
     1. Document the removal of the deprecation in the `CHANGELOG.md` file.
