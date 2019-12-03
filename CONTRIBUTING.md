@@ -94,10 +94,10 @@ Finally, bump the minor of the version.
 
 In summary, to deprecated a piece of code:
 
-    1. Add a PHPDoc block for the deprecated class, method or property.
-    1. Trigger a PHP `E_USER_DEPRECATED` error.
-    1. Document the deprecation to the `CHANGELOG.md` file.
-    1. Bump minor of the versio
+1. Add a PHPDoc block for the deprecated class, method or property.
+1. Trigger a PHP `E_USER_DEPRECATED` error.
+1. Document the deprecation to the `CHANGELOG.md` file.
+1. Bump minor of the versio
 
 ### Removing deprecated code
 The removal of deprecated code should only be done at least on the next major version. 
@@ -111,6 +111,6 @@ Once a deprecation has been removed, document it in the `CHANGELOG.md` file:
 
 In summary, to remove a deprecated piece of code:
 
-    1. Remove the PHPDoc block for the deprecated class, method or property.
-    1. Remove the PHP `E_USER_DEPRECATED` error trigger.
-    1. Document the removal of the deprecation in the `CHANGELOG.md` file.
+1. Remove the PHPDoc block for the deprecated class, method or property.
+1. Remove the PHP `E_USER_DEPRECATED` error trigger.
+1. Document the removal of the deprecation in the `CHANGELOG.md` file.
