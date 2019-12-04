@@ -12,6 +12,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Morebec\YDB\Enum\LoggerChannel;
 
 /**
  * The engine class serves as a service container.
@@ -100,14 +101,20 @@ class Engine implements EventSubscriberInterface
      * @param  string   $message message
      * @param  array    $context optional context data
      */
-    public function log(string $level, string $message, array $context = []): void
+    public function log(string $level, string $message, array $context = [],string $channel = LoggerChannel::__DEFAULT): void
     {
         if (!$this->logger) {
             return;
         }
-
+        Assertion::keyExists($this->logger->loggers, $channel, "Unsupported channel '$channel'");
         $context['database_root'] = (string)$this->database->getPath();
-        $this->logger->log($level, $message, $context);
+        $this->logger->loggers[LoggerChannel::__DEFAULT]->log($level, $message, $context);
+        if ($channel === LoggerChannel::__DEFAULT) {
+            return;
+        }
+        // Log in channel specific logger
+        $this->logger->loggers[$channel]->log($level, $message, $context);
+
     }
 
     /**
