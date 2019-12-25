@@ -2,13 +2,10 @@
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\Contract\QueryInterface;
-use Morebec\YDB\Entity\Query\Operator;
-use Morebec\YDB\Entity\Query\Query;
-use Morebec\YDB\Entity\Query\TautologyTerm;
-use Morebec\YDB\Entity\Query\Term;
-use Morebec\YDB\YQL\ExpressionNode;
-use Morebec\YDB\YQL\TermNode;
+use Morebec\YDB\Domain\YQL\ExpressionNode;
+use Morebec\YDB\Domain\YQL\Query\Operator;
+use Morebec\YDB\Domain\YQL\Query\Query;
+use Morebec\YDB\Domain\YQL\Query\Term;
 
 /**
  * QueryBuilder
@@ -21,7 +18,7 @@ class QueryBuilder extends ExpressionBuilder
      */
     public function findAll(): QueryBuilder
     {
-        return new static(new TermNode(new TautologyTerm()));
+        //return new static(new TermNode());
     }
 
     /**
@@ -42,10 +39,10 @@ class QueryBuilder extends ExpressionBuilder
     }
 
     /**
-     * Builds the Query
+     * Builds the Query and returns it
      * @return Query
      */
-    public function build(): QueryInterface
+    public function build(): Query
     {
         return new Query($this->root);
     }

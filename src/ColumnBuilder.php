@@ -2,10 +2,10 @@
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\Contract\ColumnInterface;
-use Morebec\YDB\Contract\ColumnTypeInterface;
-use Morebec\YDB\Entity\Column;
-use Morebec\YDB\Enum\ColumnType;
+
+use Cassandra\Column;
+use Morebec\YDB\Domain\Model\Entity\ColumnDefinition;
+use Morebec\YDB\Domain\Model\Entity\ColumnType;
 
 /**
  * ColumnBuilder
@@ -18,7 +18,7 @@ class ColumnBuilder
     /** @var ColumnType type of the column */
     private $columnType;
 
-    /** @var indicate if the column is indexed */
+    /** @var bool indicates if the column is indexed */
     private $indexed;
 
     /** @var bool indicates if the column is primary */
@@ -26,7 +26,6 @@ class ColumnBuilder
 
     /** @var bool indicates if the column only has unique values */
     private $unique;
-
 
     public function __construct(string $name)
     {
@@ -38,7 +37,7 @@ class ColumnBuilder
 
     /**
      * Sets the name of the column
-     * @param  string $name name of the column
+     * @param string $name name of the column
      * @return self
      */
     public static function withName(string $name): self
@@ -48,9 +47,10 @@ class ColumnBuilder
 
     /**
      * Sets the column type
+     * @param ColumnType $type
      * @return self
      */
-    public function withType(ColumnTypeInterface $type): self
+    public function withType(ColumnType $type): self
     {
         $this->columnType = $type;
 
@@ -80,7 +80,7 @@ class ColumnBuilder
     }
 
     /**
-     * Sets the column type to flato
+     * Sets the column type to float
      * @return self
      */
     public function withFloatType(): self
@@ -149,10 +149,10 @@ class ColumnBuilder
      * Builds the column object
      * @return self
      */
-    public function build(): ColumnInterface
+    public function build(): ColumnDefinition
     {
         $indexed = $this->unique || $this->primary || $this->indexed;
 
-        return new Column($this->columnName, $this->columnType, $indexed);
+        return ColumnDefinition::create($this->columnName, $this->columnType, $indexed);
     }
 }

@@ -1,15 +1,15 @@
 # Querying
 
-Querying corresponds to the retrieval of data in the database. YDB provides a simple programatic interface called PYQL (pronounced Pee-Why-Kyu-El, which stands for PHP YDB Query Language) in order to retrieve data programatically. See the user documentation for more info on usage.
+Querying corresponds to the retrieval of data in the database. YDB provides a simple programatic interface called PYQL (pronounced Pee-Why-Kyu-El, which stands for PHP YDB Query Language) in order to retrieve data. See the user documentation for more info on usage.
 
 ## PYQL
-PYQL is inspired by the delcarative nature of SQL. It provides using a PHP interface ways to query data.
+PYQL is inspired by the declarative nature of SQL. It provides ways to query data using a PHP interface.
 
 
 ## Query Planner & Query Executor
 Usually in a RDBMS the process of querying data is as follows:
 
-1. Analysis: First, the SQL query is sent to the DBMS for syntaxic analysis. To make sure the query is valid and syntactically correct. This syntax is then converted to language tokens, taht can be used by the database to detect meaning behind the SQL string.
+1. Analysis: First, the SQL query is sent to the DBMS for syntactic analysis. To make sure the query is valid and syntactically correct. This syntax is then converted to language tokens, that can be used by the database to detect meaning behind the SQL string.
 1. Optimization: The SQL query is then optimized for performance. For example, the following query:
 ```
 SELECT * FROM 'user' WHERE 'age' BETWEEN 25 AND 30; 
@@ -22,29 +22,31 @@ SELECT * FROM 'user' WHERE 'age' >= 25 AND 'age' <= 30;
 1. Execution: Once the best plan has been determined, the query is executed and the results returned.
 
 ## YDB + (P)YQL
-In YDB, a similar procedure is used to query data. However, since YDB is designed for smaller datasets, it relies on a much simpler way:
+In YDB, a similar procedure is used to query data. However, since YDB is designed for smaller datasets, it relies on a much simpler algorithm:
 1. Analysis: For the moment, since there is only a direct PHP interface to YQL, there is no particular analysis that needs to be done. the PHP interface will generate the appropriate expression tree for the Query Engine to understand the meaning behind the query.
 1. Optimization: There is currently no optimization done, it is to the users to ensure that the queries they are feeding the database are optimized.
-1. Planning: YDB uses a QueryPlanner in order to determine the best plan for to execute the query.
-1. Execution: The generated plan  is executed.
+1. Planning: YDB uses a QueryPlanner in order to determine the best strategy to execute the query.
+1. Execution: The generated plan is executed.
 
 The following sections will discuss these steps in more detail.
 
 ### Analysis
-The YQL language currently only has a PHP interface implementation, by that we mean that in order to generate YQL Expressions one need to use the `ExpressionBuilder` class methods.
-Ther is so far, no way of passing expression strings that will be converted to PHP method calls.
+The YQL language currently only has a PHP interface implementation, by that we mean that in order to generate YQL Expressions,
+one need to use the `ExpressionBuilder` class's methods.
+There is so far, no way of passing expression strings that will be converted to PHP method calls.
 
-*Note*: Although YQL ends with *'QL'* which reminds of *SQL*, it is in now way compatible with it. It is only inspired by it to be a declarative language, that ressembles a natural language.
+*Note*: Although YQL ends with *'QL'* which reminds of *SQL*, it is in now way compatible with it. It is only inspired by it to be a declarative language, that reassembles a natural language.
 
 Let's review the different elements that make up a query:
 ```sql
 FIND records WHERE 'column' == 'value' AND 'column2' == 'value' FROM table_name;
 ```
 
-**Query**: A query is a concept that encompases the idea of the need to retreive data in the database.
+**Query**: A query is a concept that encompasses the idea of the need to retrieve data in the database.
 It has the following attributes:
-    - It targets a specific table
-    - It has an expression
+- It targets a specific table
+- It has an expression
+
 In the case of the previous snippet of code: the whole line would be a query.
 
 **Expression**: an expression is simply a line of YQL code made of multiple clauses.
@@ -64,21 +66,23 @@ In the case of the previous snippet of code, these would be the clauses:
 such as
 ```'column' == 'value' ```
 
-In the code several classes or used to represent theses elements:
-- `Morebec\YDB\Entity\Query\Term` represents a term
-- `Morebec\YDB\Entity\Query\Operator` represents a Term Operator
+
+In the code, several classes are used to represent theses elements:
+- `Morebec\YDB\YQL\Query\Term` represents a term
+- `Morebec\YDB\YQL\Query\Operator` represents a Term Operator
 - `Morebec\YDB\YQL\ExpressionNode` represents an expression
 - `Morebec\YDB\YQL\ExpressionOperator` represents an Expression Operator
 
 Since by design, it is only possible to query records from one table at a time,
 the `FIND records` and `FROM table` clauses are not specifically represented, 
-instead they are implied when calling methods like `Database::queryTable`.
+instead they are implied when calling methods like `Database::queryTable`
+for a more natural enunciation of a query.
 
 In code, an expression is represented as a Binary tree.
 
 The following query that fetches books that have a price of 2.00$ or that are of the genre 'adventure':
 ```sql
-FIND records WHERE price == 2.00 OR genre == 'adventure';
+FIND records WHERE price == 2.00 OR genre == 'adventure' FROM book;
 ```
 
 Is represented using the following tree structure:
@@ -97,18 +101,19 @@ Things like:
 ```sql
 FIND records WHERE price === 2.00 AND/OR price === 2.00
 ```
-Could be optimized easily.
+Could be optimized easily. (This is actually the only optimization that is performed by the Database Engine)
+
 
 ### Query Planning
 There are many strategies to resolve a query:
 
 - **Full Table Scan**: This means loading every record in the table, and checking if it matches the query. This is strategy can prove to be quite fast when handling small tables, but painfully slow for tables with a lot of records.
 
-- **Index scan**: Using indexes to determine the records that are potential candidates for the query based on their values. For large tables this is always faster than Full table scan as we only load a subset of the records from the table, however, it slows down the insert, update and delete operations since it requries the computation of the index on every one of these operations for indexed columns.
+- **Index scan**: Using indexes to determine the records that are potential candidates for the query based on their values. For large tables this is always faster than Full table scan as we only load a subset of the records from the table, however, it slows down the insert, update and delete operations since it requires the computation of the index on every one of these operations for indexed columns.
 
 - **Id Scans**: This can be lightning fast since records are stored with their id as file name. Therefore when querying by id we can directly access the right file and return the associated record. However it is only useful when the `id` column is provided in the query.
 
-These tree ways for querying are referred to as strategies in the code and each have
+These three ways for querying are referred to as strategies in the code and each have
 their corresponding classes.
 
 There is also a fourth strategy called MultiStrategy, which is used to represent the need of using more than one strategy for a query. A Multi strategy is therefore a mixture of an Index Scan and an Id Scan.
@@ -123,6 +128,7 @@ The Query planner works in the following way:
 
 #### Truth table
 ##### AND expression operator table
+```
 TableScan AND TableScan => TableScan
 TableScan AND IdScan => IdScan
 TableScan AND IndexScan => IndexScan
@@ -134,9 +140,10 @@ IdScan AND IndexScan => IdScan
 IndexScan AND TableScan => IndexScan
 IndexScan AND IdScan => IdScan
 IndexScan AND IndexScan => IndexScan
-
+```
 
 ##### OR expression operator table
+```
 TableScan OR TableScan => TableScan
 TableScan OR IdScan => TableScan
 TableScan OR IndexScan => TableScan
@@ -152,7 +159,7 @@ IndexScan OR IndexScan -> IndexScan
 MultiStrategy OR TableSCan => TableScan
 MultiStrategy OR IdScan => Append(MultiStrategy) 
 MultiStrategy OR IndexScan => Merge(MultiStrategy) 
-
+```
 
 ### Execution
 The executor simply applies the strategy, by loading the records associated in the strategy

@@ -2,9 +2,8 @@
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\Contract\ColumnInterface;
-use Morebec\YDB\Contract\TableSchemaInterface;
-use Morebec\YDB\Entity\TableSchema;
+use Morebec\YDB\Domain\Model\Entity\ColumnDefinition;
+use Morebec\YDB\Domain\Model\Entity\TableSchema;
 
 /**
  * Helper class to create TableSchemas
@@ -35,18 +34,22 @@ class TableSchemaBuilder
 
     /**
      * Adds a column to the schema
-     * @param  ColumnInterface $column column definition
+     * @param  ColumnDefinition $column column definition
      * @return self                    for chaining
      */
-    public function withColumn(ColumnInterface $column): self
+    public function withColumn(ColumnDefinition $column): self
     {
         $this->columns[] = $column;
         
         return $this;
     }
 
-    public function build(): TableSchemaInterface
+    /**
+     * Builds the schema and returns it
+     * @return TableSchema
+     */
+    public function build(): TableSchema
     {
-        return new TableSchema($this->tableName, $this->columns);
+        return TableSchema::create($this->tableName, $this->columns);
     }
 }

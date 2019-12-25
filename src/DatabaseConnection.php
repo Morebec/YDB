@@ -2,14 +2,19 @@
 
 namespace Morebec\YDB;
 
+use Generator;
 use Morebec\YDB\Command\Database\ClearDatabaseCommand;
 use Morebec\YDB\Command\Database\CreateDatabaseCommand;
 use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
 use Morebec\YDB\Command\Record\InsertRecordCommand;
+use Morebec\YDB\Command\Table\AddTableColumnCommand;
 use Morebec\YDB\Command\Table\CreateTableCommand;
+use Morebec\YDB\Command\Table\UpdateTableCommand;
+use Morebec\YDB\Contract\ColumnInterface;
 use Morebec\YDB\Contract\QueryInterface;
-use Morebec\YDB\Contract\RecordInterface;
 use Morebec\YDB\Contract\QueryResultInterface;
+use Morebec\YDB\Contract\Record;
+use Morebec\YDB\Contract\TableSchemaInterface;
 use Morebec\YDB\Entity\TableSchema;
 use Morebec\YDB\Service\Database;
 
@@ -78,6 +83,16 @@ class DatabaseConnection
     {
         $this->database->dispatchCommand(new DropTableCommand($tableName));
     }
+    
+    /**
+     * Returns the schema of a specific table
+     * @param string $tableName name of the table
+     * @return TableSchemaInterface
+     */
+    public function getTableSchema(string $tableName): TableSchemaInterface
+    {
+        return $this->database->getTableSchema($tableName);
+    }
 
     /**
      * Indicates if a table exists
@@ -96,16 +111,27 @@ class DatabaseConnection
      */
     public function getTableNames(): array
     {
-        # code...
+        return $this->database->getTableNames();
     }
-
+    
+    /**
+     * Adds a new column on a table
+     * @param ColumnInterface $column
+     * @return void
+     */
+    public function addTableColumn(string $tableName, ColumnInterface $column): void
+    {
+        $this->database->dispatchCommand(
+                new AddTableColumnCommand($tableName, $column)
+        );
+    }
 
     /**
      * Inserts a record in a table
      * @param  string          $tableName  name of the table
-     * @param  RecordInterface $record $record
+     * @param  Record $record $record
      */
-    public function insertRecord(string $tableName, RecordInterface $record): void
+    public function insertRecord(string $tableName, Record $record): void
     {
         $this->database->dispatchCommand(new InsertRecordCommand($tableName, $record));
     }
@@ -113,18 +139,18 @@ class DatabaseConnection
     /**
      * Updates a record in the database
      * @param  string          $tableName name of the table
-     * @param  RecordInterface $record    record
+     * @param  Record $record    record
      */
-    public function updateRecord(string $tableName, RecordInterface $record): void
+    public function updateRecord(string $tableName, Record $record): void
     {
         # code...
     }
 
     /**
      * Deletes a record in the database
-     * @param  RecordInterface $record record
+     * @param  Record $record record
      */
-    public function deleteRecord(string $tableName, RecordInterface $record): void
+    public function deleteRecord(string $tableName, Record $record): void
     {
         # code...
     }
@@ -134,7 +160,7 @@ class DatabaseConnection
      * until there are no more records
      * @param  string         $tableName name of the table
      * @param  QueryInterface $query     query
-     * @return \Generator
+     * @return Generator
      */
     public function query(string $tableName, QueryInterface $query): QueryResultInterface
     {

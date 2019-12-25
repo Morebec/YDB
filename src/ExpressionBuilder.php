@@ -2,11 +2,11 @@
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\Entity\Query\Term;
-use Morebec\YDB\Entity\Query\Operator;
-use Morebec\YDB\YQL\TermNode;
-use Morebec\YDB\YQL\ExpressionNode;
-use Morebec\YDB\YQL\ExpressionOperator;
+use Morebec\YDB\Domain\YQL\ExpressionNode;
+use Morebec\YDB\Domain\YQL\ExpressionOperator;
+use Morebec\YDB\Domain\YQL\Query\Operator;
+use Morebec\YDB\Domain\YQL\Query\Term;
+use Morebec\YDB\Domain\YQL\TermNode;
 
 /**
  * ExpressionBuilder
@@ -44,12 +44,12 @@ class ExpressionBuilder
     public function andWhere(string $fieldName, Operator $operator, $value): self
     {
         $whereNode = new TermNode(new Term($fieldName, $operator, $value));
-        $this->insertNodeRight(new ExpressionOperator(ExpressionOperator::AND), $whereNode);
+        $this->insertNodeRight(ExpressionOperator::AND(), $whereNode);
         return $this;
     }
 
     /**
-     * Adds a OR clause to the exprnewession
+     * Adds a OR clause to the expression
      * Adds an AND where clause to the expression
      * @param  string   $fieldName name of the field
      * @param  Operator $operator  operator
@@ -67,20 +67,20 @@ class ExpressionBuilder
      * Builds the Expression and returns it
      * @return ExpressionNode
      */
-    public function build()
+    public function build(): ExpressionNode
     {
         return $this->root;
     }
 
     /**
      * Adds a node to the right of the root
-     * @param TreeOpeartor $operator operator
-     * @param ExpressionNode     $node     node
+     * @param ExpressionOperator $operator operator
+     * @param ExpressionNode $node node
      */
     private function insertNodeRight(ExpressionOperator $operator, ExpressionNode $node): void
     {
         if (!$this->root) {
-            throw new \Exception("An expression must start with a simple where clause");
+            throw new \LogicException('An expression must start with a simple where clause');
         }
 
         $this->root = new ExpressionNode($this->root, $operator, $node);

@@ -1,2 +1,2 @@
 # Internals Documentation
-This section of the doctumentation explains how the internals of YDB work.
+This section of the documentation explains how the internals of YDB work.

@@ -1,0 +1,66 @@
+<?php
+
+namespace Morebec\YDB\legacy\Service;
+
+use Morebec\YDB\Command\Database\ClearDatabaseCommand;
+use Morebec\YDB\Command\Database\CreateDatabaseCommand;
+use Morebec\YDB\Command\Database\DeleteDatabaseCommand;
+use Morebec\YDB\Command\Record\InsertRecordCommand;
+use Morebec\YDB\Command\Table\AddTableColumnCommand;
+use Morebec\YDB\Command\Table\CreateTableCommand;
+use Morebec\YDB\Command\Table\UpdateTableCommand;
+use Morebec\YDB\CommandHandler\Database\ClearDatabaseCommandHandler;
+use Morebec\YDB\CommandHandler\Database\CreateDatabaseCommandHandler;
+use Morebec\YDB\CommandHandler\Database\DeleteDatabaseCommandHandler;
+use Morebec\YDB\CommandHandler\Record\InsertRecordCommandHandler;
+use Morebec\YDB\CommandHandler\Table\AddTableColumnCommandHandler;
+use Morebec\YDB\CommandHandler\Table\CreateTableCommandHandler;
+use Morebec\YDB\CommandHandler\Table\UpdateTableCommandHandler;
+use Symfony\Component\Messenger\Handler\HandlersLocator;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+
+/**
+ * DatabaseCommandBus
+ */
+class DatabaseCommandBus extends MessageBus
+{
+    /**
+     * Constructs an instance of DatabaseCommandBus
+     * @param Database $database database
+     */
+    public function __construct(Database $database)
+    {
+        parent::__construct([
+            new HandleMessageMiddleware(
+                new HandlersLocator(
+                    $this->buildHandlersList($database)
+                )
+            ),
+        ]);
+    }
+
+    /**
+     * Builds the list of commands and their associated handlers
+     * and returns it
+     * @param  Database $database database
+     * @return array
+     */
+    private function buildHandlersList(Database $database): array
+    {
+        return [
+            // Database Commands
+            CreateDatabaseCommand::class => [new CreateDatabaseCommandHandler($database)],
+            DeleteDatabaseCommand::class => [new DeleteDatabaseCommandHandler($database)],
+            ClearDatabaseCommand::class => [new ClearDatabaseCommandHandler($database)],
+
+            // Table Commands
+            CreateTableCommand::class => [new CreateTableCommandHandler($database)],
+            UpdateTableCommand::class => [new UpdateTableCommandHandler($database)],
+            AddTableColumnCommand::class => [new AddTableColumnCommandHandler($database)],
+
+            // Record Commands
+            InsertRecordCommand::class => [new InsertRecordCommandHandler($database)]
+        ];
+    }
+}
