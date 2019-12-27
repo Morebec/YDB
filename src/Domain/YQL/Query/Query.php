@@ -3,14 +3,13 @@
 namespace Morebec\YDB\Domain\YQL\Query;
 
 use Morebec\ValueObjects\ValueObjectInterface;
-use Morebec\YDB\Contracts\Query\QueryInterface;
 use Morebec\YDB\Domain\Model\Entity\Record;
 use Morebec\YDB\Domain\YQL\ExpressionNode;
 
 /**
  * Query
  */
-class Query implements QueryInterface
+class Query
 {
     /** @var ExpressionNode expression */
     private $expression;

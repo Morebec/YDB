@@ -7,6 +7,15 @@ use Morebec\ValueObjects\BasicEnum;
 /**
  * Criteria Operator
  * @method static EQUAL()
+ * @method static STRICTLY_EQUAL()
+ * @method static NOT_EQUAL()
+ * @method static STRICTLY_NOT_EQUAL()
+ * @method static LESS_THAN()
+ * @method static GREATER_THAN()
+ * @method static LESS_OR_EQUAL()
+ * @method static GREATER_OR_EQUAL()
+ * @method static IN()
+ * @method static NOT_IN()
  */
 class Operator extends BasicEnum
 {

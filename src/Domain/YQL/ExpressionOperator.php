@@ -11,8 +11,8 @@ use Morebec\ValueObjects\BasicEnum;
  */
 class ExpressionOperator extends BasicEnum
 {
-    const AND = 'AND';
-    const OR = 'OR';
+    public const AND = 'AND';
+    public const OR = 'OR';
 
     public static function __callStatic($method, $arguments)
     {

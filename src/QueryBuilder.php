@@ -14,7 +14,7 @@ class QueryBuilder extends ExpressionBuilder
 {
     /**
      * Creates a find all clause to the query
-     * @return QUeryBuilder
+     * @return QueryBuilder
      */
     public function findAll(): QueryBuilder
     {
@@ -42,7 +42,7 @@ class QueryBuilder extends ExpressionBuilder
      * Builds the Query and returns it
      * @return Query
      */
-    public function build(): Query
+    public function build(): ExpressionNode
     {
         return new Query($this->root);
     }

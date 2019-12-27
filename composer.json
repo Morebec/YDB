@@ -38,8 +38,7 @@
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^0.11.19",
         "phpstan/phpstan-beberlei-assert": "^0.11.2",
-        "phpunit/phpunit": "^8.5",
-        "psy/psysh": "@stable"
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {
@@ -51,6 +50,6 @@
         "test-no-performance": "php vendor/bin/codecept run --coverage-xml --skip-group performance",
         "cs-lint": "php-cs-fixer fix src/ --diff -vvv --dry-run",
         "cs-fix": "php-cs-fixer fix src/ -vvv || true",
-        "check-outdated": "composer outdated -m"
+        "check-outdated": "composer outdated -m",
     }
 }
