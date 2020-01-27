@@ -2,8 +2,8 @@
 
 use Morebec\YDB\DatabaseConfig;
 use Morebec\YDB\Entity\Column;
-use Morebec\YDB\Entity\RecordId;
 use Morebec\YDB\Entity\Record;
+use Morebec\YDB\Entity\RecordId;
 use Morebec\YDB\Entity\TableSchema;
 use Morebec\YDB\Enum\ColumnType;
 use Morebec\YDB\Service\Database;

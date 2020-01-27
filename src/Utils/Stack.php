@@ -7,6 +7,7 @@ namespace Morebec\YDB\Utils;
  * A Stack is a “last in, first out” or “LIFO” collection that only allows access to the value at the
  * top of the structure and iterates in that order, destructively.
  * Implemented using php arrays. It has no enforced limit
+ * TODO Move to Morebec/Collections
  */
 class Stack
 {
@@ -53,7 +54,6 @@ class Stack
      */
     private function copy(): array
     {
-        $copy = array_values($this->elements);
-        return $copy;
+        return array_values($this->elements);
     }
 }

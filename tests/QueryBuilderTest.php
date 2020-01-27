@@ -1,7 +1,7 @@
 <?php
 
+use Morebec\YDB\ExpressionQueryBuilder;
 use Morebec\YDB\legacy\Entity\Query\Operator;
-use Morebec\YDB\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -11,7 +11,7 @@ class QueryBuilderTest extends TestCase
 {
     public function testBuild()
     {
-        $query = QueryBuilder::where('price', Operator::EQUAL(), 5)
+        $query = ExpressionQueryBuilder::where('price', Operator::EQUAL(), 5)
                                 ->andWhere('genre', Operator::EQUAL(), 'adventure')
                                 ->orWhere('price', Operator::EQUAL(), 2)
                                 ->build()

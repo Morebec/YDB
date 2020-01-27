@@ -3,12 +3,6 @@
     "description": "YDB is a simple PHP utility library to use Yaml as a flat file database",
     "type": "library",
     "license": "MIT",
-    "repositories": [
-        {
-            "url": "https://github.com/Morebec/ValueObjects.git",
-            "type": "git"
-        }
-    ],
     "authors": [
         {
             "name": "jwillp",
@@ -22,16 +16,9 @@
         }
     },
     "require": {
-        "php": "^7",
-        "beberlei/assert": "^3.2",
-        "katzgrau/klogger": "^1.0",
-        "monolog/monolog": "^2.0",
-        "morebec/value-objects": "dev-master",
-        "symfony/event-dispatcher": "^4.3",
-        "symfony/filesystem": "^4.3",
-        "symfony/lock": "^4.3",
-        "symfony/messenger": "^4.4",
-        "symfony/yaml": "^4.3"
+        "php": "^7.3",
+        "ext-json": "*",
+        "morebec/collections": "^0.2.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
@@ -46,10 +33,8 @@
         }
     },
     "scripts": {
-        "test": "php vendor/bin/codecept config:validate && vendor/bin/codecept clean && php vendor/bin/codecept run --coverage-xml",
-        "test-no-performance": "php vendor/bin/codecept run --coverage-xml --skip-group performance",
         "cs-lint": "php-cs-fixer fix src/ --diff -vvv --dry-run",
         "cs-fix": "php-cs-fixer fix src/ -vvv || true",
-        "check-outdated": "composer outdated -m",
+        "check-outdated": "composer outdated -m"
     }
 }
