@@ -86,7 +86,20 @@ class YDBInMemoryClientTest extends TestCase
 
     public function testUpdateDocument()
     {
+        $client = $this->createClient();
+        $client->createCollection('test_collection');
+        $document = Document::create([
+            'id' => (string)UuidIdentifier::generate(),
+            'name' => 'Test'
+        ]);
+        $client->insertDocument('test_collection', $document);
 
+        $document['name'] = 'Updated';
+        $client->updateOneDocument('test_collection', $document);
+
+        $query = new Query('FIND ALL FROM test_collection');
+        $result = $client->executeQuery($query);
+        $this->assertEquals('Updated', $result->fetch()['name']);
     }
 
     /**

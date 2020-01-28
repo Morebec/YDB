@@ -4,6 +4,8 @@
 namespace Morebec\YDB;
 
 
+use Morebec\YDB\InMemory\InMemoryDocumentCollection;
+
 interface DocumentCollectionInterface
 {
     /**
@@ -16,7 +18,13 @@ interface DocumentCollectionInterface
      * Updates a document in this collection
      * @param Document $document
      */
-    public function updateDocument(Document $document): void;
+    public function updateOneDocument(Document $document): void;
+
+    /**
+     * Updates multiple documents
+     * @param array $documents
+     */
+    public function updateDocuments(array $documents): void;
 
     /**
      * Removes a document from this collection
@@ -48,5 +56,4 @@ interface DocumentCollectionInterface
      * @return void
      */
     public function clear(): void ;
-
 }

@@ -21,7 +21,14 @@ interface YDBClientInterface
      * @param string $collectionName
      * @param Document $document
      */
-    public function updateDocument(string $collectionName, Document $document): void;
+    public function updateOneDocument(string $collectionName, Document $document): void;
+
+    /**
+     * Updates multiple documents
+     * @param string $collectionName
+     * @param Document[] $documents
+     */
+    public function updateDocuments(string $collectionName, array $documents): void;
 
     /**
      * Finds one document matching a given query or null if none found

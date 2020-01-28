@@ -30,13 +30,6 @@ interface DocumentRepositoryInterface
     public function update(string $collectionName, Document $document);
 
     /**
-     * Finds one document in this repository matching a given query
-     * @param ExpressionQuery $query
-     * @return mixed
-     */
-    public function findOneBy(ExpressionQuery $query);
-
-    /**
      * Finds all documents in this repository matching a given query
      * @param ExpressionQuery $query
      * @return mixed

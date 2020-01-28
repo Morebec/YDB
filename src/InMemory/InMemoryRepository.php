@@ -43,7 +43,7 @@ class InMemoryRepository implements DocumentRepositoryInterface
     {
         $this->ensureCollectionExists($collectionName);
 
-        /** @var InMemoryDocumentCollection $collection */
+        /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
         $collection->insertDocument($document);
     }
@@ -54,13 +54,10 @@ class InMemoryRepository implements DocumentRepositoryInterface
     public function update(string $collectionName, Document $document)
     {
         $this->ensureCollectionExists($collectionName);
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function findOneBy(ExpressionQuery $query)
-    {
+        /** @var DocumentCollectionInterface $collection */
+        $collection = $this->collections->get($collectionName);
+        $collection->updateOneDocument($document);
     }
 
     /**

@@ -40,9 +40,20 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     /**
      * @inheritDoc
      */
-    public function updateDocument(Document $document): void
+    public function updateOneDocument(Document $document): void
     {
-        $this->documents->put($document->getId(), $this->cloneDocument($document));
+        $this->updateDocuments([$document]);
+    }
+
+    /**
+     * Updates multiple documents
+     * @param array $documents
+     */
+    public function updateDocuments(array $documents): void
+    {
+        foreach ($documents as $document) {
+            $this->documents->put($document->getId(), $this->cloneDocument($document));
+        }
         $this->rebuildIndexes();
     }
 
@@ -53,7 +64,6 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     {
         $this->removeDocuments([$document]);
     }
-
 
     /**
      * @inheritDoc

@@ -31,9 +31,17 @@ class YDBInMemoryClient implements YDBClientInterface
     /**
      * @inheritDoc
      */
-    public function updateDocument(string $collectionName, Document $document): void
+    public function updateOneDocument(string $collectionName, Document $document): void
     {
         $this->repository->update($collectionName, $document);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateDocuments(string $collectionName, array $documents): void
+    {
+        $this->repository->updateMany($collectionName, $documents);
     }
 
     /**
