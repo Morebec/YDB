@@ -71,7 +71,7 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     /**
      * @inheritDoc
      */
-    public function updateOneDocuments(Document $document, array $data): void
+    public function updateOneDocument(Document $document, array $data): void
     {
         $this->updateDocuments([$document], $data);
     }

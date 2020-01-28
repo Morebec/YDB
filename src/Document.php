@@ -102,7 +102,7 @@ class Document implements \ArrayAccess
      */
     public function setData(array $data): void
     {
-        $this->data = $data;
+        $this->data = new HashMap($data);
     }
 
     /**

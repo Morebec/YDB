@@ -49,7 +49,7 @@ class ExpressionQueryBuilder
     /**
      * @param string $field
      * @param TermOperator $operator
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
     public function where(string $field, TermOperator $operator, $value): self
@@ -61,7 +61,7 @@ class ExpressionQueryBuilder
     /**
      * @param string $field
      * @param TermOperator $operator
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
     public function addWhere(string $field, TermOperator $operator, $value): self
@@ -75,7 +75,7 @@ class ExpressionQueryBuilder
     /**
      * @param string $field
      * @param TermOperator $operator
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
     public function orWhere(string $field, TermOperator $operator, $value): self

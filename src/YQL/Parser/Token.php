@@ -24,8 +24,8 @@ class Token
 
     /**
      * @param TokenType $type
-     * @param $value
-     * @return static
+     * @param mixed $value
+     * @return self
      */
     public static function create(TokenType $type, $value): self
     {
@@ -43,7 +43,7 @@ class Token
     /**
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

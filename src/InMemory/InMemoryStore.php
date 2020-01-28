@@ -89,14 +89,14 @@ class InMemoryStore implements DocumentStoreInterface
         $collection = $this->getCollectionOrThrowException($query->getCollectionName());
         $result = $this->findBy($query);
 
-        $all = $result->fetchAll();
+        $document = $result->fetch();
 
-        $collection->updateOneDocuments($all, $data);
+        if($document) {
+            $collection->updateOneDocument($document, $data);
+        }
 
-        $f = static function() use ($all): Generator {
-            foreach ($all as $d) {
-                yield $d;
-            }
+        $f = static function() use ($document): Generator {
+            yield $document;
         };
         $gen = $f();
         return new QueryResult($gen, $query);
@@ -110,12 +110,12 @@ class InMemoryStore implements DocumentStoreInterface
         $collection = $this->getCollectionOrThrowException($query->getCollectionName());
         $result = $this->findBy($query);
 
-        $all = $result->fetchAll();
+        $documents = $result->fetchAll();
 
-        $collection->updateDocuments($all, $data);
+        $collection->updateDocuments($documents, $data);
 
-        $f = static function() use ($all): Generator {
-            foreach ($all as $d) {
+        $f = static function() use ($documents): Generator {
+            foreach ($documents as $d) {
                 yield $d;
             }
         };
@@ -232,6 +232,11 @@ class InMemoryStore implements DocumentStoreInterface
         $this->collections->put($newName, $collection);
     }
 
+    public function toArray(): array
+    {
+
+    }
+
     /**
      * Throws a Collection Not found
      * @param string $collectionName
@@ -263,6 +268,7 @@ class InMemoryStore implements DocumentStoreInterface
     {
         // Check cardinality
         $documents = $collection->getDocuments();
+        // TODO use query planner
         foreach ($documents as $document) {
             if (PYQLQueryEvaluator::evaluateExpressionForDocument($query->getExpression(), $document)) {
                 yield $document;

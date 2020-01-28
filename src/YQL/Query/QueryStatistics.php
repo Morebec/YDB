@@ -2,8 +2,6 @@
 
 namespace Morebec\YDB\YQL\Query;
 
-use Morebec\ValueObjects\DateTime\Time\Timestamp;
-
 /**
  * QueryStatistics
  */
@@ -20,10 +18,10 @@ class QueryStatistics
     private $queryPlannerEndTime;
 
     public function __construct(
-        Timestamp $startTime, 
-        Timestamp $endTime,
-        Timestamp $queryPlannerStartTime,
-        Timestamp $queryPlannerEndTime
+        int $startTime,
+        int $endTime,
+        int $queryPlannerStartTime,
+        int $queryPlannerEndTime
     )
     {
         $this->startTime = $startTime;
@@ -37,7 +35,7 @@ class QueryStatistics
      */
     public function getStartTime(): int
     {
-        return $this->startTime->toInt();
+        return $this->startTime;
     }
 
     /**
@@ -45,7 +43,7 @@ class QueryStatistics
      */
     public function getEndTime(): int
     {
-        return $this->endTime->toInt();
+        return $this->endTime;
     }
 
     /**
@@ -54,7 +52,7 @@ class QueryStatistics
      */
     public function getDuration(): int
     {
-        return $this->endTime->toInt() - $this->startTime->toInt();
+        return $this->endTime - $this->startTime;
     }
 
     /**
@@ -63,7 +61,7 @@ class QueryStatistics
      */
     public function getQueryPlannerDuration(): int
     {
-        return $this->queryPlannerEndTime->toInt() - $this->queryPlannerStartTime->toInt();
+        return $this->queryPlannerEndTime - $this->queryPlannerStartTime;
     }
 
     /**
@@ -71,7 +69,7 @@ class QueryStatistics
      */
     public function getQueryPlannerStartTime(): int
     {
-        return $this->queryPlannerStartTime->toInt();
+        return $this->queryPlannerStartTime;
     }
 
     /**
@@ -79,6 +77,6 @@ class QueryStatistics
      */
     public function getQueryPlannerEndTime(): int
     {
-        return $this->queryPlannerEndTime->toInt();
+        return $this->queryPlannerEndTime;
     }
 }

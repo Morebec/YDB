@@ -36,7 +36,7 @@ interface DocumentCollectionInterface
      * @param Document $document
      * @param array $data
      */
-    public function updateOneDocuments(Document $document, array $data): void;
+    public function updateOneDocument(Document $document, array $data): void;
 
     /**
      * Updates multiple documents in this collection

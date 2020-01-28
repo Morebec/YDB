@@ -47,18 +47,19 @@ class YQLParser
      * Implementation of the shunting yard algorithm where logical operators can be considered
      * as if they were + and *
      * @param Token[] $tokens
-     * @return mixed
+     * @return ExpressionNode
      */
     public function parseTokens(array $tokens): ExpressionNode {
         // Skip the FIND CARDINALITY FROM COLLECTION WHERE, this was already verified in the TermLexer
         $tokens = array_slice($tokens, 5);
 
+        /** @var Token $token */
         foreach ($tokens as $token) {
             $type = $token->getType();
 
             if($this->isTokenTerm($token)) {
                 /** @var TermToken $token */
-                $this->termStack->push(new TermNode($token->getColumnToken()->getValue(),
+                $this->termStack->push(new TermNode($token->getFieldToken()->getValue(),
                     new TermOperator($token->getOperatorToken()->getValue()),
                     $token->getValueToken()->getValue()
                 ));

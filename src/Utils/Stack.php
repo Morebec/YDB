@@ -20,7 +20,7 @@ class Stack
 
     /**
      * Adds an item to the top of the stack
-     * @param $e
+     * @param mixed $e
      */
     public function push($e) : void
     {

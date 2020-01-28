@@ -9,7 +9,7 @@ class TermToken extends Token
     /**
      * @var Token
      */
-    private $columnToken;
+    private $fieldToken;
     /**
      * @var Token
      */
@@ -19,10 +19,10 @@ class TermToken extends Token
      */
     private $valueToken;
 
-    public function __construct(Token $columnToken, Token $operatorToken, Token $valueToken)
+    public function __construct(Token $fieldToken, Token $operatorToken, Token $valueToken)
     {
-        parent::__construct(TokenType::TERM(), "$columnToken $operatorToken $valueToken");
-        $this->columnToken = $columnToken;
+        parent::__construct(TokenType::TERM(), "$fieldToken $operatorToken $valueToken");
+        $this->fieldToken = $fieldToken;
         $this->operatorToken = $operatorToken;
         $this->valueToken = $valueToken;
     }
@@ -30,9 +30,9 @@ class TermToken extends Token
     /**
      * @return Token
      */
-    public function getColumnToken(): Token
+    public function getFieldToken(): Token
     {
-        return $this->columnToken;
+        return $this->fieldToken;
     }
 
     /**

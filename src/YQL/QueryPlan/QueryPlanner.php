@@ -31,7 +31,6 @@ class QueryPlanner
      * @param Query $query
      * @param DocumentCollectionInterface $collection
      * @return QueryPlan
-     * @throws QueryStrategyComputationFailedException
      */
     public function createPlanForQuery(Query $query, DocumentCollectionInterface $collection): QueryPlan
     {
@@ -39,10 +38,6 @@ class QueryPlanner
         // Once that done, we try to optimize the strategies to use the fastest one.
         $expr = $query->getExpression();
         $strategy = $this->getStrategiesForExpressionNode($expr, $collection);
-
-        if (!$strategy) {
-           throw new QueryStrategyComputationFailedException('Could not compute a query Plan for the given query, no strategies computed');
-        }
 
         return new QueryPlan($strategy);
     }

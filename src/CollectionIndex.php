@@ -124,7 +124,7 @@ class CollectionIndex
 
     /**
      * Finds document ids for a given value
-     * @param $value
+     * @param mixed $value
      * @return DocumentId[]
      */
     public function findDocumentIdForValue($value): array

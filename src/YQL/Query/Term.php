@@ -3,8 +3,12 @@
 namespace Morebec\YDB\YQL\Query;
 
 
+use Exception;
+use InvalidArgumentException;
+use LogicException;
 use Morebec\ValueObjects\ValueObjectInterface;
 use Morebec\YDB\Document;
+use function json_encode;
 
 /**
  * Term
@@ -29,7 +33,7 @@ class Term
     public function __construct(string $field, TermOperator $operator, $value)
     {
         if(!$field) {
-            throw new \InvalidArgumentException('The field name of a term cannot be blank');
+            throw new InvalidArgumentException('The field name of a term cannot be blank');
         }
         $this->field = $field;
         $this->operator = $operator;
@@ -37,7 +41,7 @@ class Term
 
         if ($operator->isEqualTo(TermOperator::IN()) || $operator->isEqualTo(TermOperator::NOT_IN())) {
             if(!is_array($value)) {
-                throw new \InvalidArgumentException("The right operand of a term must ba an array when used with operator {$operator}");
+                throw new InvalidArgumentException("The right operand of a term must ba an array when used with operator {$operator}");
             }
         }
     }
@@ -111,7 +115,7 @@ class Term
                 return !in_array($this->value, $value, true);
         }
 
-        throw new \LogicException("Unsupported operator: '{$this->operator}'");
+        throw new LogicException("Unsupported operator: '{$this->operator}'");
     }
 
     /**
@@ -135,26 +139,26 @@ class Term
     {
         try {
             return "{$this->field} {$this->operator} {$this->convertValueToString($this->value)}";
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'INVALID EXPRESSION';
         }
     }
 
     /**
      * Converts a value to a string
-     * @param $value
+     * @param mixed $value
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     private function convertValueToString($value): string
     {
         try {
-            $str = \json_encode($value, JSON_THROW_ON_ERROR, 512);
+            $str = json_encode($value, JSON_THROW_ON_ERROR, 512);
             if(!$str) {
-                throw new \Exception('Could not convert value to string');
+                throw new Exception('Could not convert value to string');
             }
-        } catch (\Exception $e) {
-            throw new \Exception("Error converting value to string: {$e->getMessage()}", $e);
+        } catch (Exception $e) {
+            throw new Exception("Error converting value to string: {$e->getMessage()}", 0, $e);
         }
 
         return $str;

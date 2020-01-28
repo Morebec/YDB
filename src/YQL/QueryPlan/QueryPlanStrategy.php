@@ -7,4 +7,5 @@ namespace Morebec\YDB\YQL\QueryPlan;
  */
 abstract class QueryPlanStrategy
 {
+    abstract public function __toString();
 }

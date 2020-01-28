@@ -40,7 +40,7 @@ class QueryPlanStrategyComparator
      * Compares strategy in the context of an OR
      * @param  QueryPlanStrategy $leftOperand  left operand
      * @param  QueryPlanStrategy $rightOperand right operand
-     * @return QUeryPlanStrategy
+     * @return QueryPlanStrategy
      */
     private static function compareOrOperator(
         QueryPlanStrategy $leftOperand,
@@ -81,7 +81,7 @@ class QueryPlanStrategyComparator
      * Compares strategy in the context of an AND
      * @param  QueryPlanStrategy $leftOperand  left operand
      * @param  QueryPlanStrategy $rightOperand right operand
-     * @return QUeryPlanStrategy
+     * @return QueryPlanStrategy
      */
     private static function compareAndOperator(
         QueryPlanStrategy $leftOperand,
