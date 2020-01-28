@@ -9,9 +9,9 @@ use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
 /**
- * Interface DocumentRepositoryInterface
+ * Interface DocumentStoreInterface
  */
-interface DocumentRepositoryInterface
+interface DocumentStoreInterface
 {
     /**
      * Adds a document to this repository

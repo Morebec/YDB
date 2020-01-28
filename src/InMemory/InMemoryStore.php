@@ -8,7 +8,7 @@ use Iterator;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
-use Morebec\YDB\DocumentRepositoryInterface;
+use Morebec\YDB\DocumentStoreInterface;
 use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
 use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\PYQLQueryEvaluator;
@@ -16,10 +16,10 @@ use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
 /**
- * Class InMemoryRepository
+ * Class InMemoryStore
  * In memory document repository
  */
-class InMemoryRepository implements DocumentRepositoryInterface
+class InMemoryStore implements DocumentStoreInterface
 {
     /**
      * @var HashMap<string, InMemoryDocumentCollection> $collections

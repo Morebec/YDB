@@ -3,20 +3,20 @@
 
 namespace Morebec\YDB;
 
-use Morebec\YDB\InMemory\InMemoryRepository;
+use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
 class YDBInMemoryClient implements YDBClientInterface
 {
     /**
-     * @var InMemoryRepository
+     * @var InMemoryStore
      */
     private $repository;
 
     public function __construct()
     {
-        $this->repository = new InMemoryRepository();
+        $this->repository = new InMemoryStore();
     }
 
     /**

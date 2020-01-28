@@ -1,6 +1,5 @@
 <?php
 
-
 use Morebec\YDB\Document;
 use Morebec\YDB\YQL\ExpressionNode;
 use Morebec\YDB\YQL\ExpressionOperator;
