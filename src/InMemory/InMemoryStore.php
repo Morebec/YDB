@@ -4,11 +4,13 @@
 namespace Morebec\YDB\InMemory;
 
 
+use Generator;
 use Iterator;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
 use Morebec\YDB\DocumentStoreInterface;
+use Morebec\YDB\Exception\DocumentCollectionAlreadyExistsException;
 use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
 use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\PYQLQueryEvaluator;
@@ -25,21 +27,16 @@ class InMemoryStore implements DocumentStoreInterface
      * @var HashMap<string, InMemoryDocumentCollection> $collections
      */
     private $collections;
-    /**
-     * @var PYQLQueryEvaluator
-     */
-    private $queryEvaluator;
 
     public function __construct()
     {
         $this->collections = new HashMap();
-        $this->queryEvaluator = new PYQLQueryEvaluator();
     }
 
     /**
      * @inheritDoc
      */
-    public function add(string $collectionName, Document $document): void
+    public function insertOne(string $collectionName, Document $document): void
     {
         $this->ensureCollectionExists($collectionName);
 
@@ -51,9 +48,9 @@ class InMemoryStore implements DocumentStoreInterface
     /**
      * @inheritDoc
      */
-    public function addMany(string $collectionName, array $documents): void
+    public function insertMany(string $collectionName, array $documents): void
     {
-        $this->ensureCollectionExists();
+        $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
@@ -63,25 +60,88 @@ class InMemoryStore implements DocumentStoreInterface
     /**
      * @inheritDoc
      */
-    public function update(string $collectionName, Document $document): void
+    public function replaceOne(string $collectionName, Document $document): void
     {
         $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
-        $collection->updateOneDocument($document);
+        $collection->replaceOneDocument($document);
     }
 
     /**
      * @inheritDoc
      */
-    public function updateMany(string $collectionName, array $documents): void
+    public function  replaceMany(string $collectionName, array $documents): void
     {
        $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
-        $collection->updateDocuments($document);
+        $collection->replaceDocuments($documents);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateOne(ExpressionQuery $query, array $data): QueryResult
+    {
+        $collection = $this->getCollectionOrThrowException($query->getCollectionName());
+        $result = $this->findBy($query);
+
+        $all = $result->fetchAll();
+
+        $collection->updateOneDocuments($all, $data);
+
+        $f = static function() use ($all): Generator {
+            foreach ($all as $d) {
+                yield $d;
+            }
+        };
+        $gen = $f();
+        return new QueryResult($gen, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateMany(ExpressionQuery $query, array $data): QueryResult
+    {
+        $collection = $this->getCollectionOrThrowException($query->getCollectionName());
+        $result = $this->findBy($query);
+
+        $all = $result->fetchAll();
+
+        $collection->updateDocuments($all, $data);
+
+        $f = static function() use ($all): Generator {
+            foreach ($all as $d) {
+                yield $d;
+            }
+        };
+        $gen = $f();
+        return new QueryResult($gen, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteMany(ExpressionQuery $query): QueryResult
+    {
+        $collection = $this->getCollectionOrThrowException($query->getCollectionName());
+        $result = $this->findBy($query);
+
+        $all = $result->fetchAll();
+
+        $collection->removeDocuments($all);
+
+        $f = static function() use ($all): Generator {
+            foreach ($all as $d) {
+                yield $d;
+            }
+        };
+        $gen = $f();
+        return new QueryResult($gen, $query);
     }
 
     /**
@@ -103,7 +163,7 @@ class InMemoryStore implements DocumentStoreInterface
     /**
      * @inheritDoc
      */
-    public function remove(ExpressionQuery $query): QueryResult
+    public function deleteOne(ExpressionQuery $query): QueryResult
     {
         $result = $this->findBy($query);
 
@@ -114,8 +174,10 @@ class InMemoryStore implements DocumentStoreInterface
 
         $collection->removeDocuments($all);
 
-        $f = static function() use ($all): \Generator {
-            foreach ($all as $d) yield $d;
+        $f = static function() use ($all): Generator {
+            foreach ($all as $d) {
+                yield $d;
+            }
         };
         $gen = $f();
         return new QueryResult($gen, $query);
@@ -136,7 +198,38 @@ class InMemoryStore implements DocumentStoreInterface
      */
     public function createCollection(string $collectionName): void
     {
+        $this->ensureCollectionNotExists($collectionName);
         $this->collections->put($collectionName, new InMemoryDocumentCollection());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function clearCollection(string $collectionName): void
+    {
+        $collection = $this->getCollectionOrThrowException($collectionName);
+        $collection->clear();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dropCollection(string $collectionName): void
+    {
+        $this->collections->remove($collectionName);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renameCollection(string $collectionName, string $newName): void
+    {
+        $this->ensureCollectionExists($collectionName);
+        $this->ensureCollectionNotExists($newName);
+
+        $collection = $this->collections->get($collectionName);
+        $this->dropCollection($collectionName);
+        $this->collections->put($newName, $collection);
     }
 
     /**
@@ -181,24 +274,27 @@ class InMemoryStore implements DocumentStoreInterface
     }
 
     /**
-     * @inheritDoc
+     * @param string $newName
+     * @throws DocumentCollectionAlreadyExistsException
      */
-    public function clearCollection(string $collectionName): void
+    private function ensureCollectionNotExists(string $newName): void
+    {
+        if ($this->collectionExists($newName)) {
+            throw new DocumentCollectionAlreadyExistsException($newName);
+        }
+    }
+
+    /**
+     * @param string $collectionName
+     * @return DocumentCollectionInterface
+     * @throws DocumentCollectionNotFoundException
+     */
+    private function getCollectionOrThrowException(string $collectionName): DocumentCollectionInterface
     {
         $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
-        $collection->clear();
-    }
-
-    /**
-     * Drops a collection from this repository.
-     * Does not throw an exception if it is not found
-     * @param string $collectionName
-     */
-    public function dropCollection(string $collectionName): void
-    {
-        $this->collections->remove($collectionName);
+        return $collection;
     }
 }

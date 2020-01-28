@@ -49,7 +49,9 @@ class Document implements \ArrayAccess
      */
     public function toArray(): array
     {
-        return $this->data->toArray();
+        $data = $this->getData();
+        $data[self::ID_FIELD] = (string)$this->getId();
+        return $data;
     }
 
     /**
@@ -92,5 +94,22 @@ class Document implements \ArrayAccess
     public function hasField(string $field): bool
     {
         return $this->data->containsKey($field);
+    }
+
+    /**
+     * Replaces the data of this document
+     * @param array $data
+     */
+    public function setData(array $data): void
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data->toArray();
     }
 }

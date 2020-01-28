@@ -24,7 +24,7 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function insertDocument(string $collectionName, Document $document): void
     {
-        $this->repository->add($collectionName, $document);
+        $this->repository->insertOne($collectionName, $document);
     }
 
     /**
@@ -32,7 +32,7 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function updateOneDocument(string $collectionName, Document $document): void
     {
-        $this->repository->update($collectionName, $document);
+        $this->repository->replaceOne($collectionName, $document);
     }
 
     /**
@@ -40,7 +40,7 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function updateDocuments(string $collectionName, array $documents): void
     {
-        $this->repository->updateMany($collectionName, $documents);
+        $this->repository->replaceMany($collectionName, $documents);
     }
 
     /**
@@ -56,7 +56,7 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function deleteDocument(ExpressionQuery $query): QueryResult
     {
-        return $this->repository->remove($query);
+        return $this->repository->deleteOne($query);
     }
 
     /**

@@ -20,16 +20,30 @@ interface DocumentCollectionInterface
     public function insertDocuments(array $documents);
 
      /**
-     * Updates a document in this collection
+     * Replaces a document in this collection
      * @param Document $document
      */
-    public function updateOneDocument(Document $document): void;
+    public function replaceOneDocument(Document $document): void;
 
     /**
-     * Updates multiple documents
+     * Replaces multiple documents ib this collection
      * @param array $documents
      */
-    public function updateDocuments(array $documents): void;
+    public function replaceDocuments(array $documents): void;
+
+    /**
+     * Updates a single document in this collection
+     * @param Document $document
+     * @param array $data
+     */
+    public function updateOneDocuments(Document $document, array $data): void;
+
+    /**
+     * Updates multiple documents in this collection
+     * @param Document[] $documents
+     * @param array $data
+     */
+    public function updateDocuments(array $documents, array $data): void;
 
     /**
      * Removes a document from this collection
@@ -38,7 +52,7 @@ interface DocumentCollectionInterface
     public function removeOneDocument(Document $document): void;
 
     /**
-     * Removes all given documents
+     * Removes all given documents from this collection
      * @param array $documents
      */
     public function removeDocuments(array $documents);
