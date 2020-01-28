@@ -57,6 +57,22 @@ class QueryResult
     }
 
     /**
+     * Returns the number of elements fetched.
+     * Beware of performance, this will go through
+     * the whole iterator items one by one.
+     * NOTE: at the end of the count, the iterator is reset
+     * to its first element.
+     * @return int
+     */
+    public function getCount(): int
+    {
+        $count = iterator_count($this->documentIterator);
+        $this->documentIterator->rewind();
+
+        return $count;
+    }
+
+    /**
      * Returns the Query associated with the result
      * @return ExpressionQuery
      */
