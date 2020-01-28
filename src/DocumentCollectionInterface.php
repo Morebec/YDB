@@ -12,7 +12,14 @@ interface DocumentCollectionInterface
      * Inserts a document in this collection
      * @param Document $document
      */
-    public function insertDocument(Document $document): void;
+    public function insertOneDocument(Document $document): void;
+
+    /**
+     * Inserts multiple documents
+     * @param array $documents
+     * @return mixed
+     */
+    public function insertDocuments(array $documents);
 
      /**
      * Updates a document in this collection

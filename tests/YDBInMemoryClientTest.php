@@ -3,6 +3,8 @@
 
 use Morebec\ValueObjects\Identity\UuidIdentifier;
 use Morebec\YDB\Document;
+use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
+use Morebec\YDB\Exception\QueryException;
 use Morebec\YDB\YDBInMemoryClient;
 use Morebec\YDB\YQL\Query;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +16,8 @@ class YDBInMemoryClientTest extends TestCase
     {
         $client = $this->createClient();
         $client->createCollection('test_collection');
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testDropCollection()
@@ -21,6 +25,9 @@ class YDBInMemoryClientTest extends TestCase
         $client = $this->createClient();
         $client->createCollection('test_collection');
         $client->dropCollection('test_collection');
+
+        $this->expectException(DocumentCollectionNotFoundException::class);
+        $client->executeQuery(new Query('FIND ALL FROM test_collection'));
     }
 
     public function testExecuteQuery()
@@ -107,7 +114,6 @@ class YDBInMemoryClientTest extends TestCase
      */
     private function createClient(): YDBInMemoryClient
     {
-        $client = new YDBInMemoryClient();
-        return $client;
+        return new YDBInMemoryClient();
     }
 }

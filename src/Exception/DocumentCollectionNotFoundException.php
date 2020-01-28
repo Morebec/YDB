@@ -6,7 +6,7 @@ namespace Morebec\YDB\Exception;
 
 use Throwable;
 
-class CollectionNotFoundException extends YDBException
+class DocumentCollectionNotFoundException extends YDBException
 {
     public function __construct(string $collectionName, int $code = 0, Throwable $previous = null)
     {

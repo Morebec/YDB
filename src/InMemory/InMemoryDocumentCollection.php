@@ -31,10 +31,20 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     /**
      * @inheritDoc
      */
-    public function insertDocument(Document $document): void
+    public function insertOneDocument(Document $document): void
     {
-        $this->documents->put($document->getId(), $this->cloneDocument($document));
-        $this->indexDocument($document);
+        $this->insertDocuments([$document]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function insertDocuments(array $documents)
+    {
+        foreach ($documents as $document) {
+            $this->documents->put($document->getId(), $this->cloneDocument($document));
+            $this->indexDocument($document);
+        }
     }
 
     /**

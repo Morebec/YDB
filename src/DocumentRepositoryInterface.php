@@ -19,7 +19,14 @@ interface DocumentRepositoryInterface
      * @param Document $document
      * @return mixed
      */
-    public function add(string $collectionName, Document $document);
+    public function add(string $collectionName, Document $document): void;
+
+    /**
+     * Adds multiple documents to this repository
+     * @param string $collectionName
+     * @param array $documents
+     */
+    public function addMany(string $collectionName, array $documents): void;
 
     /**
      * Updates a document in this repository
@@ -27,7 +34,14 @@ interface DocumentRepositoryInterface
      * @param Document $document
      * @return mixed
      */
-    public function update(string $collectionName, Document $document);
+    public function update(string $collectionName, Document $document): void;
+
+    /**
+     * Updates multiple documents
+     * @param string $collectionName
+     * @param Document[] $documents
+     */
+    public function updateMany(string $collectionName, array $documents): void;
 
     /**
      * Finds all documents in this repository matching a given query
@@ -42,6 +56,7 @@ interface DocumentRepositoryInterface
      * @return QueryResult
      */
     public function remove(ExpressionQuery $query): QueryResult;
+
 
     /**
      * Creates a collection

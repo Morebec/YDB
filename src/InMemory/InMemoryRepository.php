@@ -9,7 +9,7 @@ use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
 use Morebec\YDB\DocumentRepositoryInterface;
-use Morebec\YDB\Exception\CollectionNotFoundException;
+use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
 use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\PYQLQueryEvaluator;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
@@ -39,25 +39,49 @@ class InMemoryRepository implements DocumentRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function add(string $collectionName, Document $document)
+    public function add(string $collectionName, Document $document): void
     {
         $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
-        $collection->insertDocument($document);
+        $collection->insertOneDocument($document);
     }
 
     /**
      * @inheritDoc
      */
-    public function update(string $collectionName, Document $document)
+    public function addMany(string $collectionName, array $documents): void
+    {
+        $this->ensureCollectionExists();
+
+        /** @var DocumentCollectionInterface $collection */
+        $collection = $this->collections->get($collectionName);
+        $collection->insertDocuments($documents);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function update(string $collectionName, Document $document): void
     {
         $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
         $collection->updateOneDocument($document);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateMany(string $collectionName, array $documents): void
+    {
+       $this->ensureCollectionExists($collectionName);
+
+        /** @var DocumentCollectionInterface $collection */
+        $collection = $this->collections->get($collectionName);
+        $collection->updateDocuments($document);
     }
 
     /**
@@ -118,17 +142,17 @@ class InMemoryRepository implements DocumentRepositoryInterface
     /**
      * Throws a Collection Not found
      * @param string $collectionName
-     * @throws CollectionNotFoundException
+     * @throws DocumentCollectionNotFoundException
      */
     private function throwCollectionNotFoundException(string $collectionName): void
     {
-        throw new CollectionNotFoundException($collectionName);
+        throw new DocumentCollectionNotFoundException($collectionName);
     }
 
     /**
      * Ensure a collection exists or throws an exception
      * @param string $collectionName
-     * @throws CollectionNotFoundException
+     * @throws DocumentCollectionNotFoundException
      */
     private function ensureCollectionExists(string $collectionName): void
     {
@@ -166,5 +190,15 @@ class InMemoryRepository implements DocumentRepositoryInterface
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
         $collection->clear();
+    }
+
+    /**
+     * Drops a collection from this repository.
+     * Does not throw an exception if it is not found
+     * @param string $collectionName
+     */
+    public function dropCollection(string $collectionName): void
+    {
+        $this->collections->remove($collectionName);
     }
 }

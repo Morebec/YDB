@@ -73,7 +73,7 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function dropCollection(string $collectionName): void
     {
-        // TODO: Implement dropCollection() method.
+        $this->repository->dropCollection($collectionName);
     }
 
     /**
