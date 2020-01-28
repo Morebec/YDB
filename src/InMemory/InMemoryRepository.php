@@ -134,7 +134,8 @@ class InMemoryRepository implements DocumentRepositoryInterface
     private function evaluateQueryForCollection(ExpressionQuery $query, InMemoryDocumentCollection $collection): Iterator
     {
         // Check cardinality
-        foreach ($collection->getDocuments() as $document) {
+        $documents = $collection->getDocuments();
+        foreach ($documents as $document) {
             if (PYQLQueryEvaluator::evaluateExpressionForDocument($query->getExpression(), $document)) {
                 yield $document;
             }

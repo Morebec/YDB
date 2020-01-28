@@ -2,6 +2,7 @@
 
 namespace Morebec\YDB\YQL\Query;
 
+use Iterator;
 use Morebec\YDB\Document;
 
 /**
@@ -9,7 +10,7 @@ use Morebec\YDB\Document;
  */
 class QueryResult
 {
-    /** @var \Iterator generator the to documents */
+    /** @var Iterator generator the to documents */
     private $documentIterator;
 
     /** @var ExpressionQuery */
@@ -20,7 +21,7 @@ class QueryResult
 
 
     public function __construct(
-        \Iterator $documentIterator,
+        Iterator $documentIterator,
         ExpressionQuery $query,
         ?QueryStatistics $statistics = null
     )
@@ -33,20 +34,21 @@ class QueryResult
     /**
      * Retrieves the next Document found for the query.
      * Moves the pointer forward so subsequent calls
-     * return always return the next Record.
+     * always return the next Document.
      * When there are no more documents, returns null
      * @return Document|null
      */
     public function fetch(): ?Document
     {
-        $record = $this->documentIterator->current();
+        $document = $this->documentIterator->current();
         $this->documentIterator->next();
 
-        return $record !== false ? $record : null;
+        return $document !== false ? $document : null;
     }
 
     /**
-     * Retrieves all the Records found for the query
+     * Retrieves all the Documents found for the query
+     * at once
      * @return array
      */
     public function fetchAll(): array

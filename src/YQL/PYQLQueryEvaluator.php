@@ -12,9 +12,9 @@ use Morebec\YDB\YQL\Query\ExpressionQuery;
 class PYQLQueryEvaluator
 {
     /**
-     * Evaluates a Query to see if it matches a record
+     * Evaluates a Query to see if it matches a document
      * @param ExpressionQuery $query query
-     * @param Document $document record
+     * @param Document $document document
      * @return bool            true if it matches, otherwise false
      */
     public static function evaluateQueryForDocument(
@@ -25,23 +25,23 @@ class PYQLQueryEvaluator
     }
 
     /**
-     * Evaluates a ExpressionNode to see if it matches a record
+     * Evaluates a ExpressionNode to see if it matches a document
      * @param ExpressionNode $node node
-     * @param Document $record record
+     * @param Document $document document
      * @return bool            true if it matches, otherwise false
      */
     public static function evaluateExpressionForDocument(
         ExpressionNode $node,
-        Document $record
+        Document $document
     ): bool {
         if ($node instanceof TermNode) {
-            return $node->matchesDocument($record);
+            return $node->matchesDocument($document);
         }
 
         /** @var ExpressionNode $leftNode */
         $leftNode = $node->getLeft();
         // NOTE: There should logically always a left node unless it is a term node
-        $leftValue = self::evaluateExpressionForDocument($leftNode, $record);
+        $leftValue = self::evaluateExpressionForDocument($leftNode, $document);
 
         $operator = $node->getOperator();
         if (!$operator) {
@@ -50,7 +50,7 @@ class PYQLQueryEvaluator
 
         /** @var ExpressionNode $rightNode */
         $rightNode = $node->getRight();
-        $rightValue = self::evaluateExpressionForDocument($rightNode, $record);
+        $rightValue = self::evaluateExpressionForDocument($rightNode, $document);
 
         return self::evaluateOperator($leftValue, $operator, $rightValue);
     }

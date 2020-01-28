@@ -69,7 +69,7 @@ class Term
     /**
      * Indicates if a value matches this Term
      * @param  mixed $value the value to test
-     * @return bool true if record matches, otherwise false
+     * @return bool true if document matches, otherwise false
      */
     public function valueMatches($value): bool
     {
@@ -115,9 +115,9 @@ class Term
     }
 
     /**
-     * Indicates if it matches a record
-     * @param Document $document record
-     * @return bool                  true if record matches, otherwise false
+     * Indicates if it matches a document
+     * @param Document $document document
+     * @return bool                  true if document matches, otherwise false
      */
     public function matchesDocument(Document $document): bool
     {

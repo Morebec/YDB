@@ -3,7 +3,7 @@
 namespace Morebec\YDB\YQL\QueryPlan;
 
 /**
- * Represents the need for loading records by their id (filename)
+ * Represents the need for loading documents by their id (filename)
  */
 class IdScanStrategy extends QueryPlanStrategy
 {

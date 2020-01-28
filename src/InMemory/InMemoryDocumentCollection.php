@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\InMemory;
 
-
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 
