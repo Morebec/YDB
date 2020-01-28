@@ -1,11 +1,10 @@
 <?php
 
 
-use Morebec\YDB\Domain\YQL\ExpressionNode;
-use Morebec\YDB\Domain\YQL\ExpressionOperator;
-use Morebec\YDB\Domain\YQL\Query\Term;
-use Morebec\YDB\Domain\YQL\Query\TermOperator;
-use Morebec\YDB\Domain\YQL\TermNode;
+use Morebec\YDB\YQL\ExpressionNode;
+use Morebec\YDB\YQL\ExpressionOperator;
+use Morebec\YDB\YQL\Query\TermOperator;
+use Morebec\YDB\YQL\TermNode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,18 +15,18 @@ class ExpressionNodeTest extends TestCase
     public function testStringRepresentation(): void
     {
         $tree = new ExpressionNode(
-            new TermNode(new Term('price', TermOperator::EQUAL(), 2.00))
+            new TermNode('price', TermOperator::EQUAL(), 2.00)
         );
 
-        $this->assertEquals('(price == 2)', (string)$tree);
+        $this->assertEquals('price === 2', (string)$tree);
 
         // Left and Right
         $tree = new ExpressionNode(
-            new TermNode(new Term('price', TermOperator::EQUAL(), 2.00)),
-            new ExpressionOperator(ExpressionOperator::AND),
-            new TermNode(new Term('genre', TermOperator::EQUAL(), 'adventure'))
+            new TermNode('price', TermOperator::EQUAL(), 2.00),
+            ExpressionOperator::AND(),
+            new TermNode('genre', TermOperator::EQUAL(), 'adventure')
         );
 
-        $this->assertEquals("(price == 2) AND (genre == 'adventure')", (string)$tree);
-    }    
+        $this->assertEquals('(price === 2) AND (genre === "adventure")', (string)$tree);
+    }
 }

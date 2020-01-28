@@ -1,14 +1,12 @@
 <?php
 
 
-use Morebec\YDB\Domain\Model\Entity\Record;
-use Morebec\YDB\Domain\Model\Entity\RecordId;
-use Morebec\YDB\Domain\YQL\ExpressionNode;
-use Morebec\YDB\Domain\YQL\ExpressionOperator;
-use Morebec\YDB\Domain\YQL\PYQLQueryEvaluator;
-use Morebec\YDB\Domain\YQL\Query\Term;
-use Morebec\YDB\Domain\YQL\Query\TermOperator;
-use Morebec\YDB\Domain\YQL\TermNode;
+use Morebec\YDB\Document;
+use Morebec\YDB\YQL\ExpressionNode;
+use Morebec\YDB\YQL\ExpressionOperator;
+use Morebec\YDB\YQL\PYQLQueryEvaluator;
+use Morebec\YDB\YQL\Query\TermOperator;
+use Morebec\YDB\YQL\TermNode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,10 +17,10 @@ class YQLEngineTest extends TestCase
     public function testEvaluateSingleExpression(): void
     {
         $tree = new ExpressionNode(
-            new TermNode(new Term('price', TermOperator::EQUAL(), 2.00))
+            new TermNode('price', TermOperator::EQUAL(), 2)
         );
 
-        $record = Record::create(RecordId::generate(), [
+        $record = Document::create([
             'price' => 2,
             'genre' => 'adventure'
         ]);
@@ -36,13 +34,13 @@ class YQLEngineTest extends TestCase
     {
         // WHERE (price == 2) AND (genre == 'adventure')
         $tree = new ExpressionNode(
-            new TermNode(new Term('price', TermOperator::EQUAL(), 2.00)), // Left
-            new ExpressionOperator(ExpressionOperator::AND), // TermOperator
-            new TermNode(new Term('genre', TermOperator::EQUAL(), 'adventure')) // Right
+            new TermNode('price', TermOperator::EQUAL(), 2.00), // Left
+            ExpressionOperator::AND(), // TermOperator
+            new TermNode('genre', TermOperator::EQUAL(), 'adventure') // Right
         );
 
-        $record = Record::create(RecordId::generate(), [
-            'price' => 2,
+        $record = Document::create([
+            'price' => 2.00,
             'genre' => 'adventure'
         ]);
 
@@ -60,20 +58,20 @@ class YQLEngineTest extends TestCase
         #        WHERE (genre == 'crime' AND price == '10.00') // exprB
         $exprA = new ExpressionNode(
             // Right
-            new TermNode(new Term('genre', TermOperator::EQUAL(), 'adventure')),
+            new TermNode('genre', TermOperator::EQUAL(), 'adventure'),
             // TermOperator
             new ExpressionOperator(ExpressionOperator::AND),
             // Left
-            new TermNode(new Term('price', TermOperator::EQUAL(), 5.00))
+            new TermNode('price', TermOperator::EQUAL(), 5.00)
         );
 
         $exprB = new ExpressionNode(
             // Right
-            new TermNode(new Term('genre', TermOperator::EQUAL(), 'crime')),
+            new TermNode('genre', TermOperator::EQUAL(), 'crime'),
             // TermOperator
             new ExpressionOperator(ExpressionOperator::AND),
             // Left
-            new TermNode(new Term('price', TermOperator::EQUAL(), 10.00))
+            new TermNode('price', TermOperator::EQUAL(), 10.00)
         );
 
         $tree = new ExpressionNode(
@@ -83,15 +81,15 @@ class YQLEngineTest extends TestCase
         );
 
         // Will match
-        $record = Record::create(RecordId::generate(), [
-            'price' => 5,
+        $record = Document::create([
+            'price' => 5.00,
             'genre' => 'adventure'
         ]);
         $this->assertTrue(PYQLQueryEvaluator::evaluateExpressionForDocument($tree, $record));
 
         // Will NOT match
-        $record = Record::create(RecordId::generate(), [
-            'price' => 5,
+        $record = Document::create([
+            'price' => 5.00,
             'genre' => 'crime'
         ]);
         $this->assertFalse(PYQLQueryEvaluator::evaluateExpressionForDocument($tree, $record));
