@@ -27,4 +27,24 @@ class TermNode extends ExpressionNode
     public function matchesDocument(Document $document) {
         return $this->term->matchesDocument($document);
     }
+
+    /**
+     * Returns the name of the term's field
+     * @return string
+     */
+    public function getTermField(): string
+    {
+        return $this->term->getField();
+    }
+
+    /**
+     * Returns the value of this term
+     * @return mixed
+     */
+    public function getTermValue()
+    {
+        return $this->term->getValue();
+    }
+
+
 }

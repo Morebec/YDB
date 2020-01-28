@@ -5,8 +5,9 @@ namespace Morebec\YDB\InMemory;
 
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
+use Morebec\YDB\DocumentCollectionInterface;
 
-class InMemoryDocumentCollection
+class InMemoryDocumentCollection implements DocumentCollectionInterface
 {
     /**
      * @var HashMap
@@ -19,8 +20,7 @@ class InMemoryDocumentCollection
     }
 
     /**
-     * Inserts a document in this collection
-     * @param Document $document
+     * @inheritDoc
      */
     public function insertDocument(Document $document): void
     {
@@ -28,8 +28,7 @@ class InMemoryDocumentCollection
     }
 
     /**
-     * Updates a document in this collection
-     * @param Document $document
+     * @inheritDoc
      */
     public function updateDocument(Document $document): void
     {
@@ -37,8 +36,7 @@ class InMemoryDocumentCollection
     }
 
     /**
-     * Removes a document from this collection
-     * @param Document $document
+     * @inheritDoc
      */
     public function removeDocument(Document $document): void
     {
@@ -46,8 +44,7 @@ class InMemoryDocumentCollection
     }
 
     /**
-     * Returns all documents
-     * @return array
+     * @inheritDoc
      */
     public function getDocuments(): array
     {
@@ -62,5 +59,13 @@ class InMemoryDocumentCollection
     private function cloneDocument(Document $document): Document
     {
         return clone $document;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasIndexOnField(string $fieldName): bool
+    {
+        // TODO: Implement hasIndexOnField() method.
     }
 }
