@@ -4,8 +4,6 @@
 namespace Morebec\YDB;
 
 
-use Morebec\YDB\InMemory\InMemoryDocumentCollection;
-
 interface DocumentCollectionInterface
 {
     /**

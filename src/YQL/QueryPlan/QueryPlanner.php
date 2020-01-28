@@ -5,7 +5,6 @@ namespace Morebec\YDB\YQL\QueryPlan;
 
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
-use Morebec\YDB\Exception\QueryException;
 use Morebec\YDB\Exception\QueryStrategyComputationFailedException;
 use Morebec\YDB\YQL\ExpressionNode;
 use Morebec\YDB\YQL\Parser\TautologyNode;

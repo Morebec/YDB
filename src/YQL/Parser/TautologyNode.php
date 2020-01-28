@@ -5,7 +5,6 @@ namespace Morebec\YDB\YQL\Parser;
 
 
 use Morebec\YDB\Document;
-use Morebec\YDB\YQL\Query\TermOperator;
 use Morebec\YDB\YQL\TermNode;
 
 class TautologyNode extends TermNode

@@ -4,7 +4,6 @@
 use Morebec\ValueObjects\Identity\UuidIdentifier;
 use Morebec\YDB\Document;
 use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
-use Morebec\YDB\Exception\QueryException;
 use Morebec\YDB\YDBInMemoryClient;
 use Morebec\YDB\YQL\Query;
 use PHPUnit\Framework\TestCase;

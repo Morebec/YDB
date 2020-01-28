@@ -4,7 +4,6 @@
 namespace Morebec\YDB;
 
 use Morebec\YDB\InMemory\InMemoryRepository;
-use Morebec\YDB\YQL\Query;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
