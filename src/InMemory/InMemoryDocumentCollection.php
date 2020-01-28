@@ -4,6 +4,7 @@
 namespace Morebec\YDB\InMemory;
 
 use Morebec\Collections\HashMap;
+use Morebec\YDB\CollectionIndex;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
 
@@ -14,9 +15,17 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
      */
     private $documents;
 
+    /**
+     * @var HashMap
+     */
+    private $indexes;
+
     public function __construct()
     {
         $this->documents = new HashMap();
+        $this->indexes = new HashMap([
+            Document::ID_FIELD => new CollectionIndex(Document::ID_FIELD)
+        ]);
     }
 
     /**
@@ -25,6 +34,7 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     public function insertDocument(Document $document): void
     {
         $this->documents->put($document->getId(), $this->cloneDocument($document));
+        $this->indexDocument($document);
     }
 
     /**
@@ -33,6 +43,7 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     public function updateDocument(Document $document): void
     {
         $this->documents->put($document->getId(), $this->cloneDocument($document));
+        $this->rebuildIndexes();
     }
 
     /**
@@ -41,6 +52,7 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     public function removeDocument(Document $document): void
     {
         $this->documents->remove($document->getId());
+        $this->rebuildIndexes();
     }
 
     /**
@@ -66,6 +78,30 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
      */
     public function hasIndexOnField(string $fieldName): bool
     {
-        // TODO: Implement hasIndexOnField() method.
+        return $this->indexes->containsKey($fieldName);
+    }
+
+    /**
+     * Indexes a document
+     * @param Document $document
+     */
+    private function indexDocument(Document $document): void
+    {
+        /** @var CollectionIndex $index */
+        foreach ($this->indexes as $index) {
+            $index->indexOneDocument($document);
+        }
+    }
+
+    /**
+     * Update all indexes
+     */
+    private function rebuildIndexes(): void
+    {
+        /** @var CollectionIndex $index */
+        foreach ($this->indexes as $index) {
+            $index->clear();
+            $index->indexDocuments($this->getDocuments());
+        }
     }
 }

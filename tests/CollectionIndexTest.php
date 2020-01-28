@@ -5,7 +5,7 @@ use Morebec\YDB\CollectionIndex;
 use Morebec\YDB\Document;
 use PHPUnit\Framework\TestCase;
 
-class IndexTest extends TestCase
+class CollectionIndexTest extends TestCase
 {
     public function testIndexDocument()
     {

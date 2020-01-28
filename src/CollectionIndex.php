@@ -46,6 +46,14 @@ class CollectionIndex
     }
 
     /**
+     * Clears this index
+     */
+    public function clear(): void
+    {
+        $this->values = [];
+    }
+
+    /**
      * @return string
      */
     public function getField(): string
@@ -78,9 +86,18 @@ class CollectionIndex
         $this->indexDocuments([$document]);
     }
 
+    /**
+     * Indexes a list of documents
+     * @param Document[] $documents
+     */
     public function indexDocuments(array $documents): void
     {
+        /** @var Document $document */
         foreach ($documents as $document) {
+            if(Document::ID_FIELD !== $this->field && !$document->hasField($this->field)) {
+                continue;
+            }
+
             $fieldValue = $this->field === Document::ID_FIELD ? $document->getId() : $document[$this->field];
             if (!array_key_exists($fieldValue, $this->values)) {
                 $this->values[$fieldValue] = [];
