@@ -3,12 +3,9 @@
 
 namespace Morebec\YDB;
 
-
-
 use Morebec\YDB\Exception\DocumentCollectionAlreadyExistsException;
 use Morebec\YDB\Exception\DocumentCollectionNotFoundException;
 use Morebec\YDB\Exception\QueryException;
-use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 

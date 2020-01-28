@@ -3,10 +3,10 @@
 
 namespace Morebec\YDB;
 
-
+use ArrayAccess;
 use Morebec\Collections\HashMap;
 
-class Document implements \ArrayAccess
+class Document implements ArrayAccess
 {
     public const ID_FIELD = '_id';
 

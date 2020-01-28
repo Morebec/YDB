@@ -3,7 +3,8 @@
 
 namespace Morebec\YDB\Exception;
 
+use Exception;
 
-class YDBException extends \Exception
+class YDBException extends Exception
 {
 }

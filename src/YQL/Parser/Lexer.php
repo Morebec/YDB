@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\YQL\Parser;
 
-
 use InvalidArgumentException;
 
 class Lexer
@@ -21,11 +20,11 @@ class Lexer
         $offset = 0;
 
         $length = strlen($source);
-        while($offset < $length) {
+        while ($offset < $length) {
             $token = $this->findToken($source, $offset);
 
             // Filter out whitespaces
-            if(!$this->canDiscardToken($token)) {
+            if (!$this->canDiscardToken($token)) {
                 $tokens[] = $token;
             }
 
@@ -39,7 +38,7 @@ class Lexer
 
     private function stripComments(string $src): string
     {
-       return preg_replace('%/\*\s+.*?\*/%s', '', $src); // remove /* */
+        return preg_replace('%/\*\s+.*?\*/%s', '', $src); // remove /* */
     }
 
 
@@ -57,13 +56,13 @@ class Lexer
     {
         $string = substr($line, $offset);
 
-        foreach(TokenType::getNamesAndValues() as $name => $pattern) {
+        foreach (TokenType::getNamesAndValues() as $name => $pattern) {
             $regexPattern = "/^($pattern)/";
-            if(preg_match($regexPattern, $string, $matches)) {
+            if (preg_match($regexPattern, $string, $matches)) {
                 $rawValue = $matches[1];
-                if ($pattern === TokenType::NUMERIC_LITERAL)  {
+                if ($pattern === TokenType::NUMERIC_LITERAL) {
                     $value = json_decode($rawValue, true, 512, JSON_THROW_ON_ERROR);
-                } elseif ($pattern === TokenType::STRING_LITERAL){
+                } elseif ($pattern === TokenType::STRING_LITERAL) {
                     $value = trim(stripslashes($rawValue), "'");
                 } else {
                     $value = $rawValue;

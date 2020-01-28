@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB;
 
-
 interface DocumentCollectionInterface
 {
     /**
@@ -19,10 +18,10 @@ interface DocumentCollectionInterface
      */
     public function insertDocuments(array $documents);
 
-     /**
-     * Replaces a document in this collection
-     * @param Document $document
-     */
+    /**
+    * Replaces a document in this collection
+    * @param Document $document
+    */
     public function replaceOneDocument(Document $document): void;
 
     /**
@@ -57,10 +56,10 @@ interface DocumentCollectionInterface
      */
     public function removeDocuments(array $documents);
 
-     /**
-     * Returns all documents
-     * @return array
-     */
+    /**
+    * Returns all documents
+    * @return array
+    */
     public function getDocuments(): array;
 
     /**

@@ -67,7 +67,7 @@ class PYQLQueryEvaluator
         ExpressionOperator $operator,
         bool $left
     ): bool {
-        if($right === $left) {
+        if ($right === $left) {
             return $right;
         }
 

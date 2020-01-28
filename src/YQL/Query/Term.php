@@ -2,7 +2,6 @@
 
 namespace Morebec\YDB\YQL\Query;
 
-
 use Exception;
 use InvalidArgumentException;
 use LogicException;
@@ -32,7 +31,7 @@ class Term
      */
     public function __construct(string $field, TermOperator $operator, $value)
     {
-        if(!$field) {
+        if (!$field) {
             throw new InvalidArgumentException('The field name of a term cannot be blank');
         }
         $this->field = $field;
@@ -40,7 +39,7 @@ class Term
         $this->value = $value;
 
         if ($operator->isEqualTo(TermOperator::IN()) || $operator->isEqualTo(TermOperator::NOT_IN())) {
-            if(!is_array($value)) {
+            if (!is_array($value)) {
                 throw new InvalidArgumentException("The right operand of a term must ba an array when used with operator {$operator}");
             }
         }
@@ -125,7 +124,6 @@ class Term
      */
     public function matchesDocument(Document $document): bool
     {
-
         $isFieldId = $this->field === Document::ID_FIELD;
         if (!$isFieldId && !$document->hasField($this->field)) {
             return false;
@@ -155,7 +153,7 @@ class Term
     {
         try {
             $str = json_encode($value, JSON_THROW_ON_ERROR, 512);
-            if(!$str) {
+            if (!$str) {
                 throw new Exception('Could not convert value to string');
             }
         } catch (Exception $e) {

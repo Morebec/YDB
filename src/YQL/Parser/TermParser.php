@@ -4,6 +4,7 @@
 namespace Morebec\YDB\YQL\Parser;
 
 use InvalidArgumentException;
+use LogicException;
 
 class TermParser
 {
@@ -17,7 +18,7 @@ class TermParser
      */
     public function lexTerms(array $tokens): array
     {
-        if(count($tokens) === 0) {
+        if (count($tokens) === 0) {
             return [];
         }
 
@@ -30,7 +31,8 @@ class TermParser
      * @param Token[] $tokens
      * @return Token[]
      */
-    private function processFindAt(int $index, array $tokens): array {
+    private function processFindAt(int $index, array $tokens): array
+    {
         $this->expectOneInTokenTypeAt([TokenType::FIND()], $index, $tokens);
 
         $ret = $this->processCardinalityAt($index + 1, $tokens);
@@ -102,13 +104,13 @@ class TermParser
         $this->expectOneInTokenTypeAt([TokenType::WHERE()], $index, $tokens);
         $token = $tokens[$index  + 1];
 
-        if($token->getType()->isEqualTo(TokenType::PAREN())) {
+        if ($token->getType()->isEqualTo(TokenType::PAREN())) {
             $ret = $this->processOpeningParenAt($index + 1, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
         }
 
-        if($token->getType()->isEqualTo(TokenType::IDENTIFIER())) {
+        if ($token->getType()->isEqualTo(TokenType::IDENTIFIER())) {
             $ret = $this->processTermAt($index + 1, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
@@ -126,7 +128,7 @@ class TermParser
     {
         $this->expectOneInTokenTypeAt([TokenType::PAREN()], $index, $tokens);
         $token = $tokens[$index];
-        if($token->getRawValue() !== '(') {
+        if ($token->getRawValue() !== '(') {
             $this->throwUnexpectedTokenException($token, $index, ['(']);
         }
 
@@ -144,7 +146,7 @@ class TermParser
     private function processClosingParenAt(int $index, array $tokens): array
     {
         $token = $tokens[$index];
-        if($token->getRawValue() !== ')') {
+        if ($token->getRawValue() !== ')') {
             $this->throwUnexpectedTokenException($token, $index, [')']);
         }
 
@@ -153,13 +155,13 @@ class TermParser
         $nextToken = $tokens[$nextIndex];
         $nextTokenType = $nextToken->getType();
 
-        if($nextTokenType->isEqualTo(TokenType::EOX())) {
+        if ($nextTokenType->isEqualTo(TokenType::EOX())) {
             $ret =  $this->parseEndOfExpression($index + 1, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
         }
 
-        if($nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_AND()) || $nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_OR())) {
+        if ($nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_AND()) || $nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_OR())) {
             $ret = $this->processExpressionOperator($nextIndex, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
@@ -204,25 +206,25 @@ class TermParser
         $nextToken = $tokens[$nextIndex];
         $nextTokenType = $nextToken->getType();
 
-        if($nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_AND()) || $nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_OR())) {
+        if ($nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_AND()) || $nextTokenType->isEqualTo(TokenType::EXPR_OPERATOR_OR())) {
             $ret = $this->processExpressionOperator($nextIndex, $tokens);
             $ret[] = $term;
             return $ret;
         }
 
-        if($nextTokenType->isEqualTo(TokenType::PAREN())) {
+        if ($nextTokenType->isEqualTo(TokenType::PAREN())) {
             $ret = $this->processClosingParenAt($nextIndex, $tokens);
             $ret[] = $term;
             return $ret;
         }
 
-        if($nextTokenType->isEqualTo(TokenType::EOX())) {
+        if ($nextTokenType->isEqualTo(TokenType::EOX())) {
             $ret =  $this->parseEndOfExpression($nextIndex, $tokens);
             $ret[] = $term;
             return $ret;
         }
 
-        throw new \LogicException('Should not reach');
+        throw new LogicException('Should not reach');
     }
 
     /**
@@ -239,7 +241,7 @@ class TermParser
         $nextToken = $tokens[$nextIndex];
         $nextTokenType = $nextToken->getType();
 
-        if($nextTokenType->isEqualTo(TokenType::PAREN())) {
+        if ($nextTokenType->isEqualTo(TokenType::PAREN())) {
             $ret = $this->processOpeningParenAt($nextIndex, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
@@ -271,7 +273,7 @@ class TermParser
         $token = $tokens[$index];
         foreach ($expectedTypes as $expectedType) {
             $tokenType = $token->getType();
-            if($tokenType->isEqualTo($expectedType)) {
+            if ($tokenType->isEqualTo($expectedType)) {
                 return;
             }
         }

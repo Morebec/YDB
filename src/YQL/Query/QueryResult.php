@@ -24,8 +24,7 @@ class QueryResult
         Iterator $documentIterator,
         ExpressionQuery $query,
         ?QueryStatistics $statistics = null
-    )
-    {
+    ) {
         $this->documentIterator = $documentIterator;
         $this->query = $query;
         $this->statistics = $statistics;

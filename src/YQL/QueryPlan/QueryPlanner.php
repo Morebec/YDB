@@ -5,7 +5,6 @@ namespace Morebec\YDB\YQL\QueryPlan;
 
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
-use Morebec\YDB\Exception\QueryStrategyComputationFailedException;
 use Morebec\YDB\YQL\ExpressionNode;
 use Morebec\YDB\YQL\Parser\TautologyNode;
 use Morebec\YDB\YQL\Query;
@@ -51,14 +50,13 @@ class QueryPlanner
     private function getStrategiesForExpressionNode(
         ExpressionNode $node,
         DocumentCollectionInterface $collection
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         if ($node instanceof TautologyNode) {
             return new CollectionScanStrategy();
         }
 
         if ($node instanceof TermNode) {
-           return $this->determineStrategyForTerm($node, $collection);
+            return $this->determineStrategyForTerm($node, $collection);
         }
 
         /** @var ExpressionNode $leftNode */
@@ -66,7 +64,7 @@ class QueryPlanner
         $leftValue = $this->getStrategiesForExpressionNode($leftNode, $collection);
 
         $operator = $node->getOperator();
-        if(!$operator) {
+        if (!$operator) {
             return $leftValue;
         }
 
@@ -86,8 +84,7 @@ class QueryPlanner
     private function determineStrategyForTerm(
         TermNode $node,
         DocumentCollectionInterface $collection
-    ): QueryPlanStrategy
-    {
+    ): QueryPlanStrategy {
         $fieldName = $node->getTermField();
 
         // If we are dealing with the internal _id

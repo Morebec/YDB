@@ -2,7 +2,6 @@
 
 namespace Morebec\YDB\YQL\QueryPlan;
 
-
 use InvalidArgumentException;
 use Morebec\YDB\YQL\ExpressionOperator;
 
@@ -127,7 +126,7 @@ class QueryPlanStrategyComparator
             // None of the two are multi, make further validation
             $strategyAClass = get_class($strategyA);
             $strategyBClass = get_class($strategyB);
-            if($strategyAClass !== $strategyBClass) {
+            if ($strategyAClass !== $strategyBClass) {
                 throw new InvalidArgumentException(
                     "Cannot merge two strategies of different types: found {$strategyAClass} and {$strategyBClass}"
                 );

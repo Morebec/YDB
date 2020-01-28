@@ -3,7 +3,7 @@
 
 namespace Morebec\YDB\YQL\Parser;
 
-
+use InvalidArgumentException;
 use Morebec\YDB\Utils\Stack;
 use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\ExpressionNode;
@@ -49,7 +49,8 @@ class YQLParser
      * @param Token[] $tokens
      * @return ExpressionNode
      */
-    public function parseTokens(array $tokens): ExpressionNode {
+    public function parseTokens(array $tokens): ExpressionNode
+    {
         // Skip the FIND CARDINALITY FROM COLLECTION WHERE, this was already verified in the TermLexer
         $tokens = array_slice($tokens, 5);
 
@@ -57,26 +58,27 @@ class YQLParser
         foreach ($tokens as $token) {
             $type = $token->getType();
 
-            if($this->isTokenTerm($token)) {
+            if ($this->isTokenTerm($token)) {
                 /** @var TermToken $token */
-                $this->termStack->push(new TermNode($token->getFieldToken()->getValue(),
+                $this->termStack->push(new TermNode(
+                    $token->getFieldToken()->getValue(),
                     new TermOperator($token->getOperatorToken()->getValue()),
                     $token->getValueToken()->getValue()
                 ));
-            } elseif($this->isTokenOperator($token) && $this->operatorStack->isEmpty()) {
+            } elseif ($this->isTokenOperator($token) && $this->operatorStack->isEmpty()) {
                 $this->operatorStack->push($token);
-            } elseif($this->isTokenOperator($token) && !$this->operatorStack->isEmpty()) {
+            } elseif ($this->isTokenOperator($token) && !$this->operatorStack->isEmpty()) {
                 $top = $this->operatorStack->peek();
                 $topPrecedence = $this->getPrecedenceFor($top);
                 $tokenPrecedence = $this->getPrecedenceFor($token);
-                if($tokenPrecedence > $topPrecedence) {
+                if ($tokenPrecedence > $topPrecedence) {
                     $this->operatorStack->push($token);
                 }
-            } elseif($type->isEqualTo(TokenType::PAREN()) && $token->getValue() === '(') {
+            } elseif ($type->isEqualTo(TokenType::PAREN()) && $token->getValue() === '(') {
                 $this->operatorStack->push($token);
             } elseif ($type->isEqualTo(TokenType::PAREN()) && $token->getValue() === ')') {
                 $top = $this->operatorStack->peek();
-                while($top->getValue() !== '(') {
+                while ($top->getValue() !== '(') {
                     $operatorToken = $this->operatorStack->pop();
 
                     // reverse order since we are relying on a stack
@@ -91,14 +93,14 @@ class YQLParser
                 }
                 $this->operatorStack->pop();
             } else {
-                if(!$token->getType()->isEqualTo(TokenType::EOX())) {
-                    throw new \InvalidArgumentException("Unexpected token {$token}");
+                if (!$token->getType()->isEqualTo(TokenType::EOX())) {
+                    throw new InvalidArgumentException("Unexpected token {$token}");
                 }
             }
         }
 
         $top = $this->operatorStack->peek();
-        while(!$this->operatorStack->isEmpty() && $top->getValue() !== '(') {
+        while (!$this->operatorStack->isEmpty() && $top->getValue() !== '(') {
             $operatorToken = $this->operatorStack->pop();
             $term2 = $this->termStack->pop();
             $term1 = $this->termStack->pop();

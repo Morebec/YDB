@@ -40,12 +40,14 @@ class Stack
      * without removing it
      * @return mixed
      */
-    public function peek() {
+    public function peek()
+    {
         $copy = $this->copy();
         return end($copy);
     }
 
-    public function isEmpty() {
+    public function isEmpty()
+    {
         return empty($this->elements);
     }
 

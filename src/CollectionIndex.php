@@ -3,6 +3,7 @@
 
 namespace Morebec\YDB;
 
+use InvalidArgumentException;
 
 class CollectionIndex
 {
@@ -30,15 +31,14 @@ class CollectionIndex
      */
     public function __construct(string $field, ?string $name = null, int $order = self::ORDER_ASCENDING)
     {
-        if(!$field) {
-            throw new \InvalidArgumentException('Cannot create an index for field without a name');
+        if (!$field) {
+            throw new InvalidArgumentException('Cannot create an index for field without a name');
         }
         $this->field = $field;
 
-        if(!$name) {
+        if (!$name) {
             $orderStr = $order === self::ORDER_ASCENDING ? 'asc' : 'desc';
             $name = "index_{$field}_{$orderStr}";
-
         }
         $this->name = $name;
         $this->order = $order;
@@ -102,7 +102,7 @@ class CollectionIndex
     {
         /** @var Document $document */
         foreach ($documents as $document) {
-            if(Document::ID_FIELD !== $this->field && !$document->hasField($this->field)) {
+            if (Document::ID_FIELD !== $this->field && !$document->hasField($this->field)) {
                 continue;
             }
 

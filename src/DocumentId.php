@@ -11,7 +11,7 @@ class DocumentId extends StringBasedValueObject
 {
     public function __construct(string $value)
     {
-        if(!$value) {
+        if (!$value) {
             throw new InvalidArgumentException('A Document id cannot be blank');
         }
         parent::__construct($value);

@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\YQL\Parser;
 
-
 use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\ExpressionNode;
 

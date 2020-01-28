@@ -83,7 +83,7 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     {
         /** @var Document $document */
         foreach ($documents as $document) {
-            if(!$this->documents->containsKey($document->getId())) {
+            if (!$this->documents->containsKey($document->getId())) {
                 continue;
             }
             /** @var Document $doc */

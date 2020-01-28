@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\YQL\Parser;
 
-
 use Morebec\YDB\Document;
 use Morebec\YDB\YQL\TermNode;
 

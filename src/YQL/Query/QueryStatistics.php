@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Morebec\YDB\YQL\Query;
 
@@ -22,8 +22,7 @@ class QueryStatistics
         int $endTime,
         int $queryPlannerStartTime,
         int $queryPlannerEndTime
-    )
-    {
+    ) {
         $this->startTime = $startTime;
         $this->endTime = $endTime;
         $this->queryPlannerStartTime = $queryPlannerStartTime;

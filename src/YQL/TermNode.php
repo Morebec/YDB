@@ -24,7 +24,8 @@ class TermNode extends ExpressionNode
         return (string)$this->term;
     }
 
-    public function matchesDocument(Document $document) {
+    public function matchesDocument(Document $document)
+    {
         return $this->term->matchesDocument($document);
     }
 
@@ -45,6 +46,4 @@ class TermNode extends ExpressionNode
     {
         return $this->term->getValue();
     }
-
-
 }

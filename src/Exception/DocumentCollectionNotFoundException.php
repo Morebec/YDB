@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\Exception;
 
-
 use Throwable;
 
 class DocumentCollectionNotFoundException extends YDBException

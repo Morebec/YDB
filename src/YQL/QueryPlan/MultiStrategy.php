@@ -14,7 +14,7 @@ class MultiStrategy extends QueryPlanStrategy
 
     public function __construct(array $strategies)
     {
-        if(count($strategies) < 2) {
+        if (count($strategies) < 2) {
             throw new InvalidArgumentException('A multistrategy must have at least 2');
         }
         $this->strategies = $strategies;

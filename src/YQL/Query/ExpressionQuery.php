@@ -25,8 +25,7 @@ class ExpressionQuery
         Cardinality $cardinality,
         string $collectionName,
         ExpressionNode $expression
-    )
-    {
+    ) {
         $this->expression = $expression;
         $this->cardinality = $cardinality;
         $this->collectionName = $collectionName;

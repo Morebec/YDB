@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB\YQL\Parser;
 
-
 class Token
 {
     /**

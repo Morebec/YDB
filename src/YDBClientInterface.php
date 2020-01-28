@@ -3,7 +3,6 @@
 
 namespace Morebec\YDB;
 
-
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
