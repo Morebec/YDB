@@ -21,7 +21,7 @@ class TermToken extends Token
 
     public function __construct(Token $fieldToken, Token $operatorToken, Token $valueToken)
     {
-        parent::__construct(TokenType::TERM(), "$fieldToken $operatorToken $valueToken");
+        parent::__construct(TokenType::TERM(), "$fieldToken $operatorToken $valueToken", $valueToken);
         $this->fieldToken = $fieldToken;
         $this->operatorToken = $operatorToken;
         $this->valueToken = $valueToken;

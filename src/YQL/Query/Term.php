@@ -126,11 +126,12 @@ class Term
     public function matchesDocument(Document $document): bool
     {
 
-        if (!$document->hasField($this->field)) {
+        $isFieldId = $this->field === Document::ID_FIELD;
+        if (!$isFieldId && !$document->hasField($this->field)) {
             return false;
         }
 
-        $value = $this->field === Document::ID_FIELD ? $document->getId() : $document[$this->field];
+        $value = $isFieldId ? $document->getId() : $document[$this->field];
 
         return $this->valueMatches($value);
     }

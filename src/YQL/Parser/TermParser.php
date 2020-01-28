@@ -126,7 +126,7 @@ class TermParser
     {
         $this->expectOneInTokenTypeAt([TokenType::PAREN()], $index, $tokens);
         $token = $tokens[$index];
-        if($token->getValue() !== '(') {
+        if($token->getRawValue() !== '(') {
             $this->throwUnexpectedTokenException($token, $index, ['(']);
         }
 
@@ -144,7 +144,7 @@ class TermParser
     private function processClosingParenAt(int $index, array $tokens): array
     {
         $token = $tokens[$index];
-        if($token->getValue() !== ')') {
+        if($token->getRawValue() !== ')') {
             $this->throwUnexpectedTokenException($token, $index, [')']);
         }
 

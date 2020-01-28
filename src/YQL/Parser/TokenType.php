@@ -46,27 +46,30 @@ class TokenType extends BasicEnum
     public const EXPR_OPERATOR_OR = ExpressionOperator::OR;
 
     // OPERATORS ARE SYMBOLS
-    public const OPERATOR_EQUAL = TermOperator::EQUAL;
-    public const OPERATOR_STRICTLY_EQUAL = TermOperator::LOOSELY_EQUALS;
+    public const OPERATOR_STRICTLY_EQUAL = TermOperator::EQUAL;
+    public const OPERATOR_EQUAL = TermOperator::LOOSELY_EQUALS;
 
-    public const OPERATOR_NOT_EQUAL = TermOperator::NOT_EQUAL;
-    public const OPERATOR_STRICTLY_NOT_EQUAL = TermOperator::LOOSELY_NOT_EQUAL;
-
-    public const OPERATOR_LESS_THAN = TermOperator::LESS_THAN;
-    public const OPERATOR_GREATER_THAN = TermOperator::GREATER_THAN;
+    public const OPERATOR_STRICTLY_NOT_EQUAL = TermOperator::NOT_EQUAL;
+    public const OPERATOR_NOT_EQUAL = TermOperator::LOOSELY_NOT_EQUAL;
 
     public const OPERATOR_LESS_OR_EQUAL = TermOperator::LESS_OR_EQUAL;
     public const OPERATOR_GREATER_OR_EQUAL = TermOperator::GREATER_OR_EQUAL;
+
+    public const OPERATOR_LESS_THAN = TermOperator::LESS_THAN;
+    public const OPERATOR_GREATER_THAN = TermOperator::GREATER_THAN;
 
     public const OPERATOR_IN = TermOperator::IN;
     public const OPERATOR_NOT_IN = TermOperator::NOT_IN;
 
     public const TERM = 'TERM';
 
-    public const NUMERIC_LITERAL = '\d+';
+    public const NUMERIC_LITERAL = '\d+(\.\d+)?';
+
     public const PAREN = '\(|\)';
+
     public const IDENTIFIER = '\w+';
-    public const STRING_LITERAL = '^((?:(?:"(?:\\"|[^"])+")|(?:\'(?:\\\'|[^\'])+\')))"';
+
+    public const STRING_LITERAL = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
 
     public const WHITESPACE = '\s+';
 

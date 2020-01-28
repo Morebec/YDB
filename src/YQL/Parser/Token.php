@@ -15,21 +15,27 @@ class Token
      * @var mixed
      */
     private $value;
+    /**
+     * @var string
+     */
+    private $rawValue;
 
-    protected function __construct(TokenType $tokenType, $value)
+    protected function __construct(TokenType $tokenType, $value, string $rawValue)
     {
         $this->tokenType = $tokenType;
         $this->value = $value;
+        $this->rawValue = $rawValue;
     }
 
     /**
      * @param TokenType $type
      * @param mixed $value
+     * @param string $rawValue
      * @return self
      */
-    public static function create(TokenType $type, $value): self
+    public static function create(TokenType $type, $value, string $rawValue): self
     {
-        return new static($type, $value);
+        return new static($type, $value, $rawValue);
     }
 
     /**
@@ -41,11 +47,19 @@ class Token
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getValue(): string
+    public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRawValue(): string
+    {
+        return $this->rawValue;
     }
 
     public function __toString()
