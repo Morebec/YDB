@@ -47,9 +47,9 @@ class QueryPlanStrategyComparator
         QueryPlanStrategy $rightOperand
     ): QueryPlanStrategy {
         // If any of the two are TableScans, return the TableScans
-        if (self::isOfType($leftOperand, TableScanStrategy::class) ||
-            self::isOfType($rightOperand, TableScanStrategy::class)) {
-            $leftIsIdScan = self::isOfType($leftOperand, TableScanStrategy::class);
+        if (self::isOfType($leftOperand, CollectionScanStrategy::class) ||
+            self::isOfType($rightOperand, CollectionScanStrategy::class)) {
+            $leftIsIdScan = self::isOfType($leftOperand, CollectionScanStrategy::class);
             return  $leftIsIdScan ? $leftOperand : $rightOperand;
         }
 
@@ -217,7 +217,7 @@ class QueryPlanStrategyComparator
         MultiStrategy $strategyB
     ): MultiStrategy {
         // TODO Document this
-        $strategies = array_merge($strategyA, $strategyB);
+        $strategies = array_merge($strategyA->getStrategies(), $strategyB->getStrategies());
 
         // Now sort into type arrays
         $types = [];

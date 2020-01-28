@@ -3,9 +3,9 @@
 namespace Morebec\YDB\YQL\QueryPlan;
 
 /**
- * TableScanStrategy
+ * CollectionScanStrategy
  */
-class TableScanStrategy extends QueryPlanStrategy
+class CollectionScanStrategy extends QueryPlanStrategy
 {
     public function __toString()
     {
