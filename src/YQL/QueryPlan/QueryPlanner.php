@@ -3,6 +3,7 @@
 
 namespace Morebec\YDB\YQL\QueryPlan;
 
+use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
 use Morebec\YDB\Exception\QueryException;
 use Morebec\YDB\Exception\QueryStrategyComputationFailedException;
@@ -96,7 +97,7 @@ class QueryPlanner
         $fieldName = $node->getTermField();
 
         // If we are dealing with the internal _id
-        if ($fieldName === '_id') {
+        if ($fieldName === Document::ID_FIELD) {
             return new IdScanStrategy([$node->getTermValue()]);
         }
 
