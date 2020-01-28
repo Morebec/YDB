@@ -2,6 +2,7 @@
 
 namespace Morebec\YDB\YQL;
 
+use Morebec\YDB\Document;
 use Morebec\YDB\YQL\Query\Term;
 use Morebec\YDB\YQL\Query\TermOperator;
 
@@ -23,18 +24,7 @@ class TermNode extends ExpressionNode
         return (string)$this->term;
     }
 
-    public function getTerm(): Term
-    {
-        return $this->term;
-    }
-
-    public function getTermFieldName(): string
-    {
-        return $this->term->getField();
-    }
-
-    public function getTermValue()
-    {
-        return $this->term->getValue();
+    public function matchesDocument(Document $document) {
+        return $this->term->matchesDocument($document);
     }
 }

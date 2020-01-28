@@ -108,7 +108,8 @@ class YQLParser
             $top = $this->operatorStack->peek();
         }
         // There should be only a single node that is the root node
-        return $this->termStack->pop();
+        $expressionNode = $this->termStack->pop();
+        return $expressionNode ?? new TautologyNode(); // If we have nothing, it means we want a tautology
     }
 
     /**

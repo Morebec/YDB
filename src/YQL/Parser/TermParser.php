@@ -62,7 +62,7 @@ class TermParser
     {
         $this->expectOneInTokenTypeAt([TokenType::FROM()], $index, $tokens);
 
-        $ret = $this->processDocumentAt($index + 1, $tokens);
+        $ret = $this->processCollectionAt($index + 1, $tokens);
         $ret[] = $tokens[$index];
         return $ret;
     }
@@ -72,10 +72,22 @@ class TermParser
      * @param Token[] $tokens
      * @return Token[]
      */
-    private function processDocumentAt(int $index, array $tokens): array
+    private function processCollectionAt(int $index, array $tokens): array
     {
-        $this->expectOneInTokenTypeAt([TokenType::IDENTIFIER()], $index, $tokens);
-        $ret = $this->processWhereAt($index + 1, $tokens);
+        // Either a where clause or EOX (For cases like FIND ALL FROM collection)
+        $this->expectOneInTokenTypeAt([TokenType::IDENTIFIER(), TokenType::EOX()], $index, $tokens);
+
+        $token = $tokens[$index];
+        $nextIndex = $index + 1;
+        $nextToken = $tokens[$nextIndex];
+
+        if ($nextToken->getType()->isEqualTo(TokenType::EOX())) {
+            $ret =  $this->parseEndOfExpression($nextIndex, $tokens);
+            $ret[] = $token;
+            return $ret;
+        }
+
+        $ret = $this->processWhereAt($nextIndex, $tokens);
         $ret[] = $tokens[$index];
         return $ret;
     }

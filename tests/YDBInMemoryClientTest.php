@@ -48,7 +48,7 @@ class YDBInMemoryClientTest extends TestCase
         ]);
         $client->insertDocument('test_collection', $document);
 
-        $query = new Query('FIND ALL FROM test_collection WHERE name === Test');
+        $query = new Query('FIND ALL FROM test_collection');
         $result = $client->executeQuery($query);
 
         $this->assertCount(1, $result->fetchAll());

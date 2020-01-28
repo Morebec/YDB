@@ -55,8 +55,11 @@ class Query extends ExpressionQuery
 
     private function ensureParsed(): void
     {
-        if (!$this->parsed) {
-            $this->parse();
+        if ($this->parsed) {
+            return;
         }
+
+        $this->parse();
+        $this->parsed = true;
     }
 }

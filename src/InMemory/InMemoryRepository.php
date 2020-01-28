@@ -9,6 +9,7 @@ use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentRepositoryInterface;
 use Morebec\YDB\Exception\CollectionNotFoundException;
+use Morebec\YDB\YQL\Cardinality;
 use Morebec\YDB\YQL\PYQLQueryEvaluator;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
@@ -132,9 +133,13 @@ class InMemoryRepository implements DocumentRepositoryInterface
      */
     private function evaluateQueryForCollection(ExpressionQuery $query, InMemoryDocumentCollection $collection): Iterator
     {
+        // Check cardinality
         foreach ($collection->getDocuments() as $document) {
             if (PYQLQueryEvaluator::evaluateExpressionForDocument($query->getExpression(), $document)) {
                 yield $document;
+            }
+            if($query->getCardinality()->isEqualTo(Cardinality::ONE())) {
+                return;
             }
         }
     }

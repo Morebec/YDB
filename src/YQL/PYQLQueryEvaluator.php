@@ -35,7 +35,7 @@ class PYQLQueryEvaluator
         Document $record
     ): bool {
         if ($node instanceof TermNode) {
-            return $node->getTerm()->matchesDocument($record);
+            return $node->matchesDocument($record);
         }
 
         /** @var ExpressionNode $leftNode */
