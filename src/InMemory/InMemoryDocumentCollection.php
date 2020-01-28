@@ -49,9 +49,20 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     /**
      * @inheritDoc
      */
-    public function removeDocument(Document $document): void
+    public function removeOneDocument(Document $document): void
     {
-        $this->documents->remove($document->getId());
+        $this->removeDocuments([$document]);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function removeDocuments(array $documents): void
+    {
+        foreach ($documents as $document) {
+            $this->documents->remove($document->getId());
+        }
         $this->rebuildIndexes();
     }
 

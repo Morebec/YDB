@@ -31,10 +31,11 @@ interface YDBClientInterface
     public function executeQuery(ExpressionQuery $query): QueryResult;
 
     /**
-     * Deletes a document in a collection matching a given query
+     * Deletes a document in a collection matching a given query and returns the deleted documents
      * @param ExpressionQuery $query
+     * @return QueryResult
      */
-    public function deleteDocument(ExpressionQuery $query): void;
+    public function deleteDocument(ExpressionQuery $query): QueryResult;
 
     /**
      * Creates a Collection

@@ -4,6 +4,7 @@
 namespace Morebec\YDB;
 
 use Morebec\YDB\InMemory\InMemoryRepository;
+use Morebec\YDB\YQL\Query;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
@@ -46,9 +47,9 @@ class YDBInMemoryClient implements YDBClientInterface
     /**
      * @inheritDoc
      */
-    public function deleteDocument(ExpressionQuery $query): void
+    public function deleteDocument(ExpressionQuery $query): QueryResult
     {
-        $this->repository->remove($query);
+        return $this->repository->remove($query);
     }
 
     /**

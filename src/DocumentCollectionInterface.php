@@ -22,7 +22,13 @@ interface DocumentCollectionInterface
      * Removes a document from this collection
      * @param Document $document
      */
-    public function removeDocument(Document $document): void;
+    public function removeOneDocument(Document $document): void;
+
+    /**
+     * Removes all given documents
+     * @param array $documents
+     */
+    public function removeDocuments(array $documents);
 
      /**
      * Returns all documents
@@ -42,4 +48,5 @@ interface DocumentCollectionInterface
      * @return void
      */
     public function clear(): void ;
+
 }

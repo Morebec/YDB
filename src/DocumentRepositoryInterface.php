@@ -44,11 +44,11 @@ interface DocumentRepositoryInterface
     public function findBy(ExpressionQuery $query): QueryResult;
 
     /**
-     * Removes a document matching a given query
+     * Removes a document matching a given query. Returns a QueryResult with all the documents removed
      * @param ExpressionQuery $query
-     * @return mixed
+     * @return QueryResult
      */
-    public function remove(ExpressionQuery $query);
+    public function remove(ExpressionQuery $query): QueryResult;
 
     /**
      * Creates a collection

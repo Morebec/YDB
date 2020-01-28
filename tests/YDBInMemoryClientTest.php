@@ -65,7 +65,23 @@ class YDBInMemoryClientTest extends TestCase
 
     public function testDeleteDocument()
     {
+        $client = $this->createClient();
+        $client->createCollection('test_collection');
+        $document = Document::create([
+            'id' => (string)UuidIdentifier::generate(),
+            'name' => 'Test'
+        ]);
+        $client->insertDocument('test_collection', $document);
 
+        $query = new Query('FIND ALL FROM test_collection WHERE name === Test');
+        $result = $client->deleteDocument($query);
+
+        $this->assertEquals(1, $result->getCount());
+
+        $query = new Query('FIND ALL FROM test_collection');
+        $result = $client->executeQuery($query);
+
+        $this->assertCount(0, $result->fetchAll());
     }
 
     public function testUpdateDocument()

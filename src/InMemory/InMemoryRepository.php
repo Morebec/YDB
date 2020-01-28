@@ -82,9 +82,22 @@ class InMemoryRepository implements DocumentRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function remove(ExpressionQuery $query): void
+    public function remove(ExpressionQuery $query): QueryResult
     {
-        // TODO: Implement remove() method.
+        $result = $this->findBy($query);
+
+        $all = $result->fetchAll();
+
+        /** @var DocumentCollectionInterface $collection */
+        $collection = $this->collections->get($query->getCollectionName());
+
+        $collection->removeDocuments($all);
+
+        $f = static function() use ($all): \Generator {
+            foreach ($all as $d) yield $d;
+        };
+        $gen = $f();
+        return new QueryResult($gen, $query);
     }
 
     /**

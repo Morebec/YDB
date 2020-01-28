@@ -48,33 +48,27 @@ class QueryResult
 
     /**
      * Retrieves all the Documents found for the query
-     * at once
+     * at once.
+     * Note: Once this method has been executed, it is not possible to fetch the data again nor counting it
      * @return array
      */
     public function fetchAll(): array
     {
-        return iterator_to_array($this->documentIterator);
+        $documents = iterator_to_array($this->documentIterator);
+
+        return $documents;
     }
 
     /**
      * Returns the number of elements fetched.
-     * Beware of performance, this will go through
-     * the whole iterator items one by one.
-     * NOTE: at the end of the count, the iterator is reset
+     * Once this method has been executed, it is not possible to fetch the data again
      * to its first element.
      * @return int
      */
     public function getCount(): int
     {
-        // Clone a generator so it can be rewinded
-        $generator = $this->documentIterator;
-        $documentIterator = static function ($e) use($generator) { yield $generator; };
-        $count = iterator_count($this->documentIterator);
-        $this->documentIterator = $documentIterator;
-
-        return $count;
+        return iterator_count($this->documentIterator);
     }
-
     /**
      * Returns the Query associated with the result
      * @return ExpressionQuery
