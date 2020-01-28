@@ -8,6 +8,8 @@ use Morebec\Collections\HashMap;
 
 class Document implements \ArrayAccess
 {
+    public const ID_FIELD = '_id';
+
     /** @var HashMap<string, mixed> */
     private $data;
 
