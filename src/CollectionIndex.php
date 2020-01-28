@@ -98,7 +98,7 @@ class CollectionIndex
                 continue;
             }
 
-            $fieldValue = $this->field === Document::ID_FIELD ? $document->getId() : $document[$this->field];
+            $fieldValue = (string)($this->field === Document::ID_FIELD ? $document->getId() : $document[$this->field]);
             if (!array_key_exists($fieldValue, $this->values)) {
                 $this->values[$fieldValue] = [];
             }

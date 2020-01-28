@@ -55,4 +55,10 @@ interface DocumentRepositoryInterface
      * @param string $collectionName
      */
     public function createCollection(string $collectionName): void;
+
+    /**
+     * Clears a collection
+     * @param string $collectionName
+     */
+    public function clearCollection(string $collectionName): void;
 }

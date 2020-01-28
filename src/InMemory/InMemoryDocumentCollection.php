@@ -104,4 +104,12 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
             $index->indexDocuments($this->getDocuments());
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function clear(): void
+    {
+        $this->documents->clear();
+    }
 }

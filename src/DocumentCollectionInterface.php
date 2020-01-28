@@ -36,4 +36,10 @@ interface DocumentCollectionInterface
      * @return bool
      */
     public function hasIndexOnField(string $fieldName): bool;
+
+    /**
+     * Cleats this collection, removing all records
+     * @return void
+     */
+    public function clear(): void ;
 }

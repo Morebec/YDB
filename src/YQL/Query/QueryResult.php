@@ -10,7 +10,7 @@ use Morebec\YDB\Document;
  */
 class QueryResult
 {
-    /** @var Iterator generator the to documents */
+    /** @var Iterator generator to the documents */
     private $documentIterator;
 
     /** @var ExpressionQuery */
@@ -66,8 +66,11 @@ class QueryResult
      */
     public function getCount(): int
     {
+        // Clone a generator so it can be rewinded
+        $generator = $this->documentIterator;
+        $documentIterator = static function ($e) use($generator) { yield $generator; };
         $count = iterator_count($this->documentIterator);
-        $this->documentIterator->rewind();
+        $this->documentIterator = $documentIterator;
 
         return $count;
     }

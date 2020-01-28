@@ -72,6 +72,6 @@ class YDBInMemoryClient implements YDBClientInterface
      */
     public function clearCollection(string $collectionName): void
     {
-        // TODO: Implement clearCollection() method.
+        $this->repository->clearCollection($collectionName);
     }
 }

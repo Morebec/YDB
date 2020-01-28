@@ -35,7 +35,16 @@ class YDBInMemoryClientTest extends TestCase
 
     public function testClearCollection(): void
     {
+        $client = $this->createClient();
+        $client->createCollection('test_collection');
+        $client->insertDocument('test_collection', Document::create([
+            'name' => 'test'
+        ]));
 
+        $client->clearCollection('test_collection');
+        $result = $client->executeQuery(new Query('FIND ALL FROM test_collection'));
+
+        $this->assertEquals(0, $result->getCount());
     }
 
     public function testInsertDocument(): void

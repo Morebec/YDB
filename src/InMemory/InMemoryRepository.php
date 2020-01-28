@@ -7,6 +7,7 @@ namespace Morebec\YDB\InMemory;
 use Iterator;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
+use Morebec\YDB\DocumentCollectionInterface;
 use Morebec\YDB\DocumentRepositoryInterface;
 use Morebec\YDB\Exception\CollectionNotFoundException;
 use Morebec\YDB\YQL\Cardinality;
@@ -143,5 +144,17 @@ class InMemoryRepository implements DocumentRepositoryInterface
                 return;
             }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function clearCollection(string $collectionName): void
+    {
+        $this->ensureCollectionExists($collectionName);
+
+        /** @var DocumentCollectionInterface $collection */
+        $collection = $this->collections->get($collectionName);
+        $collection->clear();
     }
 }
