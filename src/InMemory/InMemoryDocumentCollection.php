@@ -140,6 +140,14 @@ class InMemoryDocumentCollection implements DocumentCollectionInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getIndexes(): array
+    {
+        return $this->indexes->toArray();
+    }
+
+    /**
      * Indexes a document
      * @param Document $document
      */

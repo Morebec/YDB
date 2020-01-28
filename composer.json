@@ -33,6 +33,7 @@
         }
     },
     "scripts": {
+        "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
         "cs-lint": "php-cs-fixer fix src/ --diff -vvv --dry-run",
         "cs-fix": "php-cs-fixer fix src/ -vvv || true",
         "check-outdated": "composer outdated -m"

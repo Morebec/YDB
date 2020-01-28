@@ -71,6 +71,12 @@ interface DocumentCollectionInterface
     public function hasIndexOnField(string $fieldName): bool;
 
     /**
+     * Returns all indexes of this collection
+     * @return array
+     */
+    public function getIndexes(): array;
+
+    /**
      * Cleats this collection, removing all records
      * @return void
      */

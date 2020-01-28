@@ -78,6 +78,14 @@ class CollectionIndex
     }
 
     /**
+     * @return mixed[]
+     */
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    /**
      * Indexes a document
      * @param Document $document
      */
@@ -103,7 +111,7 @@ class CollectionIndex
                 $this->values[$fieldValue] = [];
             }
 
-            $this->values[(string)$fieldValue][] = (string)$document->getId();
+            $this->values[$fieldValue][] = (string)$document->getId();
         }
 
         // Update index

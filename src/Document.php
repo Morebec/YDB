@@ -49,8 +49,9 @@ class Document implements \ArrayAccess
      */
     public function toArray(): array
     {
-        $data = $this->getData();
+        $data = [];
         $data[self::ID_FIELD] = (string)$this->getId();
+        $data = array_merge($data, $this->getData());
         return $data;
     }
 

@@ -3,10 +3,10 @@
 
 namespace Morebec\YDB\InMemory;
 
-
 use Generator;
 use Iterator;
 use Morebec\Collections\HashMap;
+use Morebec\YDB\CollectionIndex;
 use Morebec\YDB\Document;
 use Morebec\YDB\DocumentCollectionInterface;
 use Morebec\YDB\DocumentStoreInterface;
@@ -72,9 +72,9 @@ class InMemoryStore implements DocumentStoreInterface
     /**
      * @inheritDoc
      */
-    public function  replaceMany(string $collectionName, array $documents): void
+    public function replaceMany(string $collectionName, array $documents): void
     {
-       $this->ensureCollectionExists($collectionName);
+        $this->ensureCollectionExists($collectionName);
 
         /** @var DocumentCollectionInterface $collection */
         $collection = $this->collections->get($collectionName);
@@ -91,11 +91,11 @@ class InMemoryStore implements DocumentStoreInterface
 
         $document = $result->fetch();
 
-        if($document) {
+        if ($document) {
             $collection->updateOneDocument($document, $data);
         }
 
-        $f = static function() use ($document): Generator {
+        $f = static function () use ($document): Generator {
             yield $document;
         };
         $gen = $f();
@@ -114,7 +114,7 @@ class InMemoryStore implements DocumentStoreInterface
 
         $collection->updateDocuments($documents, $data);
 
-        $f = static function() use ($documents): Generator {
+        $f = static function () use ($documents): Generator {
             foreach ($documents as $d) {
                 yield $d;
             }
@@ -131,12 +131,12 @@ class InMemoryStore implements DocumentStoreInterface
         $collection = $this->getCollectionOrThrowException($query->getCollectionName());
         $result = $this->findBy($query);
 
-        $all = $result->fetchAll();
+        $documents = $result->fetchAll();
 
-        $collection->removeDocuments($all);
+        $collection->removeDocuments($documents);
 
-        $f = static function() use ($all): Generator {
-            foreach ($all as $d) {
+        $f = static function () use ($documents): Generator {
+            foreach ($documents as $d) {
                 yield $d;
             }
         };
@@ -157,7 +157,6 @@ class InMemoryStore implements DocumentStoreInterface
         $iterator = $this->evaluateQueryForCollection($query, $collection);
 
         return new QueryResult($iterator, $query);
-
     }
 
     /**
@@ -167,16 +166,17 @@ class InMemoryStore implements DocumentStoreInterface
     {
         $result = $this->findBy($query);
 
-        $all = $result->fetchAll();
+        $docs = $result->fetchAll();
+        if (!empty($docs)) {
+            /** @var DocumentCollectionInterface $collection */
+            $collection = $this->collections->get($query->getCollectionName());
+            $collection->removeDocuments([$docs[0]]);
+        }
 
-        /** @var DocumentCollectionInterface $collection */
-        $collection = $this->collections->get($query->getCollectionName());
-
-        $collection->removeDocuments($all);
-
-        $f = static function() use ($all): Generator {
-            foreach ($all as $d) {
+        $f = static function () use ($docs): Generator {
+            foreach ($docs as $d) {
                 yield $d;
+                return;
             }
         };
         $gen = $f();
@@ -232,9 +232,35 @@ class InMemoryStore implements DocumentStoreInterface
         $this->collections->put($newName, $collection);
     }
 
+    /**
+     * Converts this store to an array for serialization
+     * @return array
+     */
     public function toArray(): array
     {
+        $dump = [];
+        $dump['collections'] = [];
+        /** @var DocumentCollectionInterface $collection */
+        foreach ($this->collections as $name => $collection) {
+            $dump['collections'][$name] = [];
+            $dump['collections'][$name]['documents'] = [];
+            $dump['collections'][$name]['indexes'] = [];
+            /** @var Document $document */
+            foreach ($collection->getDocuments() as $document) {
+                $dump['collections'][$name]['documents'][] = $document->toArray();
+            }
 
+            /** @var CollectionIndex $index */
+            foreach ($collection->getIndexes() as $index) {
+                $dump['collections'][$name]['indexes'][$index->getName()] = [
+                    'order' => $index->getOrder(),
+                    'field' => $index->getField(),
+                    'values' => $index->getValues()
+                ];
+            }
+        }
+
+        return $dump;
     }
 
     /**
@@ -273,7 +299,7 @@ class InMemoryStore implements DocumentStoreInterface
             if (PYQLQueryEvaluator::evaluateExpressionForDocument($query->getExpression(), $document)) {
                 yield $document;
             }
-            if($query->getCardinality()->isEqualTo(Cardinality::ONE())) {
+            if ($query->getCardinality()->isEqualTo(Cardinality::ONE())) {
                 return;
             }
         }
