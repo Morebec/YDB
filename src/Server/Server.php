@@ -12,7 +12,7 @@ use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\Command\CommandFactory;
 use React\Socket\ConnectionInterface;
 
-class InMemoryServer implements ServerInterface
+class Server implements ServerInterface
 {
     /** @var string Version of this server */
     private const VERSION = '0.1.0';

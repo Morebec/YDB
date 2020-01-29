@@ -4,7 +4,7 @@
 namespace Morebec\YDB\Client;
 
 use Exception;
-use Morebec\YDB\ClientException;
+use Morebec\YDB\Client\ClientException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory as ReactLoopFactory;
 use React\EventLoop\LoopInterface;

@@ -6,7 +6,7 @@ namespace Morebec\YDB\Server\Command;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Exception\ServerException;
 use Morebec\YDB\InMemory\InMemoryStore;
-use Morebec\YDB\Server\InMemoryServer;
+use Morebec\YDB\Server\Server;
 use React\Socket\ConnectionInterface;
 
 class CreateCollectionCommand implements ServerCommandInterface
@@ -35,7 +35,7 @@ class CreateCollectionCommand implements ServerCommandInterface
     /**
      * @inheritDoc
      */
-    public function execute(InMemoryServer $server, ConnectionInterface $client, InMemoryStore $store)
+    public function execute(Server $server, ConnectionInterface $client, InMemoryStore $store)
     {
         $store->createCollection($this->collectionName);
 

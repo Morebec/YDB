@@ -7,7 +7,7 @@ use Morebec\YDB\Document;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
-interface YDBClientInterface
+interface ClientInterface
 {
     /**
      * Inserts a document in a collection

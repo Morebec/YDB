@@ -1,13 +1,12 @@
 <?php
 
-use Morebec\YDB\Client\ClientHandler;
-use Morebec\YDB\YDBInMemoryClient;
-use Morebec\YDB\YDBInMemoryClientConfiguration;
+use Morebec\YDB\Client\ClientConfiguration;
+use Morebec\YDB\Client\Client;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$config = new YDBInMemoryClientConfiguration();
-$client = new YDBInMemoryClient($config);
+$config = new ClientConfiguration();
+$client = new Client($config);
 $client->connect();
 $client->createCollection('remote_collection');
 

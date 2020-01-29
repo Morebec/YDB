@@ -1,22 +1,26 @@
 <?php
 
 
-namespace Morebec\YDB;
+namespace Morebec\YDB\Client;
 
 use Morebec\Collections\HashMap;
-use Morebec\YDB\Client\ClientConnection;
-use Morebec\YDB\Client\ClientHandler;
-use Morebec\YDB\Client\YDBClientConfiguration;
-use Morebec\YDB\Client\YDBClientInterface;
+use Morebec\YDB\ClearCollectionCommand;
+use Morebec\YDB\Client\ClientException;
+use Morebec\YDB\DeleteDocumentCommand;
+use Morebec\YDB\Document;
+use Morebec\YDB\DropCollectionCommand;
+use Morebec\YDB\ExecuteQueryCommand;
+use Morebec\YDB\InsertDocumentCommand;
 use Morebec\YDB\Server\Command\CreateCollectionCommand;
 use Morebec\YDB\Server\Command\ServerCommandInterface;
+use Morebec\YDB\UpdateDocumentsCommand;
+use Morebec\YDB\UpdateOneDocumentCommand;
+use Morebec\YDB\YDBInMemoryClientConfiguration;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
-use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
-use React\Socket\Connector;
 
-class YDBInMemoryClient implements YDBClientInterface
+class Client implements ClientInterface
 {
     /**
      * @var YDBInMemoryClientConfiguration
@@ -30,9 +34,9 @@ class YDBInMemoryClient implements YDBClientInterface
 
     /**
      * YDBInMemoryClient constructor.
-     * @param YDBInMemoryClientConfiguration $config
+     * @param ClientConfiguration $config
      */
-    public function __construct(YDBInMemoryClientConfiguration $config)
+    public function __construct(ClientConfiguration $config)
     {
         $this->config = $config;
     }
