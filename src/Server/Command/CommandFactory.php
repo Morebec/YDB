@@ -9,6 +9,9 @@ use Morebec\YDB\Exception\UndefinedServerCommandException;
 
 class CommandFactory
 {
+    /** @var array<string, Closure> */
+    private $map;
+
     public function __construct()
     {
         $this->buildCommandMap();
@@ -23,27 +26,35 @@ class CommandFactory
      */
     public function makeCommand(string $command, HashMap $data): ServerCommandInterface
     {
-        $map = $this->buildCommandMap();
-
-        if (!array_key_exists($command, $map)) {
+        if (!array_key_exists($command, $this->map)) {
             throw new UndefinedServerCommandException($command);
         }
 
-        $command = $map[$command]($data);
+        $command = $this->map[$command]($data);
 
         return $command;
     }
 
     /**
      * Builds the command map between command names and factory methods
-     * @return array<string, Closure>
+     * @return void
      */
-    private function buildCommandMap(): array
+    private function buildCommandMap(): void
     {
-        $map = [];
-        $map[CreateCollectionCommand::NAME] = Closure::fromCallable([CreateCollectionCommand::class, 'fromData']);
-        $map[InsertOneDocumentCommand::NAME] = Closure::fromCallable([InsertOneDocumentCommand::class, 'fromData']);
-        $map[ServerVersionCommand::NAME] = Closure::fromCallable([ServerVersionCommand::class, 'fromData']);
-        return $map;
+        $this->map = [];
+        $this->registerCommand(CreateCollectionCommand::NAME, CreateCollectionCommand::class);
+        $this->registerCommand(InsertOneDocumentCommand::NAME, InsertOneDocumentCommand::class);
+        $this->registerCommand(InsertDocumentsCommand::NAME, InsertDocumentsCommand::class);
+        $this->registerCommand(ServerVersionCommand::NAME, ServerVersionCommand::class);
+    }
+
+    /**
+     * Registers a command factory
+     * @param string $commandName
+     * @param string $commandClass
+     */
+    private function registerCommand(string $commandName, string $commandClass): void
+    {
+        $this->map[$commandName] = Closure::fromCallable([$commandClass, 'fromData']);
     }
 }

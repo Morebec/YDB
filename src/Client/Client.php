@@ -6,6 +6,7 @@ namespace Morebec\YDB\Client;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Document;
 use Morebec\YDB\Server\Command\CreateCollectionCommand;
+use Morebec\YDB\Server\Command\InsertDocumentsCommand;
 use Morebec\YDB\Server\Command\InsertOneDocumentCommand;
 use Morebec\YDB\Server\Command\ServerCommandInterface;
 use Morebec\YDB\YQL\Query\ExpressionQuery;

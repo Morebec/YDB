@@ -10,26 +10,22 @@ use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\Server;
 use React\Socket\ConnectionInterface;
 
-/**
- * Inserts a document in a collection
- */
-class InsertOneDocumentCommand implements ServerCommandInterface
+class InsertDocumentsCommand implements ServerCommandInterface
 {
-    public const NAME = 'insert_one_document';
-
+    public const NAME = 'insert_documents';
     /**
      * @var string
      */
     private $collectionName;
     /**
-     * @var Document
+     * @var array
      */
-    private $document;
+    private $documents;
 
-    public function __construct(string $collectionName, Document $document)
+    public function __construct(string $collectionName, array $documents)
     {
         $this->collectionName = $collectionName;
-        $this->document = $document;
+        $this->documents = $documents;
     }
 
     /**
@@ -38,8 +34,13 @@ class InsertOneDocumentCommand implements ServerCommandInterface
     public static function fromData(HashMap $data): ServerCommandInterface
     {
         $collectionName = $data->get('collection_name');
-        $document = new Document(DocumentId::fromString($data->get('document')['_id']), $data->get('document'));
-        return new static($collectionName, $document);
+
+        $documents = [];
+        foreach ($data->get('documents') as $document) {
+            $documents[] = new Document(DocumentId::fromString($document['_id']), $document);
+        }
+
+        return new static($collectionName, $documents);
     }
 
     /**
@@ -47,7 +48,7 @@ class InsertOneDocumentCommand implements ServerCommandInterface
      */
     public function execute(Server $server, ConnectionInterface $client, InMemoryStore $store)
     {
-        $store->insertOne($this->collectionName, $this->document);
+        $store->insertMany($this->collectionName, $this->documents);
         return new SuccessStatus();
     }
 
@@ -57,8 +58,11 @@ class InsertOneDocumentCommand implements ServerCommandInterface
     public function toArray(): array
     {
         return [
+            'command' => self::NAME,
             'collection_name' => $this->collectionName,
-            'document' => $this->document->toArray()
+            'documents' => array_map(static function (Document $doc) {
+                return $doc->toArray();
+            }, $this->documents)
         ];
     }
 }
