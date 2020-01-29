@@ -6,6 +6,7 @@ namespace Morebec\YDB\Server;
 use Exception;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\DocumentStoreInterface;
+use Morebec\YDB\Server\Command\CommandCode;
 use Morebec\YDB\Server\ServerException;
 use Morebec\YDB\Exception\UndefinedServerCommandException;
 use Morebec\YDB\InMemory\InMemoryStore;
@@ -88,7 +89,7 @@ class Server implements ServerInterface
         echo "[{$client->getRemoteAddress()}]: $rawData" . PHP_EOL;
 
         try {
-            $data = json_decode($rawData, true, 512, JSON_THROW_ON_ERROR);
+            $data = $this->decodeData($rawData);
             $this->processData($client, new HashMap($data));
         } catch (\Exception $e) {
             $errorData = [
@@ -150,5 +151,19 @@ class Server implements ServerInterface
     private function getServerName(): string
     {
         return 'YDB Server';
+    }
+
+    /**
+     * @param string $rawData
+     * @return mixed
+     * @throws \Morebec\YDB\Server\ServerException
+     */
+    private function decodeData(string $rawData)
+    {
+        try {
+            return json_decode($rawData, true, 512, JSON_THROW_ON_ERROR);
+        }catch (\Exception $e) {
+            throw new \Morebec\YDB\Server\ServerException('Malformed data', CommandCode::INVALID_DATA);
+        }
     }
 }

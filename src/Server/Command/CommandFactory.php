@@ -42,10 +42,11 @@ class CommandFactory
     private function buildCommandMap(): void
     {
         $this->map = [];
+        $this->registerCommand(ServerVersionCommand::NAME, ServerVersionCommand::class);
         $this->registerCommand(CreateCollectionCommand::NAME, CreateCollectionCommand::class);
         $this->registerCommand(InsertOneDocumentCommand::NAME, InsertOneDocumentCommand::class);
         $this->registerCommand(InsertDocumentsCommand::NAME, InsertDocumentsCommand::class);
-        $this->registerCommand(ServerVersionCommand::NAME, ServerVersionCommand::class);
+        $this->registerCommand(ExecuteQueryCommand::NAME, ExecuteQueryCommand::class);
     }
 
     /**

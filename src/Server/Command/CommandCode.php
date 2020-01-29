@@ -19,4 +19,7 @@ abstract class CommandCode
 
     /** @var int When a command executed successfully */
     public const SUCCESS = 200;
+
+    /** @var int When the data received was malformed */
+    public const INVALID_DATA = 987;
 }
