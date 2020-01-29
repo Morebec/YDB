@@ -4,7 +4,7 @@
 namespace Morebec\YDB\Server\Command;
 
 use Morebec\Collections\HashMap;
-use Morebec\YDB\InMemory\InMemoryServer;
+use Morebec\YDB\Server\InMemoryServer;
 use Morebec\YDB\InMemory\InMemoryStore;
 use React\Socket\ConnectionInterface;
 
@@ -25,4 +25,10 @@ interface ServerCommandInterface
      * @return mixed
      */
     public function execute(InMemoryServer $server, ConnectionInterface $client, InMemoryStore $store);
+
+    /**
+     * Converts this command to an array
+     * @return mixed
+     */
+    public function toArray();
 }

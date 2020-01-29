@@ -1,8 +1,9 @@
 <?php
 
 
-namespace Morebec\YDB;
+namespace Morebec\YDB\Client;
 
+use Morebec\YDB\Document;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 
@@ -60,4 +61,5 @@ interface YDBClientInterface
      * @param string $collectionName
      */
     public function clearCollection(string $collectionName): void;
+
 }

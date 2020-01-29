@@ -41,7 +41,7 @@ class CommandFactory
     private function buildCommandMap(): array
     {
         $map = [];
-        $map[CloseConnectionCommand::NAME] = Closure::fromCallable([CloseConnectionCommand::class, 'fromData']);
+        $map[CreateCollectionCommand::NAME] = Closure::fromCallable([CreateCollectionCommand::class, 'fromData']);
         return $map;
     }
 }

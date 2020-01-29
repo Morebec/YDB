@@ -1,18 +1,14 @@
 <?php
 
 
-namespace Morebec\YDB\InMemory;
+namespace Morebec\YDB\Server;
 
 use Exception;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\Exception\ServerException;
 use Morebec\YDB\Exception\UndefinedServerCommandException;
-use Morebec\YDB\Server\Command\CloseConnectionCommand;
+use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\Command\CommandFactory;
-use Morebec\YDB\Server\Command\CreateCollectionCommand;
-use Morebec\YDB\Server\ServerConfiguration;
-use Morebec\YDB\Server\ServerHandler;
-use Morebec\YDB\Server\ServerInterface;
 use React\Socket\ConnectionInterface;
 
 class InMemoryServer implements ServerInterface
@@ -38,7 +34,7 @@ class InMemoryServer implements ServerInterface
     /**
      * @var CommandFactory
      */
-    private CommandFactory $factory;
+    private $factory;
 
     public function __construct(InMemoryServerConfig $config)
     {
@@ -73,7 +69,7 @@ class InMemoryServer implements ServerInterface
      */
     public function onClientConnection(ConnectionInterface $client): void
     {
-        $client->write(sprintf('%s version: %s', $this->getServerName(), self::VERSION) . PHP_EOL);
+        //  $client->write(sprintf('%s version: %s', $this->getServerName(), self::VERSION) . PHP_EOL);
         echo "[Connected {$client->getRemoteAddress()}]" . PHP_EOL;
     }
 
@@ -87,7 +83,7 @@ class InMemoryServer implements ServerInterface
         $data = json_decode($rawData, true, 512, JSON_THROW_ON_ERROR);
         try {
             $this->processData($client, new HashMap($data));
-        } catch (ServerException $e) {
+        } catch (\Exception $e) {
             $errorData = [
                 'status' => $e->getCode(),
                 'error' => [
@@ -119,7 +115,7 @@ class InMemoryServer implements ServerInterface
      */
     public function onClientConnectionEnded(ConnectionInterface $client): void
     {
-        echo "[Disconnected {$client->getRemoteAddress()}]";
+        echo "[Disconnected {$client->getRemoteAddress()}]" . PHP_EOL;
     }
 
     /**

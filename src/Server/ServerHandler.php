@@ -4,7 +4,6 @@
 namespace Morebec\YDB\Server;
 
 use Exception;
-use GuzzleHttp\ClientInterface;
 use React\EventLoop\Factory as ReactLoopFactory;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;

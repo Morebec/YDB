@@ -1,7 +1,7 @@
 <?php
 
-use Morebec\YDB\InMemory\InMemoryServer;
-use Morebec\YDB\InMemory\InMemoryServerConfig;
+use Morebec\YDB\Server\InMemoryServer;
+use Morebec\YDB\Server\InMemoryServerConfig;
 use Morebec\YDB\Server\ServerHandler;
 
 require __DIR__ . '/../vendor/autoload.php';
