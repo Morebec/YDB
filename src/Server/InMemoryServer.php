@@ -5,6 +5,7 @@ namespace Morebec\YDB\Server;
 
 use Exception;
 use Morebec\Collections\HashMap;
+use Morebec\YDB\DocumentStoreInterface;
 use Morebec\YDB\Exception\ServerException;
 use Morebec\YDB\Exception\UndefinedServerCommandException;
 use Morebec\YDB\InMemory\InMemoryStore;
@@ -17,7 +18,7 @@ class InMemoryServer implements ServerInterface
     private const VERSION = '0.1.0';
 
     /**
-     * @var InMemoryServerConfig
+     * @var ServerConfiguration
      */
     private $config;
 
@@ -36,32 +37,44 @@ class InMemoryServer implements ServerInterface
      */
     private $factory;
 
-    public function __construct(InMemoryServerConfig $config)
+    /**
+     * @var ServerConnection
+     */
+    private $connection;
+
+    public function __construct(ServerConfiguration $config, DocumentStoreInterface $store)
     {
         $this->config = $config;
-        $this->store = new InMemoryStore();
+        $this->store = $store;
+    }
+
+    /**
+     * Starts the server
+     */
+    public function start(): void
+    {
+        $this->connection = new ServerConnection($this);
+        $this->connection->open($this->config->url);
     }
 
     /**
      * @inheritDoc
      */
-    public function onStart(ServerHandler $handler): void
+    public function onStart(): void
     {
-        $this->address = $handler->getSocket()->getAddress();
-
+        $address = $this->connection->getAddress();
         $this->factory = new CommandFactory();
 
-
         echo sprintf('%s version: %s', $this->getServerName(), self::VERSION)  . PHP_EOL;
-        echo 'Listening at ' . $this->address . PHP_EOL;
+        echo 'Listening at ' . $address . PHP_EOL;
     }
 
     /**
      * @inheritDoc
      */
-    public function onStop(ServerHandler $handler): void
+    public function onStop(): void
     {
-        echo 'Closing ...';
+        echo 'Stopping ...';
     }
 
     /**
@@ -69,7 +82,6 @@ class InMemoryServer implements ServerInterface
      */
     public function onClientConnection(ConnectionInterface $client): void
     {
-        //  $client->write(sprintf('%s version: %s', $this->getServerName(), self::VERSION) . PHP_EOL);
         echo "[Connected {$client->getRemoteAddress()}]" . PHP_EOL;
     }
 
@@ -125,14 +137,6 @@ class InMemoryServer implements ServerInterface
     {
         $clientAddress = $client->getRemoteAddress();
         echo "Error establishing connection with {$clientAddress}: {$exception->getMessage()}";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getConfig(): ServerConfiguration
-    {
-        return $this->config;
     }
 
     /**

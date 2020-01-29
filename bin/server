@@ -1,5 +1,6 @@
 <?php
 
+use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\InMemoryServer;
 use Morebec\YDB\Server\InMemoryServerConfig;
 use Morebec\YDB\Server\ServerHandler;
@@ -8,7 +9,9 @@ require __DIR__ . '/../vendor/autoload.php';
 
 
 $config = new InMemoryServerConfig();
-$server = new InMemoryServer($config);
+$server = new InMemoryServer($config, new InMemoryStore());
+$server->start();
+
 $serverHandler = new ServerHandler($server);
 
 $serverHandler->start();

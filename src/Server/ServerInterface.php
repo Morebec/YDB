@@ -9,16 +9,14 @@ use React\Socket\ConnectionInterface;
 interface ServerInterface
 {
     /**
-     * Called when the server is started by the handler
-     * @param ServerHandler $handler
+     * Called when the server is started
      */
-    public function onStart(ServerHandler $handler): void;
+    public function onStart(): void;
 
     /**
      * Called when the server is stopped
-     * @param ServerHandler $handler
      */
-    public function onStop(ServerHandler $handler): void;
+    public function onStop(): void;
 
     /**
      * Called when a connection is established with a client
@@ -45,11 +43,4 @@ interface ServerInterface
      * @param Exception $exception
      */
     public function onClientConnectionError(ConnectionInterface $client, Exception $exception): void;
-
-    /**
-     * Returns the server's configuration
-     * @return ServerConfiguration
-     */
-    public function getConfig(): ServerConfiguration;
-
 }
