@@ -5,18 +5,16 @@ namespace Morebec\YDB\YQL\Parser;
 
 use InvalidArgumentException;
 use LogicException;
+use Morebec\YDB\YQL\Parser\Exception\UnexpectedTokenException;
 
 class TermParser
 {
-    private $tokens = [];
-
-    private $queryTokens = [];
-
     /**
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
-    public function lexTerms(array $tokens): array
+    public function parseTerms(array $tokens): array
     {
         if (count($tokens) === 0) {
             return [];
@@ -30,6 +28,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processFindAt(int $index, array $tokens): array
     {
@@ -44,6 +43,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processCardinalityAt(int $index, array $tokens): array
     {
@@ -59,6 +59,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processFromAt(int $index, array $tokens): array
     {
@@ -73,21 +74,14 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processCollectionAt(int $index, array $tokens): array
     {
-        // Either a where clause or EOX (For cases like FIND ALL FROM collection)
-        $this->expectOneInTokenTypeAt([TokenType::IDENTIFIER(), TokenType::EOX()], $index, $tokens);
+        $this->expectOneInTokenTypeAt([TokenType::IDENTIFIER()], $index, $tokens);
 
         $token = $tokens[$index];
         $nextIndex = $index + 1;
-        $nextToken = $tokens[$nextIndex];
-
-        if ($nextToken->getType()->isEqualTo(TokenType::EOX())) {
-            $ret =  $this->parseEndOfExpression($nextIndex, $tokens);
-            $ret[] = $token;
-            return $ret;
-        }
 
         $ret = $this->processWhereAt($nextIndex, $tokens);
         $ret[] = $tokens[$index];
@@ -98,31 +92,43 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processWhereAt(int $index, array $tokens): array
     {
-        $this->expectOneInTokenTypeAt([TokenType::WHERE()], $index, $tokens);
-        $token = $tokens[$index  + 1];
+        // Either a where clause or EOX (For cases like FIND ALL FROM collection)
+        $this->expectOneInTokenTypeAt([TokenType::WHERE(), TokenType::EOX()], $index, $tokens);
+        $token = $tokens[$index];
 
-        if ($token->getType()->isEqualTo(TokenType::PAREN())) {
+        if ($token->getType()->isEqualTo(TokenType::EOX())) {
+            $ret =  $this->parseEndOfExpression($index, $tokens);
+            $ret[] = $token;
+            return $ret;
+        }
+
+        $nextToken = $tokens[$index  + 1];
+
+        $this->expectOneInTokenTypeAt([TokenType::PAREN(), TokenType::IDENTIFIER()], $index + 1, $tokens);
+        if ($nextToken->getType()->isEqualTo(TokenType::PAREN())) {
             $ret = $this->processOpeningParenAt($index + 1, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
         }
 
-        if ($token->getType()->isEqualTo(TokenType::IDENTIFIER())) {
+        if ($nextToken->getType()->isEqualTo(TokenType::IDENTIFIER())) {
             $ret = $this->processTermAt($index + 1, $tokens);
             $ret[] = $tokens[$index];
             return $ret;
         }
 
-        $this->throwUnexpectedTokenException($token, $index + 1, [TokenType::PAREN(), TokenType::IDENTIFIER()]);
+        $this->throwUnexpectedTokenException($nextToken, $index + 1, [TokenType::PAREN(), TokenType::IDENTIFIER()]);
     }
 
     /**
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processOpeningParenAt(int $index, array $tokens): array
     {
@@ -142,6 +148,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processClosingParenAt(int $index, array $tokens): array
     {
@@ -174,6 +181,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processTermAt(int $index, array $tokens): array
     {
@@ -231,6 +239,7 @@ class TermParser
      * @param int $index
      * @param Token[] $tokens
      * @return Token[]
+     * @throws UnexpectedTokenException
      */
     private function processExpressionOperator(int $index, array $tokens): array
     {
@@ -267,6 +276,7 @@ class TermParser
      * @param TokenType[] $expectedTypes
      * @param int $index
      * @param Token[] $tokens
+     * @throws UnexpectedTokenException
      */
     private function expectOneInTokenTypeAt(array $expectedTypes, int $index, array $tokens): void
     {
@@ -274,6 +284,9 @@ class TermParser
         foreach ($expectedTypes as $expectedType) {
             $tokenType = $token->getType();
             if ($tokenType->isEqualTo($expectedType)) {
+                /*                echo sprintf('Expected %s got %s', implode(', ', array_map(static function (TokenType $t) {
+                                    return $t->getValue();
+                                }, $expectedTypes)), $token) . PHP_EOL;*/
                 return;
             }
         }
@@ -285,10 +298,27 @@ class TermParser
      * @param int $index
      * @param TokenType[]|string[] $expectedTypes
      * @throws InvalidArgumentException
+     * @throws UnexpectedTokenException
      */
     private function throwUnexpectedTokenException(Token $token, int $index, array $expectedTypes): void
     {
-        $expectedTypesAsString = implode(', ', $expectedTypes);
-        throw new InvalidArgumentException("Unexpected token $token, expected $expectedTypesAsString at $index");
+        $tokenTypes = TokenType::getNamesAndValues();
+
+        $expectedTypesAsString = implode(', ', array_map(static function (TokenType $type) use ($tokenTypes) {
+            $typeAsString = $type->getValue();
+            if (in_array($typeAsString, [
+                TokenType::IDENTIFIER,
+                TokenType::EOX,
+                TokenType::NUMERIC_LITERAL,
+                TokenType::PAREN,
+                TokenType::STRING_LITERAL], true)) {
+                return array_search($typeAsString, $tokenTypes, true);
+            }
+            return $typeAsString;
+        }, $expectedTypes));
+
+        $tokenValue = $token->getType()->isEqualTo(TokenType::EOX()) ? 'End of Expression' : $token->getRawValue();
+
+        throw new UnexpectedTokenException("Unexpected token $tokenValue, expected one in [$expectedTypesAsString] at $index");
     }
 }

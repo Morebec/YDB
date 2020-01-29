@@ -65,5 +65,10 @@ class LexerTest extends TestCase
 
         $token = $lexer->lex("'Hello O\' World'")[0];
         $this->assertTrue($token->getType()->isEqualTo(TokenType::STRING_LITERAL()));
+
+        // Make sure it ends with EOX
+        $tokens = $lexer->lex("FIND ALL FROM");
+        $lastToken = $tokens[count($tokens) - 1];
+        $this->assertTrue($lastToken->getType()->isEqualTo(TokenType::EOX()));
     }
 }

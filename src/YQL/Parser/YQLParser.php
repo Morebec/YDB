@@ -35,7 +35,7 @@ class YQLParser
         $lexemes = $lexer->lex($query);
 
         $termParser = new TermParser();
-        $tokens = $termParser->lexTerms($lexemes);
+        $tokens = $termParser->parseTerms($lexemes);
 
         $parser = new static();
         $expressionNode = $parser->parseTokens($tokens);

@@ -116,7 +116,9 @@ class Server implements ServerInterface
         }
         $command = $this->factory->makeCommand($data->get('command'), $data);
         $result = $command->execute($this, $client, $this->store);
-        $client->write(json_encode($result, JSON_THROW_ON_ERROR, 512));
+        $response = json_encode($result, JSON_THROW_ON_ERROR, 512);
+        echo "[{$client->getRemoteAddress()}]: $response" . PHP_EOL;
+        $client->write($response);
     }
 
     /**
