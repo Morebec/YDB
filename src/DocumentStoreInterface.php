@@ -15,6 +15,7 @@ use Morebec\YDB\YQL\Query\QueryResult;
 interface DocumentStoreInterface
 {
     /**
+     * // TODO Throw exception if document with id already exists
      * Inserts a single document into this store
      * @param string $collectionName
      * @param Document $document

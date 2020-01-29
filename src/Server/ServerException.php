@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Morebec\YDB\Exception;
+namespace Morebec\YDB\Server;
 
 class ServerException extends \Exception
 {

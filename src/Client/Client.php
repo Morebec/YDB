@@ -4,18 +4,10 @@
 namespace Morebec\YDB\Client;
 
 use Morebec\Collections\HashMap;
-use Morebec\YDB\ClearCollectionCommand;
-use Morebec\YDB\Client\ClientException;
-use Morebec\YDB\DeleteDocumentCommand;
 use Morebec\YDB\Document;
-use Morebec\YDB\DropCollectionCommand;
-use Morebec\YDB\ExecuteQueryCommand;
-use Morebec\YDB\InsertDocumentCommand;
 use Morebec\YDB\Server\Command\CreateCollectionCommand;
+use Morebec\YDB\Server\Command\InsertOneDocumentCommand;
 use Morebec\YDB\Server\Command\ServerCommandInterface;
-use Morebec\YDB\UpdateDocumentsCommand;
-use Morebec\YDB\UpdateOneDocumentCommand;
-use Morebec\YDB\YDBInMemoryClientConfiguration;
 use Morebec\YDB\YQL\Query\ExpressionQuery;
 use Morebec\YDB\YQL\Query\QueryResult;
 use React\Socket\ConnectionInterface;
@@ -23,7 +15,7 @@ use React\Socket\ConnectionInterface;
 class Client implements ClientInterface
 {
     /**
-     * @var YDBInMemoryClientConfiguration
+     * @var ClientConfiguration
      */
     private $config;
 
@@ -44,9 +36,18 @@ class Client implements ClientInterface
     /**
      * @inheritDoc
      */
-    public function insertDocument(string $collectionName, Document $document): void
+    public function insertOneDocument(string $collectionName, Document $document): void
     {
-        $this->sendCommand(new InsertDocumentCommand($collectionName, $document));
+        $this->sendCommand(new InsertOneDocumentCommand($collectionName, $document));
+    }
+
+    /**
+     * @param string $collectionName
+     * @param Document[] $documents
+     */
+    public function insertDocuments(string $collectionName, array $documents): void
+    {
+        $this->sendCommand(new InsertDocumentsCommand($collectionName, $documents));
     }
 
     /**

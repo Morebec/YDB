@@ -3,6 +3,7 @@
 
 namespace Morebec\YDB\Exception;
 
+use Morebec\YDB\Server\ServerException;
 use Throwable;
 
 class UndefinedServerCommandException extends ServerException

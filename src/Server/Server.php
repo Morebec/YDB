@@ -6,7 +6,7 @@ namespace Morebec\YDB\Server;
 use Exception;
 use Morebec\Collections\HashMap;
 use Morebec\YDB\DocumentStoreInterface;
-use Morebec\YDB\Exception\ServerException;
+use Morebec\YDB\Server\ServerException;
 use Morebec\YDB\Exception\UndefinedServerCommandException;
 use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\Command\CommandFactory;
@@ -21,11 +21,6 @@ class Server implements ServerInterface
      * @var ServerConfiguration
      */
     private $config;
-
-    /**
-     * @var string|string[]|null
-     */
-    private $address;
 
     /**
      * @var InMemoryStore
@@ -92,8 +87,8 @@ class Server implements ServerInterface
     {
         echo "[{$client->getRemoteAddress()}]: $rawData" . PHP_EOL;
 
-        $data = json_decode($rawData, true, 512, JSON_THROW_ON_ERROR);
         try {
+            $data = json_decode($rawData, true, 512, JSON_THROW_ON_ERROR);
             $this->processData($client, new HashMap($data));
         } catch (\Exception $e) {
             $errorData = [
@@ -119,7 +114,8 @@ class Server implements ServerInterface
             throw new ServerException('Missing command name');
         }
         $command = $this->factory->makeCommand($data->get('command'), $data);
-        $command->execute($this, $client, $this->store);
+        $result = $command->execute($this, $client, $this->store);
+        $client->write(json_encode($result, JSON_THROW_ON_ERROR, 512));
     }
 
     /**
@@ -140,10 +136,19 @@ class Server implements ServerInterface
     }
 
     /**
+     * Returns the version of the server
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return sprintf('%s %s', $this->getServerName(), self::VERSION);
+    }
+
+    /**
      * @return string
      */
     private function getServerName(): string
     {
-        return 'Server YDB InMemoryServer';
+        return 'YDB Server';
     }
 }

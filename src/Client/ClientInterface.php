@@ -14,7 +14,7 @@ interface ClientInterface
      * @param string $collectionName
      * @param Document $document
      */
-    public function insertDocument(string $collectionName, Document $document): void;
+    public function insertOneDocument(string $collectionName, Document $document): void;
 
     /**
      * Updates a document in a collection

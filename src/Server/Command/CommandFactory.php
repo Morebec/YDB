@@ -42,6 +42,8 @@ class CommandFactory
     {
         $map = [];
         $map[CreateCollectionCommand::NAME] = Closure::fromCallable([CreateCollectionCommand::class, 'fromData']);
+        $map[InsertOneDocumentCommand::NAME] = Closure::fromCallable([InsertOneDocumentCommand::class, 'fromData']);
+        $map[ServerVersionCommand::NAME] = Closure::fromCallable([ServerVersionCommand::class, 'fromData']);
         return $map;
     }
 }

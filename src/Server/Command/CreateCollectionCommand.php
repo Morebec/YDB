@@ -4,7 +4,7 @@
 namespace Morebec\YDB\Server\Command;
 
 use Morebec\Collections\HashMap;
-use Morebec\YDB\Exception\ServerException;
+use Morebec\YDB\Server\ServerException;
 use Morebec\YDB\InMemory\InMemoryStore;
 use Morebec\YDB\Server\Server;
 use React\Socket\ConnectionInterface;
@@ -39,13 +39,13 @@ class CreateCollectionCommand implements ServerCommandInterface
     {
         $store->createCollection($this->collectionName);
 
-        $client->write('ok');
+        return new SuccessStatus();
     }
 
     /**
      * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
           'command' => self::NAME,

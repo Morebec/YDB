@@ -19,6 +19,7 @@ interface ServerCommandInterface
 
     /**
      * Executes this command
+     * // TODO remove client
      * @param Server $server
      * @param ConnectionInterface $client
      * @param InMemoryStore $store
@@ -28,7 +29,7 @@ interface ServerCommandInterface
 
     /**
      * Converts this command to an array
-     * @return mixed
+     * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 }
