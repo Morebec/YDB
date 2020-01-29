@@ -98,7 +98,9 @@ class Server implements ServerInterface
                     'message' => $e->getMessage()
                 ]
             ];
-            $client->write(json_encode($errorData, JSON_THROW_ON_ERROR, 512));
+            $response = json_encode($errorData, JSON_THROW_ON_ERROR, 512);
+            echo "[{$client->getRemoteAddress()}]: $response" . PHP_EOL;
+            $client->write($response);
         }
     }
 
